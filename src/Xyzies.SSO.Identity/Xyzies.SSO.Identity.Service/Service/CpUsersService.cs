@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Core;
@@ -19,9 +20,9 @@ namespace Xyzies.SSO.Identity.Services.Service
             _cpUserRepo = cpUserRepo;
         }
 
-        public async Task<LazyLoadedResult<CpUser>> GetAllCpUsers(string authorRole, string companyId, LazyLoadParameters lazyLoad = null)
+        public async Task<LazyLoadedResult<CpUser>> GetAllCpUsers(int authorId, string authorRole, string companyId, LazyLoadParameters lazyLoad = null)
         {
-            //if (authorRole == Consts.Roles.SuperAdmin)
+            if (authorRole == Consts.Roles.SuperAdmin)
             {
                 var users = (await _cpUserRepo.GetAsync()).GetPart(lazyLoad);
                 return users.Adapt<LazyLoadedResult<CpUser>>();
@@ -31,6 +32,12 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 var companyUsers = (await _cpUserRepo.GetAsync(x => x.CompanyId == int.Parse(companyId))).GetPart(lazyLoad);
                 return companyUsers.Adapt<LazyLoadedResult<CpUser>>();
+            }
+
+            if (authorRole == Consts.Roles.SalesRep && !string.IsNullOrEmpty(companyId))
+            {
+                var user = (await _cpUserRepo.GetAsync(x => x.CompanyId == int.Parse(companyId) && x.Id == authorId)).GetPart(lazyLoad);
+                return user.Adapt<LazyLoadedResult<CpUser>>();
             }
             return null;
         }

@@ -8,7 +8,7 @@ namespace Xyzies.SSO.Identity.Data.Core
 {
     public static class GetPartExtensions
     {
-        public static LazyLoadedResult<T> GetPart<T>(this IQueryable<T> query, LazyLoadParameters parameters)
+        public static LazyLoadedResult<T> GetPart<T>(this IQueryable<T> query, LazyLoadParameters parameters = null)
             where T : class
         {
             if (parameters == null)
@@ -19,7 +19,8 @@ namespace Xyzies.SSO.Identity.Data.Core
                     Total = query.Count()
                 };
             }
-            var result = query.Skip(parameters.Offset).Take(parameters.Limit);
+            var result = query.Skip(parameters.Offset.HasValue ? parameters.Offset.Value : 0)
+                              .Take(parameters.Limit.HasValue ? parameters.Limit.Value : query.Count());
             return new LazyLoadedResult<T>
             {
                 Result = result,
