@@ -10,6 +10,7 @@ using Xyzies.SSO.Identity.API.Filters;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -33,6 +34,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         //[AccessFilter(Consts.Scopes.Full)]
+        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(IEnumerable<Profile>))]
         public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter)
         {
             var users = await _userService.GetAllUsersAsync(filter);
@@ -48,6 +50,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
         [HttpGet("{id}", Name = "User")]
+        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(Profile))]
         public async Task<IActionResult> Get(string id)
         {
             try
@@ -68,6 +71,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="200">If user fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
+        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(Profile))]
         [HttpGet("profile")]
         public async Task<IActionResult> Get()
         {
@@ -120,6 +124,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <returns>URL to newly created user</returns>
         /// <response code="201">If user fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
+        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(Profile))]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] [Required] ProfileCreatable userCreatable)
         {

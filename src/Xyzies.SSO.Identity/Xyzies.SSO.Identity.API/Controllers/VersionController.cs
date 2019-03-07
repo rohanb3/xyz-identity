@@ -25,7 +25,7 @@ namespace Xyzies.TWC.DisputeService.API.Controllers
             return await Task.FromResult(Ok(new
             {
                 ServiceName = "XYZies.SSO.IdentityService",
-                ServiceVersion = "1.0",
+                ServiceVersion = "1.1",
                 ApiVersion = "1.0",
                 BuildNumber = "none",
                 ReleaseDate = DateTime.Now.ToShortDateString(),
