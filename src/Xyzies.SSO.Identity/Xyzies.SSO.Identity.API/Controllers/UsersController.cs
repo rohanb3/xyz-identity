@@ -9,7 +9,6 @@ using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.API.Filters;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -32,7 +31,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="200">If users fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
-        //[AccessFilter(Consts.Scopes.Full)]
+        [AccessFilter(Consts.Scopes.Full)]
         public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter)
         {
             var users = await _userService.GetAllUsersAsync(filter);
@@ -58,32 +57,6 @@ namespace Xyzies.SSO.Identity.API.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Get user by his objectId from token
-        /// </summary>
-        /// <returns>User with passed identifier, or not found response</returns>
-        /// <response code="200">If user fetched successfully</response>
-        /// <response code="401">If authorization token is invalid</response>
-        /// <response code="404">If user was not found</response>
-        [HttpGet("profile")]
-        public async Task<IActionResult> Get()
-        {
-            try
-            {
-                var oid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == Consts.UserIdPropertyName).Value ?? throw new ArgumentException("Token is not valid");
-                var user = await _userService.GetUserByIdAsync(oid);
-                return Ok(user);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch(ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
             }
         }
 
