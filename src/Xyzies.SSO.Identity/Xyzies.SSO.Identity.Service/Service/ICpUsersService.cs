@@ -9,7 +9,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 {
     public interface ICpUsersService
     {
-        Task<LazyLoadedResult<CpUser>> GetAllCpUsers(int authorId, string authorRole, string companyId, LazyLoadParameters lazyLoad = null);
+        Task<LazyLoadedResult<CpUser>> GetAllCpUsers(string authorId, string authorRole, string companyId, SearchParameters lazyLoad = null);
         Task<CpUser> GetUserById(int id, int authorId, string authorRole, string companyId);
     }
 }
