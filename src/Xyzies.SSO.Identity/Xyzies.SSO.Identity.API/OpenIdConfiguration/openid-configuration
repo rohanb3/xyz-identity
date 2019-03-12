@@ -1,6 +1,6 @@
 {
   "issuer": "https://api.identity.ardas.biz",
-  "jwks_uri": "https://api.identity.ardas.biz/.well-known/openid-configuration/jwks",
+  "jwks_uri": "https://api.identity.ardas.biz/api/account/.well-known/openid-configuration/jwks",
   "authorization_endpoint": "https://api.identity.ardas.biz/api/account/authorize",
   "token_endpoint": "https://api.identity.ardas.biz/api/account/token",
   "userinfo_endpoint": "https://api.identity.ardas.biz/api/account/info",
