@@ -1,0 +1,44 @@
+{
+  "issuer": "https://api.identity.ardas.biz",
+  "jwks_uri": "https://api.identity.ardas.biz/.well-known/openid-configuration/jwks",
+  "authorization_endpoint": "https://api.identity.ardas.biz/api/account/authorize",
+  "token_endpoint": "https://api.identity.ardas.biz/api/account/token",
+  "userinfo_endpoint": "https://api.identity.ardas.biz/api/account/info",
+  "end_session_endpoint": "https://api.identity.ardas.biz/api/account/logout",
+  "frontchannel_logout_supported": true,
+  "frontchannel_logout_session_supported": true,
+  "backchannel_logout_supported": true,
+  "backchannel_logout_session_supported": true,
+  "scopes_supported": [
+    "openid",
+    "profile",
+    "email",
+    "api"
+  ],
+  "claims_supported": [
+    "sub",
+    "name",
+    "group",
+    "profile",
+    "email"
+  ],
+  "grant_types_supported": [
+    "authorization_code",
+    "client_credentials",
+    "refresh_token"
+  ],
+  "response_types_supported": [
+    "token"
+  ],
+  "response_modes_supported": [
+    "form_post",
+    "query"
+  ],
+  "token_endpoint_auth_methods_supported": [
+    "client_secret_basic",
+    "client_secret_post"
+  ],
+  "subject_types_supported": [ "public" ],
+  "id_token_signing_alg_values_supported": [ "RS256" ],
+  "code_challenge_methods_supported": [ "plain", "S256" ]
+}
