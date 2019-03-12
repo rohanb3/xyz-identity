@@ -46,11 +46,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
             return new PhysicalFileResult(path, "application/json");
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("authorize")]
-        public IActionResult Login(string email, string password)
+        public IActionResult Login([FromQuery]AuthorizeModel authorizeModel)
         {
-        http://localhost:8081/api/account/.well-known/openid-configuration
+        //http://localhost:8081/api/account/.well-known/openid-configuration
             return Redirect("https://google.com");
         }
 
