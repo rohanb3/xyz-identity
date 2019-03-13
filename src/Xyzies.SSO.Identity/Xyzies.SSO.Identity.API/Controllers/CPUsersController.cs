@@ -25,7 +25,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         public async Task<IActionResult> GetAllUsers([FromQuery]SearchParameters parameters = null)
         {
             var role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
-            var companyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdPropertyName)?.Value;
+            var companyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value;
             var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value;
 
             var users = await _users.GetAllCpUsers(userId, role, companyId, parameters);
