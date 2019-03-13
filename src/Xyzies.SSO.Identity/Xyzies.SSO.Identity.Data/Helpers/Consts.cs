@@ -10,6 +10,8 @@
         public const string RetailerIdPropertyName = _extensionPropertyTemplate + "RetailerId";
         public const string CompanyIdPropertyName = _extensionPropertyTemplate + "CompanyId";
         public const string ManagerIdPropertyName = _extensionPropertyTemplate + "ManagerId";
+        public const string PhonePropertyName = _extensionPropertyTemplate + "Phone";
+
         public static string UserIdPropertyName = "http://schemas.microsoft.com/identity/claims/objectidentifier";
 
         public class GraphApi

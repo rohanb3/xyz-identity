@@ -22,6 +22,7 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
 
         public string Email { get; set; }
 
+        [JsonProperty(Consts.PhonePropertyName)]
         public string Phone { get; set; }
 
         public string Status { get; set; }
