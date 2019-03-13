@@ -1,4 +1,10 @@
 ﻿using System.IO;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using IdentityServer4.Events;
+using IdentityServer4.Models;
+using IdentityServer4.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Xyzies.SSO.Identity.Services.Models.User;
@@ -10,10 +16,14 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IHostingEnvironment _appEnvironment;
+        private readonly IEventService _events;
+        private readonly IIdentityServerInteractionService _interaction;
 
-        public AccountController(IHostingEnvironment appEnvironment)
+        public AccountController(IHostingEnvironment appEnvironment, IIdentityServerInteractionService interaction, IEventService events)
         {
             _appEnvironment = appEnvironment;
+            _interaction = interaction;
+            _events = events;
         }
 
         [HttpGet]
@@ -48,10 +58,14 @@ namespace Xyzies.SSO.Identity.API.Controllers
 
         [HttpGet]
         [Route("authorize")]
-        public IActionResult Login([FromQuery]AuthorizeModel authorizeModel)
+        public async Task<IActionResult> Login([FromQuery]AuthorizeModel authorizeModel)
         {
-        //http://localhost:8081/api/account/.well-known/openid-configuration
-            return Redirect("https://ardasdev.b2clogin.com/ardasdev.onmicrosoft.com/oauth2/authresp");
+            var result = await HttpContext.AuthenticateAsync(IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            var id_token = result.Properties?.GetTokenValue("id_token");
+            await _events.RaiseAsync(new UserLoginSuccessEvent("SuperAdmin", "1", "Super"));
+            AuthenticationProperties props = null;
+            await HttpContext.SignInAsync("1", "Super", props);
+            return Redirect(authorizeModel.redirect_uri + "&id_token=" + id_token);
         }
 
         [HttpPost]
