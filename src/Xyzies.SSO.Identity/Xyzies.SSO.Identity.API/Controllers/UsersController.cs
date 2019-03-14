@@ -11,12 +11,13 @@ using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Xyzies.SSO.Identity.Services.Exceptions;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -27,40 +28,66 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Returns collection of users from Active Directory
+        /// Returns collection of users
         /// </summary>
         /// <returns>Collection of users</returns>
         /// <response code="200">If users fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
-        //[AccessFilter(Consts.Scopes.Full)]
-        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(IEnumerable<Profile>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
         public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter)
         {
-            var users = await _userService.GetAllUsersAsync(filter);
-            return Ok(users);
+            try
+            {
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                };
+                var users = await _userService.GetAllUsersAsync(currentUser, filter);
+                return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
-        /// Get user by his objectId or userPrincipalName
+        /// Get user by his id, objectId or userPrincipalName
         /// </summary>
-        /// <param name="id">Azure AD B2C user uniq identifier. Can be objectId of userPrincipalName</param>
+        /// <param name="id">Azure AD B2C user uniq identifier or integer. Can be objectId of userPrincipalName</param>
         /// <returns>User with passed identifier, or not found response</returns>
         /// <response code="200">If user fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
         [HttpGet("{id}", Name = "User")]
-        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(Profile))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
         public async Task<IActionResult> Get(string id)
         {
             try
             {
-                var user = await _userService.GetUserByIdAsync(id);
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                };
+                var user = await _userService.GetUserByIdAsync(id, currentUser);
                 return Ok(user);
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
             }
         }
 
@@ -71,23 +98,32 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="200">If user fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
-        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(Profile))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
         [HttpGet("profile")]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var oid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == Consts.UserIdPropertyName).Value ?? throw new ArgumentException("Token is not valid");
-                var user = await _userService.GetUserByIdAsync(oid);
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                };
+                var user = await _userService.GetUserByIdAsync(currentUser.Id, currentUser);
                 return Ok(user);
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
-            catch(ArgumentException ex)
+            catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
             }
         }
 
@@ -113,7 +149,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (AccessViolationException)
             {
-                return Forbid();
+                return new ContentResult { StatusCode = 403 };
             }
         }
 
@@ -124,7 +160,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <returns>URL to newly created user</returns>
         /// <response code="201">If user fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
-        [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(Profile))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] [Required] ProfileCreatable userCreatable)
         {

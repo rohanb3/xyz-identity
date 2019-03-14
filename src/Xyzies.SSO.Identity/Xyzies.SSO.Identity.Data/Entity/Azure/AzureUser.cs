@@ -30,7 +30,11 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         [JsonProperty(Consts.RolePropertyName)]
         public string Role { get; set; }
 
+        [JsonProperty(Consts.AvatarUrlPropertyName)]
         public string AvatarUrl { get; set; }
+
+        [JsonProperty(Consts.BranchIdPropertyName)]
+        public string BranchId { get; set; }
 
         public string City { get; set; }
 

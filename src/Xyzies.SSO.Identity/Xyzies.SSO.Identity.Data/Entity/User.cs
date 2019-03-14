@@ -31,7 +31,6 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public string Role { get; set; }
 
-        [NotMapped]
         public int? RoleId => string.IsNullOrEmpty(Role) ? null : new int?(int.Parse(Role));
 
         public DateTime? CreatedDate { get; set; }

@@ -5,10 +5,13 @@
         private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";
         public const string RoleClaimType = "extension_Group";
         public const string CompanyIdClaimType = "extension_CompanyId";
+        public const string BranchIdClaimType = "extension_BranchId";
 
         public const string RolePropertyName = _extensionPropertyTemplate + "Group";
         public const string RetailerIdPropertyName = _extensionPropertyTemplate + "RetailerId";
         public const string CompanyIdPropertyName = _extensionPropertyTemplate + "CompanyId";
+        public const string BranchIdPropertyName = _extensionPropertyTemplate + "BranchId";
+        public const string AvatarUrlPropertyName = _extensionPropertyTemplate + "AvatarUrl";
         public const string ManagerIdPropertyName = _extensionPropertyTemplate + "ManagerId";
         public const string PhonePropertyName = _extensionPropertyTemplate + "Phone";
 
