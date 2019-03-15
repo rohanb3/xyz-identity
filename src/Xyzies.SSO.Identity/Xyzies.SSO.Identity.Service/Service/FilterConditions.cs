@@ -105,27 +105,32 @@ namespace Xyzies.SSO.Identity.Services.Service
                 filtersByFields.Add(Equal(Consts.RolePropertyName, filters.Role));
             }
 
-            if (filters.CompanyIds != null && filters.CompanyIds.Length != 0)
+            if (!string.IsNullOrEmpty(filters.CompanyId))
             {
-                List<string> companyIdsFilter = new List<string>();
-                foreach (var companyId in filters.CompanyIds)
-                {
-                    companyIdsFilter.Add(Equal(Consts.CompanyIdPropertyName, companyId.ToString()));
-                }
-
-                filtersByFields.Add(GenerateOrSequence(companyIdsFilter));
+                filtersByFields.Add(Equal(Consts.CompanyIdPropertyName, filters.CompanyId));
             }
 
-            if (filters.ManagerIds != null && filters.ManagerIds.Length != 0)
-            {
-                List<string> managerIdsFilter = new List<string>();
-                foreach (var managerId in filters.ManagerIds)
-                {
-                    managerIdsFilter.Add(Equal(Consts.ManagerIdPropertyName, managerId.ToString()));
-                }
+            //if (filters.CompanyIds != null && filters.CompanyIds.Length != 0)
+            //{
+            //    List<string> companyIdsFilter = new List<string>();
+            //    foreach (var companyId in filters.CompanyIds)
+            //    {
+            //        companyIdsFilter.Add(Equal(Consts.CompanyIdPropertyName, companyId.ToString()));
+            //    }
 
-                filtersByFields.Add(GenerateOrSequence(managerIdsFilter));
-            }
+            //    filtersByFields.Add(GenerateOrSequence(companyIdsFilter));
+            //}
+
+            //if (filters.ManagerIds != null && filters.ManagerIds.Length != 0)
+            //{
+            //    List<string> managerIdsFilter = new List<string>();
+            //    foreach (var managerId in filters.ManagerIds)
+            //    {
+            //        managerIdsFilter.Add(Equal(Consts.ManagerIdPropertyName, managerId.ToString()));
+            //    }
+
+            //    filtersByFields.Add(GenerateOrSequence(managerIdsFilter));
+            //}
 
             return filtersByFields.Count != 0 ? $"$filter={GenerateAndSequence(filtersByFields)}" : "";
         }

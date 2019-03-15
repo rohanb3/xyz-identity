@@ -108,7 +108,6 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IAzureAdClient, AzureAdClient>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICpUsersService, CpUsersService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
             #endregion
 
