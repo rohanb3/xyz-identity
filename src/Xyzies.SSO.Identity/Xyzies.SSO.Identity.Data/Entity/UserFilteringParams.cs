@@ -21,5 +21,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
         public string City { get; set; }
 
         public string State { get; set; }
+
+        public string UserName { get; set; }
     }
 }
