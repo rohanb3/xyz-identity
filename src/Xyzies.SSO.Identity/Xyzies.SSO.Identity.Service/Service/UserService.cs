@@ -218,10 +218,10 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task SetCpUsersRoles(IQueryable<User> users)
         {
-            var roles = await _roleRepo.GetAsync();
+            var roles = (await _roleRepo.GetAsync()).ToList();
             foreach (var user in users)
             {
-                user.Role = roles.FirstOrDefault(r => r.RoleId == int.Parse(user.Role)).RoleName;
+                user.Role = roles.FirstOrDefault(r => r.RoleId == user.RoleId)?.RoleName;
             }
         }
 
@@ -247,6 +247,29 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (parameters.CompanyId != null)
             {
                 filters += (User user) => user.CompanyId == int.Parse(parameters.CompanyId);
+            }
+
+            if (parameters.UserName != null)
+            {
+                filters += (User user) =>
+                {
+                    if(string.IsNullOrEmpty(user.Name) && string.IsNullOrEmpty(user.LastName))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrEmpty(user.Name) && string.IsNullOrEmpty(user.LastName))
+                    {
+                        return user.Name.ToLower().Contains(parameters.UserName.ToLower());
+                    }
+
+                    if (string.IsNullOrEmpty(user.Name) && !string.IsNullOrEmpty(user.LastName))
+                    {
+                        return user.LastName.ToLower().Contains(parameters.UserName.ToLower());
+                    }
+
+                    return user.LastName.ToLower().Contains(parameters.UserName.ToLower()) || user.Name.ToLower().Contains(parameters.UserName.ToLower());
+                };
             }
 
             if (filters != null)
