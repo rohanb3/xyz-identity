@@ -45,8 +45,8 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
-                //var users = await _userService.GetAllUsersAsync(currentUser, filter);
-                return Ok($"currentUser role - {currentUser.Role} const - {Consts.Roles.SuperAdmin}");
+                var users = await _userService.GetAllUsersAsync(currentUser, filter);
+                return Ok(users);
             }
             catch (ArgumentException ex)
             {
