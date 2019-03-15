@@ -17,7 +17,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -46,7 +46,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter);
-                return Ok(users);
+                return Ok($"currentUser role - {currentUser.Role} const - {Consts.Roles.SuperAdmin}");
             }
             catch (ArgumentException ex)
             {
