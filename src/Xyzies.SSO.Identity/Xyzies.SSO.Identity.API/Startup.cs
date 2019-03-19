@@ -24,6 +24,8 @@ using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Middleware;
 using Xyzies.SSO.Identity.Services.Service.Roles;
 using Xyzies.SSO.Identity.Services.Service.Permission;
+using Xyzies.SSO.Identity.UserMigration;
+
 namespace Xyzies.SSO.Identity.API
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -109,6 +111,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IAzureAdClient, AzureAdClient>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
+            services.AddUserMigrationService();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));

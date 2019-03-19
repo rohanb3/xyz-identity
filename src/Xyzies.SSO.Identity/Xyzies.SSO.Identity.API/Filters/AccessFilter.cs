@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Xyzies.SSO.Identity.Services.Service.Permission;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Xyzies.SSO.Identity.Data.Helpers;
-using System.Net;
 
 namespace Xyzies.SSO.Identity.API.Filters
 {

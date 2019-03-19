@@ -23,6 +23,11 @@
             public const string ApiVersionParameter = "api-version";
             public const string ApiVersion = "1.6";
             public const string UserEntity = "users";
+
+            public class Errors
+            {
+                public const string UserAlreadyExist = "Another object with the same value for property signInNames already exists.";
+            }
         }
         public class Roles
         {
@@ -42,5 +47,11 @@
             public const string Read = "xyzies.sso.identity.read";
         }
 
+        public class PasswordPolicy
+        {
+            public const string DisablePasswordExpirationAndStrong = "DisablePasswordExpiration, DisableStrongPassword";
+            public const string DisablePasswordExpiration = "DisablePasswordExpiration";
+            public const string DisablePasswordString = "DisableStrongPassword";
+        }
     }
 }

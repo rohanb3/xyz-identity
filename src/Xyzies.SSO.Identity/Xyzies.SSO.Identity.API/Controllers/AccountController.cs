@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Xyzies.SSO.Identity.Services.Models.User;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {

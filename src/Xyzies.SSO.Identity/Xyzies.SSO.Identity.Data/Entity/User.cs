@@ -31,7 +31,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public string Role { get; set; }
 
-        public int? RoleId => string.IsNullOrEmpty(Role) ? null : new int?(int.Parse(Role));
+        public int? RoleId => !int.TryParse(Role, out int roleId) ? null : new int?(roleId);
 
         public DateTime? CreatedDate { get; set; }
 
