@@ -30,6 +30,8 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         public string AvatarUrl { get; set; }
 
+        public int BranchId { get; set; }
+
         public bool? AccountEnabled { get; set; }
 
         [StringLength(32)]
