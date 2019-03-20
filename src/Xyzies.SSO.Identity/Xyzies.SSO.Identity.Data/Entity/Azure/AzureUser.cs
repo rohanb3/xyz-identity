@@ -34,7 +34,7 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         public string AvatarUrl { get; set; }
 
         [JsonProperty(Consts.BranchIdPropertyName)]
-        public string BranchId { get; set; }
+        public int? BranchId { get; set; }
 
         public string City { get; set; }
 
