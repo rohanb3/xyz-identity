@@ -108,6 +108,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IAzureAdClient, AzureAdClient>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
