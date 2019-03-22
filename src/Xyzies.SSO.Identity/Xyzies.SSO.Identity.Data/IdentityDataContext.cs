@@ -24,8 +24,6 @@ namespace Xyzies.SSO.Identity.Data
 
         public DbSet<PermissionToPolicy> PermissionToPolicy { get; set; }
 
-        public DbSet<User> Users { get; set; }
-
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)

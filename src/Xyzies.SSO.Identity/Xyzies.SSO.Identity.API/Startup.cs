@@ -99,7 +99,7 @@ namespace Xyzies.SSO.Identity.API
                         .AllowCredentials()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            services.AddMemoryCache();
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -108,7 +108,6 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IAzureAdClient, AzureAdClient>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICpUsersRepository, CpUsersRepository>();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
@@ -147,6 +146,12 @@ namespace Xyzies.SSO.Identity.API
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
                 //context.Database.Migrate();
+            }
+
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
+                userService.SetUsersCache();
             }
 
             app.UseAuthentication()

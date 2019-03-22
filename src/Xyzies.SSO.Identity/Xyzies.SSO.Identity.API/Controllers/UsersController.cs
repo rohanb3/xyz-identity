@@ -35,7 +35,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter)
+        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter, [FromQuery]UserSortingParameters sorting)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
-                var users = await _userService.GetAllUsersAsync(currentUser, filter);
+                var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
                 return Ok(users);
             }
             catch (ArgumentException ex)

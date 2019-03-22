@@ -7,7 +7,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
     public interface IAzureAdClient
     {
         Task<AzureUser> GetUserById(string id);
-        Task<IEnumerable<AzureUser>> GetUsers(string filter = null);
+        Task<AzureUsersResponse> GetUsers(string filter = "", int userCount = 100, bool takeFromDirectoryObjects = false);
         Task PostUser(AzureUser user);
         Task PatchUser(string id, AzureUser user);
         Task DeleteUser(string id);

@@ -8,10 +8,11 @@ namespace Xyzies.SSO.Identity.Services.Service
 {
     public interface IUserService
     {
-        Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null);
+        Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null);
         Task<Profile> GetUserByIdAsync(string id, UserIdentityParams user);
         Task UpdateUserByIdAsync(string id, BaseProfile model);
         Task<Profile> CreateUserAsync(ProfileCreatable model);
         Task DeleteUserByIdAsync(string id);
+        Task SetUsersCache();
     }
 }

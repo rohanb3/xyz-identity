@@ -58,13 +58,17 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             return value.ToObject<AzureUser>();
         }
 
-        public async Task<IEnumerable<AzureUser>> GetUsers(string filter = null)
+        public async Task<AzureUsersResponse> GetUsers(string filter = "", int userCount = 100, bool takeFromDirectoryObjects = false)
         {
-            var response = await SendRequest(HttpMethod.Get, Consts.GraphApi.UserEntity, query: filter);
+            string entity = Consts.GraphApi.UserEntity;
+            if (takeFromDirectoryObjects)
+            {
+                entity = Consts.GraphApi.ObjectUserEntity;
+            }
+            var response = await SendRequest(HttpMethod.Get, entity, query: $"{filter}&$top={userCount}");
             var responseString = await response?.Content?.ReadAsStringAsync();
-            var value = (JsonConvert.DeserializeObject(responseString) as JToken)["value"];
-
-            return value.ToObject<List<AzureUser>>();
+            var responseObject = JsonConvert.DeserializeObject<AzureUsersResponse>(responseString);
+            return responseObject;
         }
 
         public async Task PatchUser(string id, AzureUser user)
