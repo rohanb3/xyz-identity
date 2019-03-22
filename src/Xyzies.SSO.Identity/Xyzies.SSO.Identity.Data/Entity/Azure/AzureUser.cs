@@ -38,6 +38,8 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
 
         public string City { get; set; }
 
+        public string State { get; set; }
+
         [JsonProperty(Consts.CompanyIdPropertyName)]
         public string CompanyId { get; set; }
 

@@ -16,7 +16,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <returns></returns>
         public static string And(string left, string right)
         {
-            if(string.IsNullOrEmpty(left))
+            if (string.IsNullOrEmpty(left))
             {
                 throw new ArgumentNullException(nameof(left));
             }
@@ -72,6 +72,27 @@ namespace Xyzies.SSO.Identity.Services.Service
         }
 
         /// <summary>
+        /// Creates a "containse" filter condition with passed params
+        /// </summary>
+        /// <param name="first">Condition's left operand</param>
+        /// <param name="second">Condition's right operand</param>
+        /// <returns></returns>
+        public static string Contains(string propertyName, string propertyValue)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (string.IsNullOrEmpty(propertyValue))
+            {
+                throw new ArgumentNullException(nameof(propertyValue));
+            }
+
+            return $"contains({propertyName},'{propertyValue}')";
+        }
+
+        /// <summary>
         /// Creates a filter string with "or" conditions between each successive pair of parameters from the incoming sequence
         /// </summary>
         /// <param name="conditions">Not empty sequence of conditions</param>
@@ -108,6 +129,21 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (!string.IsNullOrEmpty(filters.CompanyId))
             {
                 filtersByFields.Add(Equal(Consts.CompanyIdPropertyName, filters.CompanyId));
+            }
+
+            if (!string.IsNullOrEmpty(filters.City))
+            {
+                filtersByFields.Add(Equal(Consts.CityPropertyName, filters.City));
+            }
+
+            if (!string.IsNullOrEmpty(filters.State))
+            {
+                filtersByFields.Add(Equal(Consts.StatePropertyName, filters.State));
+            }
+
+            if (!string.IsNullOrEmpty(filters.UserName))
+            {
+                filtersByFields.Add(Contains(Consts.UserNamePropertyName, filters.UserName));
             }
 
             //if (filters.CompanyIds != null && filters.CompanyIds.Length != 0)

@@ -14,9 +14,13 @@ namespace Xyzies.SSO.Identity.Data.Entity
         /// </summary>
         public string Role { get; set; }
 
-        public bool? IsCablePortal { get; set; }
+        public List<string> UsersId { get; set; }
 
         public string CompanyId { get; set; }
+
+        public List<string> CompaniesId { get; set; }
+
+        public List<int> BranchesId { get; set; }
 
         public string City { get; set; }
 
