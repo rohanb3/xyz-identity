@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-identity-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-identity-api
+  template:
+    metadata:
+      labels:
+        app: dev-identity-api
+    spec:
+      containers:
+      - name: dev-identity-api
+        image: xyzies.azurecr.io/xyz-be-identity-dev:0.0.0.0
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        ports:
+        - containerPort: 8081
+          name: dotnet-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-identity-api
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 8081
+    targetPort: 8081
+  selector:
+    app: dev-identity-api
+  clusterIP: 172.18.3.81
