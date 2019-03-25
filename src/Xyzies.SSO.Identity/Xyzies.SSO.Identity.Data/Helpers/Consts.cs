@@ -46,6 +46,7 @@
 
         public class Scopes
         {
+            public const string AzureAccessScope = "https://ardasdev.onmicrosoft.com/api/user_impersonation";
             public const string Full = "xyzies.sso.identity.full";
             public const string Edit = "xyzies.sso.identity.edit";
             public const string Read = "xyzies.sso.identity.read";
@@ -60,6 +61,11 @@
             public const string City = "city";
             public const string Descending = "desc";
             public const string Ascending = "asc";
+        }
+        public class GrantTypes
+        {
+            public const string Password = "password";
+            public const string RefreshToken = "refresh_token";
         }
     }
 }
