@@ -29,36 +29,6 @@ namespace Xyzies.SSO.Identity.Services.Service
             _options = authServiceOptionsMonitor.CurrentValue ?? throw new ArgumentNullException(nameof(authServiceOptionsMonitor));
         }
 
-        private List<KeyValuePair<string, string>> BaseOptions
-        {
-            get => new List<KeyValuePair<string, string>> {
-                 new KeyValuePair<string, string>("scope", $"openid offline_access {Scopes.AzureAccessScope}"),
-                 new KeyValuePair<string, string>("response_type", "id_token"),
-                 new KeyValuePair<string, string>("client_id", _options.ClientId)
-            };
-        }
-
-        private List<KeyValuePair<string, string>> GetKeyValuePairOptions(UserAuthorizeOptions options)
-        {
-            var result = BaseOptions;
-
-            result.Add(new KeyValuePair<string, string>("password", options.Password));
-            result.Add(new KeyValuePair<string, string>("username", options.Username));
-            result.Add(new KeyValuePair<string, string>("grant_type", GrantTypes.Password));
-
-            return result;
-        }
-
-        private List<KeyValuePair<string, string>> GetKeyValuePairOptions(UserRefreshOptions options)
-        {
-            var result = BaseOptions;
-
-            result.Add(new KeyValuePair<string, string>("grant_type", GrantTypes.RefreshToken));
-            result.Add(new KeyValuePair<string, string>("refresh_token", options.refresh_token));
-
-            return result;
-        }
-
         private async Task<TokenResponse> RequestAzureEndpoint(FormUrlEncodedContent content)
         {
             using (HttpClient httpClient = new HttpClient())
@@ -97,5 +67,37 @@ namespace Xyzies.SSO.Identity.Services.Service
         {
             return await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
         }
+
+
+        private List<KeyValuePair<string, string>> BaseOptions
+        {
+            get => new List<KeyValuePair<string, string>> {
+                 new KeyValuePair<string, string>("scope", $"openid offline_access {Scopes.AzureAccessScope}"),
+                 new KeyValuePair<string, string>("response_type", "id_token"),
+                 new KeyValuePair<string, string>("client_id", _options.ClientId)
+            };
+        }
+
+        private List<KeyValuePair<string, string>> GetKeyValuePairOptions(UserAuthorizeOptions options)
+        {
+            var result = BaseOptions;
+
+            result.Add(new KeyValuePair<string, string>("password", options.Password));
+            result.Add(new KeyValuePair<string, string>("username", options.Username));
+            result.Add(new KeyValuePair<string, string>("grant_type", GrantTypes.Password));
+
+            return result;
+        }
+
+        private List<KeyValuePair<string, string>> GetKeyValuePairOptions(UserRefreshOptions options)
+        {
+            var result = BaseOptions;
+
+            result.Add(new KeyValuePair<string, string>("grant_type", GrantTypes.RefreshToken));
+            result.Add(new KeyValuePair<string, string>("refresh_token", options.refresh_token));
+
+            return result;
+        }
+
     }
 }
