@@ -17,11 +17,11 @@ spec:
         image: xyzies.azurecr.io/xyz-be-identity-dev:0.0.0.0
         resources:
           requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
             cpu: 200m
-            memory: 256Mi
+            memory: 1024Mi
+          limits:
+            cpu: 400m
+            memory: 1024Mi
         ports:
         - containerPort: 8081
           name: dotnet-app
