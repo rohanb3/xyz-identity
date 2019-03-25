@@ -46,19 +46,6 @@ namespace Xyzies.SSO.Identity.API
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
 
-            //services.AddIdentityServer(c =>
-            //{
-
-            //});
-
-            // For Azure Custom Identity Provider
-            //services.AddAuthentication()
-            //    .AddOpenIdConnect("aad_b2c", "SSO", options =>
-            //    {
-
-            //    });
-
-            // TODO: DB connection string
             string dbConnectionString = Configuration.GetConnectionString("db");
             if (string.IsNullOrEmpty(dbConnectionString))
             {
