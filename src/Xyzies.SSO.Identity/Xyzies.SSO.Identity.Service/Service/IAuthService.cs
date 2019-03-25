@@ -9,6 +9,6 @@ namespace Xyzies.SSO.Identity.Services.Service
     public interface IAuthService
     {
         Task<TokenResponse> AuthorizeAsync(UserAuthorizeOptions options);
-        Task<TokenResponse> RefreshAsync(string refresh_token);
+        Task<TokenResponse> RefreshAsync(UserRefreshOptions refresh_token);
     }
 }

@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Models.User;
-using static Xyzies.SSO.Identity.Data.Helpers.Consts;
+using Xyzies.SSO.Identity.Services.Exceptions;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/authorize")]
     [ApiController]
     public class AuthorizeController : ControllerBase
     {
@@ -22,15 +22,15 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <summary>
         /// Authorizes user with passed credentials
         /// </summary>
-        /// <param name="grant_type">Grant type for authorization, supported types are 'password' and 'refresh_token'</param>
         /// <param name="username">User name</param>
         /// <param name="password">User password</param>
         /// <param name="scope">scope what user will use to work with. Example - xyzies.authorization.reviews.admin</param>
-        /// <param name="refresh_token">Refresh token</param>
-        /// <returns></returns>
+        /// <returns>Access token with additional info</returns>
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        public async Task<IActionResult> Token(string grant_type, UserAuthorizeOptions credentials)
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ContentResult))]
+        public async Task<IActionResult> Token(UserAuthorizeOptions credentials)
         {
             try
             {
@@ -41,9 +41,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch(AccessViolationException ex)
+            catch (AccessException ex)
             {
-                return Forbid(ex.Message);
+                return new ContentResult { StatusCode = 403, Content = ex.Message, ContentType = "application/json" };
             }
         }
 
@@ -51,12 +51,22 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// Return refreshed access_token
         /// </summary>
         /// <param name="refresh_token">Refresh token</param>
-        /// <returns></returns>
+        /// <returns>Refreshed access_token</returns>
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        public async Task<IActionResult> Refresh(string refresh_token)
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ContentResult))]
+        public async Task<IActionResult> Refresh(UserRefreshOptions refresh)
         {
-            var refreshResult = await _authorizationService.RefreshAsync(refresh_token);
-            return Ok(refreshResult);
+            try
+            {
+                var refreshResult = await _authorizationService.RefreshAsync(refresh);
+                return Ok(refreshResult);
+            }
+            catch (AccessException ex)
+            {
+                return new ContentResult { StatusCode = 403, Content = ex.Message, ContentType = "application/json" };
+            }
         }
+    }
 }
