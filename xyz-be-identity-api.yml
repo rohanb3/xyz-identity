@@ -17,10 +17,10 @@ spec:
         image: xyzies.azurecr.io/xyz-be-identity-dev:0.0.0.0
         resources:
           requests:
-            cpu: 200m
-            memory: 1024Mi
+            cpu: 250m
+            memory: 512Mi
           limits:
-            cpu: 400m
+            cpu: 500m
             memory: 1024Mi
         ports:
         - containerPort: 8081
