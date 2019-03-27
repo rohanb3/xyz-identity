@@ -2,9 +2,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
+using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.UserMigration.Models;
 
 namespace Xyzies.SSO.Identity.UserMigration.Services
@@ -36,6 +38,30 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 {
                     user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName;
                     await _azureClient.PostUser(user.Adapt<AzureUser>());
+                }
+            }
+            catch (ApplicationException)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpdateBranchId(UserFilteringParams options)
+        {
+            try
+            {
+                var users = await _azureClient.GetUsers(FilterConditions.GetUserFilterString(options));
+
+                foreach (var user in users)
+                {
+                    if ((user.Role == "RetailerAdmin" || user.Role == "SalesRep"))
+                    {
+                        if (int.TryParse(user.BranchId, out int BranchId))
+                        {
+                            user.BranchId = "ff9f2e2f-e4cc-4c10-a279-12d68cdb45ce";
+                            await _azureClient.PatchUser(user.ObjectId, user);
+                        }
+                    }
                 }
             }
             catch (ApplicationException)

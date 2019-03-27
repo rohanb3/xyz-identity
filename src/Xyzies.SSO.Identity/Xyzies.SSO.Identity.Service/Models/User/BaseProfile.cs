@@ -21,6 +21,8 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         public int? RetailerId { get; set; }
 
+        public string BranchId { get; set; }
+
         [Phone]
         public string Phone { get; set; }
 
