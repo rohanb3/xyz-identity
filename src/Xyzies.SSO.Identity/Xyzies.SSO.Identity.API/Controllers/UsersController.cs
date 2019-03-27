@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Data.Core;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -47,6 +48,28 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
                 return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Returns total count of users
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet]
+        [Route("total")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetTotalInCompanies([FromQuery] List<string> companyIds, [FromQuery] UserSortingParameters sorting, [FromQuery] LazyLoadParameters lazyParameters)
+        {
+            try
+            {
+                var usersCount = _userService.GetUsersCountInCompanies(companyIds, sorting, lazyParameters);
+                return Ok(usersCount);
             }
             catch (ArgumentException ex)
             {
