@@ -173,6 +173,40 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
+
+        public Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds, UserSortingParameters sorting, LazyLoadParameters lazyParameters)
+        {
+            var result = new Dictionary<string, int>();
+            var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            if (companyIds != null && companyIds.Any())
+            {
+                foreach (var companyId in companyIds)
+                {
+                    var usersInCompanyCount = usersInCache.Where(x => x.CompanyId == companyId).Count();
+                    result.Add(companyId, usersInCompanyCount);
+                }
+                return result;
+            }
+            var grouped = usersInCache.GroupBy(x => x.CompanyId);
+            if (sorting.By == Consts.UsersSorting.Descending)
+            {
+                grouped = grouped.OrderByDescending(x => x.Count());
+            }
+
+            if (sorting.By == Consts.UsersSorting.Ascending)
+            {
+                grouped = grouped.OrderBy(x => x.Count());
+            }
+            grouped = grouped.Where(x => x.Key != null).Skip(lazyParameters.Offset.HasValue ? lazyParameters.Offset.Value : 0)
+                              .Take(lazyParameters.Limit.HasValue ? lazyParameters.Limit.Value : grouped.Count());
+
+            foreach (var value in grouped)
+            {
+                result.Add(value.Key, value.Count());
+            }
+            return result;
+        }
+
         private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
             var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
