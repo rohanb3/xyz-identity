@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public List<string> CompaniesId { get; set; }
 
-        public List<int> BranchesId { get; set; }
+        public List<Guid> BranchesId { get; set; }
 
         public string City { get; set; }
 
