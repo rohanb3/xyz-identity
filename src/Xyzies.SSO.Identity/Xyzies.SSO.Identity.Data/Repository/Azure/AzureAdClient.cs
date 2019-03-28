@@ -81,7 +81,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             }
         }
 
-        public async Task PostUser(AzureUser user)
+        public async Task<AzureUser> PostUser(AzureUser user)
         {
             var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
             var response = await SendRequest(HttpMethod.Post, Consts.GraphApi.UserEntity, content);
@@ -89,6 +89,9 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             {
                 throw new ApplicationException("Can not create user with current parameters");
             }
+            var createdUser = await response?.Content?.ReadAsStringAsync();
+            var value = JsonConvert.DeserializeObject(createdUser) as JToken;
+            return value.ToObject<AzureUser>();
         }
 
         private async Task<HttpResponseMessage> SendRequest(HttpMethod method, string entity, StringContent content = null, string additional = null, string query = "")
