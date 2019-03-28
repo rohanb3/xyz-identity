@@ -68,6 +68,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
+                var userRole = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
+                if (!string.IsNullOrEmpty(userRole) && userRole != Consts.Roles.SuperAdmin)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
                 var usersCount = _userService.GetUsersCountInCompanies(companyIds, sorting, lazyParameters);
                 return Ok(usersCount);
             }
