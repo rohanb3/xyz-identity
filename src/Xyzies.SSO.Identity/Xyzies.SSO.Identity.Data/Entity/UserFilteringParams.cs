@@ -13,19 +13,17 @@ namespace Xyzies.SSO.Identity.Data.Entity
         /// <summary>
         /// User role
         /// </summary>
-        public string Role { get; set; }
+        public List<string> Role { get; set; }
 
         public List<string> UsersId { get; set; }
 
-        public string CompanyId { get; set; }
-
-        public List<string> CompaniesId { get; set; }
+        public List<string> CompanyId { get; set; }
 
         public List<Guid> BranchesId { get; set; }
 
-        public string City { get; set; }
+        public List<string> City { get; set; }
 
-        public string State { get; set; }
+        public List<string> State { get; set; }
 
         public string UserName { get; set; }
     }
