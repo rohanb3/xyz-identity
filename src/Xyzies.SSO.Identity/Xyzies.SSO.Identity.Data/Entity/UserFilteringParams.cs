@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Xyzies.SSO.Identity.Data.Core;
-using Xyzies.SSO.Identity.Data.Helpers;
 
 namespace Xyzies.SSO.Identity.Data.Entity
 {

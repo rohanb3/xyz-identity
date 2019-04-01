@@ -13,6 +13,8 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
 
         public PasswordProfile PasswordProfile { get; set; }
 
+        public string PasswordPolicies { get; set; }
+
         public string ObjectId { get; set; }
 
         public string DisplayName { get; set; }
