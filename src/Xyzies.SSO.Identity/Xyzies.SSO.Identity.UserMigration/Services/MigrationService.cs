@@ -49,31 +49,5 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 throw;
             }
         }
-
-        public async Task UpdateBranchId(UserFilteringParams options)
-        {
-            try
-            {
-                var migrationUser = new UserIdentityParams { Role = Consts.Roles.SuperAdmin };
-                var users = await _userService.GetAllUsersAsync(migrationUser, filter: options);
-
-                foreach (var user in users.Result)
-                {
-                    if ((user.Role == "RetailerAdmin" || user.Role == "SalesRep"))
-                    {
-                        if (int.TryParse(user.BranchId, out int BranchId))
-                        {
-                            user.BranchId = "ff9f2e2f-e4cc-4c10-a279-12d68cdb45ce";
-                            await _azureClient.PatchUser(user.ObjectId, user);
-                        }
-                    }
-                }
-            }
-            catch (ApplicationException)
-            {
-                throw;
-            }
-        }
     }
-
 }
