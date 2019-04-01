@@ -63,22 +63,17 @@ namespace Xyzies.SSO.Identity.Services.Service
             UserFilters condition = null;
             if (filters.Role != null)
             {
-                condition += (AzureUser user) => user.Role == filters.Role;
+                condition += (AzureUser user) => filters.Role.Contains(user.Role?.ToLower());
             }
 
-            if (filters.State != null)
+            if (filters.State != null && filters.State.Any())
             {
-                condition += (AzureUser user) => user.State == filters.State;
+                condition += (AzureUser user) => filters.State.Contains(user.State?.ToLower());
             }
 
-            if (filters.City != null)
+            if (filters.City != null && filters.City.Any())
             {
-                condition += (AzureUser user) => user.City == filters.City;
-            }
-
-            if (filters.CompanyId != null)
-            {
-                condition += (AzureUser user) => user.CompanyId == filters.CompanyId;
+                condition += (AzureUser user) => filters.City.Contains(user.City?.ToLower());
             }
 
             if (filters.UserName != null)
@@ -91,9 +86,9 @@ namespace Xyzies.SSO.Identity.Services.Service
                 condition += (AzureUser user) => filters.UsersId.Contains(user.ObjectId);
             }
 
-            if (filters.CompaniesId != null && filters.CompaniesId.Any())
+            if (filters.CompanyId != null && filters.CompanyId.Any())
             {
-                condition += (AzureUser user) => filters.CompaniesId.Contains(user.CompanyId);
+                condition += (AzureUser user) => filters.CompanyId.Contains(user.CompanyId?.ToLower());
             }
 
             if (filters.BranchesId != null && filters.BranchesId.Any())

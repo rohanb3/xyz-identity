@@ -36,7 +36,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (user.Role == Consts.Roles.RetailerAdmin)
             {
-                filter.CompanyId = user.CompanyId;
+                filter.CompanyId = new List<string> { user.CompanyId };
                 return await GetUsers(filter, sorting);
             }
 

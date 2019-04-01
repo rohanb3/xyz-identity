@@ -28,6 +28,11 @@
             public const string ApiVersion = "1.6";
             public const string UserEntity = "users";
             public const string ObjectUserEntity = "directoryObjects/$/Microsoft.DirectoryServices.User";
+
+            public class Errors
+            {
+                public const string UserAlreadyExist = "Another object with the same value for property signInNames already exists.";
+            }
         }
 
         public class Roles
@@ -66,6 +71,12 @@
         {
             public const string Password = "password";
             public const string RefreshToken = "refresh_token";
+        }
+        public class PasswordPolicy
+        {
+            public const string DisablePasswordExpirationAndStrong = "DisablePasswordExpiration, DisableStrongPassword";
+            public const string DisablePasswordExpiration = "DisablePasswordExpiration";
+            public const string DisablePasswordString = "DisableStrongPassword";
         }
     }
 }
