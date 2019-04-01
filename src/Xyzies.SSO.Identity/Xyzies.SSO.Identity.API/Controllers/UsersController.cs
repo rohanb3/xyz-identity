@@ -10,12 +10,14 @@ using Xyzies.SSO.Identity.Data.Helpers;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Data.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -33,7 +35,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter)
+        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter, [FromQuery]UserSortingParameters sorting)
         {
             try
             {
@@ -43,8 +45,35 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
-                var users = await _userService.GetAllUsersAsync(currentUser, filter);
+                var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
                 return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Returns total count of users
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet]
+        [Route("total")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetTotalInCompanies([FromQuery] List<string> companyIds, [FromQuery] UserSortingParameters sorting, [FromQuery] LazyLoadParameters lazyParameters)
+        {
+            try
+            {
+                var userRole = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
+                if (!string.IsNullOrEmpty(userRole) && userRole != Consts.Roles.SuperAdmin)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+                var usersCount = _userService.GetUsersCountInCompanies(companyIds, sorting, lazyParameters);
+                return Ok(usersCount);
             }
             catch (ArgumentException ex)
             {

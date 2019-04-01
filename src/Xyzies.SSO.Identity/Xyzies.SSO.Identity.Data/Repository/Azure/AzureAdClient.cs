@@ -59,13 +59,17 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             return value.ToObject<AzureUser>();
         }
 
-        public async Task<IEnumerable<AzureUser>> GetUsers(string filter = null)
+        public async Task<AzureUsersResponse> GetUsers(string filter = "", int userCount = 100, bool takeFromDirectoryObjects = false)
         {
-            var response = await SendRequest(HttpMethod.Get, Consts.GraphApi.UserEntity, query: filter);
+            string entity = Consts.GraphApi.UserEntity;
+            if (takeFromDirectoryObjects)
+            {
+                entity = Consts.GraphApi.ObjectUserEntity;
+            }
+            var response = await SendRequest(HttpMethod.Get, entity, query: $"{filter}&$top={userCount}");
             var responseString = await response?.Content?.ReadAsStringAsync();
-            var value = (JsonConvert.DeserializeObject(responseString) as JToken)["value"];
-
-            return value.ToObject<List<AzureUser>>();
+            var responseObject = JsonConvert.DeserializeObject<AzureUsersResponse>(responseString);
+            return responseObject;
         }
 
         public async Task PatchUser(string id, AzureUser user)
@@ -78,7 +82,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             }
         }
 
-        public async Task PostUser(AzureUser user)
+        public async Task<AzureUser> PostUser(AzureUser user)
         {
             var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
             var response = await SendRequest(HttpMethod.Post, Consts.GraphApi.UserEntity, content);
@@ -92,6 +96,9 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
                 throw new ApplicationException($"Can not create user with current parameters\n {responseMessage.Odata.Message.Value}");
 
             }
+            var createdUser = await response?.Content?.ReadAsStringAsync();
+            var value = JsonConvert.DeserializeObject(createdUser) as JToken;
+            return value.ToObject<AzureUser>();
         }
 
         private async Task<HttpResponseMessage> SendRequest(HttpMethod method, string entity, StringContent content = null, string additional = null, string query = "")

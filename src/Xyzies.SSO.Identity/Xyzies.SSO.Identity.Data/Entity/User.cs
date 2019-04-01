@@ -31,6 +31,8 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public string Role { get; set; }
 
+        public Guid BranchId { get; set; }
+
         public int? RoleId => !int.TryParse(Role, out int roleId) ? null : new int?(roleId);
 
         public DateTime? CreatedDate { get; set; }

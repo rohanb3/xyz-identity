@@ -1,7 +1,9 @@
 ﻿using Mapster;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -17,64 +19,37 @@ namespace Xyzies.SSO.Identity.Services.Service
     public class UserService : IUserService
     {
         private readonly IAzureAdClient _azureClient;
-        private readonly ICpUsersRepository _cpUserRepo;
-        private readonly IRoleRepository _roleRepo;
-        private delegate bool UserFilters(User user);
+        private readonly IMemoryCache _cache;
 
-        public UserService(IAzureAdClient azureClient, ICpUsersRepository cpUserRepo, IRoleRepository roleRepo)
+        public UserService(IAzureAdClient azureClient, IMemoryCache cache)
         {
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
-            _cpUserRepo = cpUserRepo ?? throw new ArgumentNullException(nameof(cpUserRepo));
-            _roleRepo = roleRepo ?? throw new ArgumentNullException(nameof(roleRepo));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
-        public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null)
+        public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
             if (user.Role == Consts.Roles.SuperAdmin)
             {
-                if (!filter.IsCablePortal.HasValue)
-                {
-                    throw new ArgumentException("Value IsCablePortal must be specified");
-                }
-                if (filter.IsCablePortal.Value)
-                {
-                    var cpUsers = await _cpUserRepo.GetAsync();
-                    await SetCpUsersRoles(cpUsers);
-                    return GetFilteredUsers(cpUsers, filter).Adapt<LazyLoadedResult<Profile>>();
-                }
-
-                return await GetAzureUsers(filter);
+                return await GetUsers(filter, sorting);
             }
 
             if (user.Role == Consts.Roles.RetailerAdmin)
             {
-                if (IsAzureUser(user.Id))
-                {
-                    filter.CompanyId = user.CompanyId;
-                    return await GetAzureUsers(filter);
-                }
-
-                var cpUsers = await _cpUserRepo.GetAsync(x => x.CompanyId == int.Parse(user.CompanyId));
-                await SetCpUsersRoles(cpUsers);
-                return GetFilteredUsers(cpUsers, filter).Adapt<LazyLoadedResult<Profile>>();
+                filter.CompanyId = new List<string> { user.CompanyId };
+                return await GetUsers(filter, sorting);
             }
 
             if (user.Role == Consts.Roles.SalesRep)
             {
-                if (IsAzureUser(user.Id))
+                var salesRep = await _azureClient.GetUserById(user.Id.ToString());
+                return new LazyLoadedResult<Profile>()
                 {
-                    var salesRep = await _azureClient.GetUserById(user.Id.ToString());
-                    return new LazyLoadedResult<Profile>()
-                    {
-                        Result = new List<Profile> { salesRep.Adapt<Profile>() },
-                        Limit = 1,
-                        Offset = 0,
-                        Total = 1
-                    };
-                }
-                var resultUser = await _cpUserRepo.GetAsync(x => x.CompanyId == int.Parse(user.CompanyId) && x.Id == int.Parse(user.Id));
-                await SetCpUsersRoles(resultUser);
-                return GetFilteredUsers(resultUser, filter).Adapt<LazyLoadedResult<Profile>>();
+                    Result = new List<Profile> { salesRep.Adapt<Profile>() },
+                    Limit = 1,
+                    Offset = 0,
+                    Total = 1
+                };
             }
             throw new ArgumentException("Unknown user role");
         }
@@ -94,6 +69,17 @@ namespace Xyzies.SSO.Identity.Services.Service
             try
             {
                 await _azureClient.PatchUser(id, model.Adapt<AzureUser>());
+                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                var user = usersInCache.FirstOrDefault(x => x.ObjectId == id);
+                if (user != null)
+                {
+                    MergeObjects(model.Adapt<AzureUser>(), user);
+                }
+                else
+                {
+                    usersInCache.Add(model.Adapt<AzureUser>());
+                }
+                _cache.Set(Consts.Cache.UsersKey, usersInCache);
             }
             catch (ApplicationException)
             {
@@ -110,8 +96,13 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
-                await _azureClient.PostUser(model.Adapt<AzureUser>());
-                return model.Adapt<Profile>();
+                var createdUser = await _azureClient.PostUser(model.Adapt<AzureUser>());
+
+                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                usersInCache.Add(createdUser);
+                _cache.Set(Consts.Cache.UsersKey, usersInCache);
+
+                return createdUser.Adapt<Profile>();
             }
             catch (ApplicationException)
             {
@@ -132,45 +123,24 @@ namespace Xyzies.SSO.Identity.Services.Service
                 {
                     throw new AccessException();
                 }
+                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
 
-                if (!IsAzureUser(id))
+                if (user.Role == Consts.Roles.SuperAdmin)
                 {
-                    if (user.Role == Consts.Roles.SuperAdmin)
-                    {
-                        var result = await _cpUserRepo.GetAsync(int.Parse(id));
-                        result.Role = (_roleRepo.Get(x => x.RoleId == int.Parse(result.Role))).First().RoleName;
-                        return result.Adapt<Profile>();
-                    }
-
-                    if (user.Role == Consts.Roles.RetailerAdmin || user.Role == Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
-                    {
-                        var result = await _cpUserRepo.GetByAsync(x => x.CompanyId == int.Parse(user.CompanyId) && x.Id == int.Parse(id));
-                        result.Role = (_roleRepo.Get(x => x.RoleId == int.Parse(result.Role))).First().RoleName;
-                        return result.Adapt<Profile>();
-                    }
-
-                    throw new AccessException();
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
+                    return result?.Adapt<Profile>();
                 }
-                else
+
+                if (user.Role == Consts.Roles.RetailerAdmin || user.Role == Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
                 {
-                    if (user.Role == Consts.Roles.SuperAdmin)
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
+                    if (result?.CompanyId != user.CompanyId)
                     {
-                        var result = await _azureClient.GetUserById(id);
-                        return result.Adapt<Profile>();
+                        throw new AccessException();
                     }
-
-                    if (user.Role == Consts.Roles.RetailerAdmin || user.Role == Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
-                    {
-                        var result = await _azureClient.GetUserById(id);
-                        if (result.CompanyId != user.CompanyId)
-                        {
-                            throw new AccessException();
-                        }
-                        return result.Adapt<Profile>();
-                    }
-
-                    throw new AccessException();
+                    return result?.Adapt<Profile>();
                 }
+                throw new AccessException();
             }
             catch (KeyNotFoundException)
             {
@@ -188,6 +158,10 @@ namespace Xyzies.SSO.Identity.Services.Service
             try
             {
                 await _azureClient.DeleteUser(id);
+
+                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                usersInCache.RemoveAll(x => x.ObjectId == id);
+                _cache.Set(Consts.Cache.UsersKey, usersInCache);
             }
             catch (KeyNotFoundException)
             {
@@ -199,97 +173,98 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
-        private bool IsAzureUser(string userId)
+
+        public Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds, UserSortingParameters sorting, LazyLoadParameters lazyParameters)
         {
-            return !int.TryParse(userId, out int result);
+            var result = new Dictionary<string, int>();
+            var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            if (companyIds != null && companyIds.Any())
+            {
+                foreach (var companyId in companyIds)
+                {
+                    var usersInCompanyCount = usersInCache.Where(x => x.CompanyId == companyId).Count();
+                    result.Add(companyId, usersInCompanyCount);
+                }
+                return result;
+            }
+            var grouped = usersInCache.GroupBy(x => x.CompanyId);
+            if (sorting.By == Consts.UsersSorting.Descending)
+            {
+                grouped = grouped.OrderByDescending(x => x.Count());
+            }
+
+            if (sorting.By == Consts.UsersSorting.Ascending)
+            {
+                grouped = grouped.OrderBy(x => x.Count());
+            }
+            grouped = grouped.Where(x => x.Key != null).Skip(lazyParameters.Offset.HasValue ? lazyParameters.Offset.Value : 0)
+                              .Take(lazyParameters.Limit.HasValue ? lazyParameters.Limit.Value : grouped.Count());
+
+            foreach (var value in grouped)
+            {
+                result.Add(value.Key, value.Count());
+            }
+            return result;
         }
 
-        private async Task<LazyLoadedResult<Profile>> GetAzureUsers(UserFilteringParams filter = null)
+        private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            var azureUsers = await _azureClient.GetUsers(FilterConditions.GetUserFilterString(filter));
-            return new LazyLoadedResult<Profile>()
+            var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            var searchedUsers = users.GetByParameters(filter, sorting);
+            return new LazyLoadedResult<Profile>
             {
+                Result = searchedUsers.Adapt<IEnumerable<Profile>>(),
                 Limit = filter.Limit,
-                Total = azureUsers.Count(),
                 Offset = filter.Offset,
-                Result = azureUsers.Adapt<IEnumerable<Profile>>()
+                Total = searchedUsers.Count
             };
         }
 
-        private async Task SetCpUsersRoles(IQueryable<User> users)
+        public async Task SetUsersCache()
         {
-            var roles = (await _roleRepo.GetAsync()).ToList();
-            foreach (var user in users)
+            var usersToCache = new List<AzureUser>();
+            var users = await _azureClient.GetUsers(userCount: 999);
+            usersToCache.AddRange(users.Users);
+            while (!string.IsNullOrEmpty(users.NextLink))
             {
-                user.Role = roles.FirstOrDefault(r => r.RoleId == user.RoleId)?.RoleName;
+                users = await _azureClient.GetUsers(users.NextLink.Split('?').Last(), 999, true);
+                usersToCache.AddRange(users.Users);
             }
+            _cache.Set(Consts.Cache.UsersKey, usersToCache);
         }
 
-        private LazyLoadedResult<User> GetFilteredUsers(IQueryable<User> query, UserFilteringParams parameters)
+        private bool IsPropertyAccessible(PropertyInfo prop)
         {
-            UserFilters filters = null;
-            if (parameters.Role != null)
-            {
-                var roleId = (_roleRepo.Get(x => x.RoleName == parameters.Role)).First().RoleId;
-                filters += (User user) => user.Role == roleId.ToString();
-            }
-
-            if (parameters.State != null)
-            {
-                filters += (User user) => user.State == parameters.State;
-            }
-
-            if (parameters.City != null)
-            {
-                filters += (User user) => user.City == parameters.City;
-            }
-
-            if (parameters.CompanyId != null)
-            {
-                filters += (User user) => user.CompanyId == int.Parse(parameters.CompanyId);
-            }
-
-            if (parameters.UserName != null)
-            {
-                filters += (User user) =>
-                {
-                    if(string.IsNullOrEmpty(user.Name) && string.IsNullOrEmpty(user.LastName))
-                    {
-                        return false;
-                    }
-
-                    if (!string.IsNullOrEmpty(user.Name) && string.IsNullOrEmpty(user.LastName))
-                    {
-                        return user.Name.ToLower().Contains(parameters.UserName.ToLower());
-                    }
-
-                    if (string.IsNullOrEmpty(user.Name) && !string.IsNullOrEmpty(user.LastName))
-                    {
-                        return user.LastName.ToLower().Contains(parameters.UserName.ToLower());
-                    }
-
-                    return user.LastName.ToLower().Contains(parameters.UserName.ToLower()) || user.Name.ToLower().Contains(parameters.UserName.ToLower());
-                };
-            }
-
-            if (filters != null)
-            {
-                query = query.Where(user => AllTrue(filters, user));
-            }
-
-            return query.GetPart(parameters);
+            return prop.CanRead && prop.CanWrite;
         }
 
-        private bool AllTrue(UserFilters condition, User user)
+        public void MergeObjects<T1, T2>(T1 source, T2 destination)
         {
-            foreach (UserFilters t in condition.GetInvocationList())
+            Type t1Type = typeof(T1);
+            Type t2Type = typeof(T2);
+
+            IEnumerable<PropertyInfo> t1PropertyInfos =
+                t1Type.GetProperties().Where(IsPropertyAccessible);
+            IEnumerable<PropertyInfo> t2PropertyInfos =
+                t2Type.GetProperties().Where(IsPropertyAccessible);
+
+
+            foreach (PropertyInfo t1PropertyInfo in t1PropertyInfos)
             {
-                if (!t(user))
+                var propertyValue = t1PropertyInfo.GetValue(source);
+                if (propertyValue != null)
                 {
-                    return false;
+                    foreach (PropertyInfo t2PropertyInfo in t2PropertyInfos)
+                    {
+                        if (t1PropertyInfo.Name == t2PropertyInfo.Name)
+                        {
+                            t2PropertyInfo.SetValue(destination, propertyValue);
+                            break;
+                        }
+                    }
                 }
             }
-            return true;
+
         }
     }
 }

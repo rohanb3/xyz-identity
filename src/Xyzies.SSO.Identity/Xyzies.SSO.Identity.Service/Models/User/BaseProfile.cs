@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Xyzies.SSO.Identity.Services.Models.User
 {
@@ -21,8 +22,6 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         public int? RetailerId { get; set; }
 
-        public string BranchId { get; set; }
-
         [Phone]
         public string Phone { get; set; }
 
@@ -31,6 +30,8 @@ namespace Xyzies.SSO.Identity.Services.Models.User
         public string Role { get; set; }
 
         public string AvatarUrl { get; set; }
+
+        public Guid? BranchId { get; set; }
 
         public bool? AccountEnabled { get; set; }
 

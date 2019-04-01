@@ -24,6 +24,8 @@ using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Middleware;
 using Xyzies.SSO.Identity.Services.Service.Roles;
 using Xyzies.SSO.Identity.Services.Service.Permission;
+using Xyzies.SSO.Identity.Services.Helpers;
+
 using Xyzies.SSO.Identity.UserMigration;
 
 namespace Xyzies.SSO.Identity.API
@@ -48,19 +50,6 @@ namespace Xyzies.SSO.Identity.API
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
 
-            //services.AddIdentityServer(c =>
-            //{
-
-            //});
-
-            // For Azure Custom Identity Provider
-            //services.AddAuthentication()
-            //    .AddOpenIdConnect("aad_b2c", "SSO", options =>
-            //    {
-
-            //    });
-
-            // TODO: DB connection string
             string dbConnectionString = Configuration.GetConnectionString("db");
             if (string.IsNullOrEmpty(dbConnectionString))
             {
@@ -101,7 +90,7 @@ namespace Xyzies.SSO.Identity.API
                         .AllowCredentials()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            services.AddMemoryCache();
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -110,12 +99,14 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IAzureAdClient, AzureAdClient>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
             services.AddUserMigrationService();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
+            services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Info
@@ -150,6 +141,12 @@ namespace Xyzies.SSO.Identity.API
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
                 //context.Database.Migrate();
+            }
+
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
+                userService.SetUsersCache();
             }
 
             app.UseAuthentication()

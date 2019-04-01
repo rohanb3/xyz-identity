@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using Xyzies.SSO.Identity.Data.Helpers;
 
@@ -36,9 +37,11 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         public string AvatarUrl { get; set; }
 
         [JsonProperty(Consts.BranchIdPropertyName)]
-        public string BranchId { get; set; }
+        public Guid? BranchId { get; set; }
 
         public string City { get; set; }
+
+        public string State { get; set; }
 
         [JsonProperty(Consts.CompanyIdPropertyName)]
         public string CompanyId { get; set; }

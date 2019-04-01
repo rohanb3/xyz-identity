@@ -1,4 +1,9 @@
-﻿using Xyzies.SSO.Identity.Data.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Xyzies.SSO.Identity.Data.Core;
 
 namespace Xyzies.SSO.Identity.Data.Entity
 {
@@ -7,15 +12,17 @@ namespace Xyzies.SSO.Identity.Data.Entity
         /// <summary>
         /// User role
         /// </summary>
-        public string Role { get; set; }
+        public List<string> Role { get; set; }
 
-        public bool? IsCablePortal { get; set; }
+        public List<string> UsersId { get; set; }
 
-        public string CompanyId { get; set; }
+        public List<string> CompanyId { get; set; }
 
-        public string City { get; set; }
+        public List<Guid> BranchesId { get; set; }
 
-        public string State { get; set; }
+        public List<string> City { get; set; }
+
+        public List<string> State { get; set; }
 
         public string UserName { get; set; }
     }
