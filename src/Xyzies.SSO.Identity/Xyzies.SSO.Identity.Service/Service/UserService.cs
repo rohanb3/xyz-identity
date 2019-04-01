@@ -42,7 +42,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (user.Role == Consts.Roles.SalesRep)
             {
-                var salesRep = await _azureClient.GetUserById(user.Id.ToString());
+                var salesRep = await GetUserByIdAsync(user.Id.ToString(), user); ;
                 return new LazyLoadedResult<Profile>()
                 {
                     Result = new List<Profile> { salesRep.Adapt<Profile>() },
