@@ -36,7 +36,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (user.Role == Consts.Roles.RetailerAdmin)
             {
-                filter.CompanyId = user.CompanyId;
+                filter.CompanyId = new List<string> { user.CompanyId };
                 return await GetUsers(filter, sorting);
             }
 
@@ -96,13 +96,13 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
-                await _azureClient.PostUser(model.Adapt<AzureUser>());
+                var createdUser = await _azureClient.PostUser(model.Adapt<AzureUser>());
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                usersInCache.Add(model.Adapt<AzureUser>());
+                usersInCache.Add(createdUser);
                 _cache.Set(Consts.Cache.UsersKey, usersInCache);
 
-                return model.Adapt<Profile>();
+                return createdUser.Adapt<Profile>();
             }
             catch (ApplicationException)
             {
