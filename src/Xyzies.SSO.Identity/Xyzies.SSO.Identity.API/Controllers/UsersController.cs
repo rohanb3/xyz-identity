@@ -225,5 +225,78 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Update avatar for user
+        /// </summary>
+        /// <param name="avatarModel"></param>
+        /// <returns></returns>
+        /// <response code="204">If avatar updated successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        /// <response code="400">If avatar not updated</response>
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(Profile))]
+        [HttpPut("id/avatar")]
+        public async Task<IActionResult> UploadAvatar([FromForm] [Required] AvatarModel avatarModel)
+        {
+            try
+            {
+                await _userService.UploadAvatar(avatarModel);
+                return NoContent();
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Delete avatar for user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        /// <response code="200">If avatar updated successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        /// <response code="400">If avatar not deleted</response>
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+        [HttpDelete("id/avatar")]
+        public async Task<IActionResult> DeleteAvatar([Required] string userId)
+        {
+            try
+            {
+                await _userService.DeleteAvatar(userId);
+                return Ok();
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get avatar for user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        /// <response code="200">If avatar updated successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        /// <response code="404">If avatar not found</response>
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+        [HttpGet("id/avatar")]
+        public async Task<IActionResult> GetAvatar([Required] string userId)
+        {
+            try
+            {
+                var avatarFile = await _userService.GetAvatar(userId);
+                if(avatarFile == null)
+                {
+                    return NotFound();
+                }
+                return File(avatarFile.FileBytes, avatarFile.ContentType);
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

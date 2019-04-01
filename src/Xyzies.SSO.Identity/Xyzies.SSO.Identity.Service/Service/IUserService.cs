@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -15,5 +16,8 @@ namespace Xyzies.SSO.Identity.Services.Service
         Task<Profile> CreateUserAsync(ProfileCreatable model);
         Task DeleteUserByIdAsync(string id);
         Task SetUsersCache();
+        Task UploadAvatar(AvatarModel avatarModel);
+        Task DeleteAvatar(string userId);
+        Task<FileModel> GetAvatar(string userId);
     }
 }

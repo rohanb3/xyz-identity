@@ -15,6 +15,8 @@ using Newtonsoft.Json.Linq;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi;
+using System.IO;
+using Xyzies.SSO.Identity.Data.Core;
 
 namespace Xyzies.SSO.Identity.Data.Repository.Azure
 {
@@ -106,6 +108,19 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             }
         }
 
+        private async Task<HttpResponseMessage> SendAvatarRequest(HttpMethod method, string entity, ByteArrayContent content = null, string additional = null, string query = "")
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                await SetClient(httpClient, $"{entity}{(string.IsNullOrEmpty(additional) ? string.Empty : $"/{additional}")}", query);
+                return method == HttpMethod.Get ? await httpClient.GetAsync(httpClient.BaseAddress)
+                     : method == HttpMethod.Delete ? await httpClient.DeleteAsync(httpClient.BaseAddress)
+                     : method == HttpMethod.Post ? await httpClient.PostAsync(httpClient.BaseAddress, content)
+                     : await httpClient.PutAsync(httpClient.BaseAddress, content);
+            }
+        }
+
+
         // NOTE: The same as below
         private async Task SetClient(HttpClient client, string entity, string query = "")
         {
@@ -153,5 +168,41 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _credentials.AccessToken);
         }
+
+        /// <summary>
+        /// if avatarfile == null, avatar was deleted from azure
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="avatarFile"></param>
+        /// <returns></returns>
+        public async Task PutAvatar(string userId, byte[] avatarFile)
+        {
+            HttpResponseMessage response;
+            ByteArrayContent byteContent = new ByteArrayContent(avatarFile);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            response = await SendAvatarRequest(HttpMethod.Put, Consts.GraphApi.UserEntity, byteContent, additional: $"{userId}/thumbnailPhoto");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException($"Can not update or delete avatar in user with id: {userId}");
+            }
+        }
+
+        public async Task<FileModel> GetAvatar(string userId)
+        {
+            var response = await SendAvatarRequest(HttpMethod.Get, Consts.GraphApi.UserEntity, null, additional: $"{userId}/thumbnailPhoto");
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+            var avatarFile = await response.Content.ReadAsByteArrayAsync();
+
+            return new FileModel()
+            {
+                FileBytes = avatarFile,
+                ContentType = response.Content.Headers.ContentType.MediaType
+            };
+        }
+
     }
 }
