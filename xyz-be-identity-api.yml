@@ -12,6 +12,8 @@ spec:
       labels:
         app: dev-identity-api
     spec:
+      nodeSelector:
+        env: applications
       containers:
       - name: dev-identity-api
         image: xyzies.azurecr.io/xyz-be-identity-dev:0.0.0.0
