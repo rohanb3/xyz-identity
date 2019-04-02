@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Xyzies.SSO.Identity.Data.Entity;
-using Xyzies.SSO.Identity.Data.Core;
 
 namespace Xyzies.SSO.Identity.Data.Repository
 {

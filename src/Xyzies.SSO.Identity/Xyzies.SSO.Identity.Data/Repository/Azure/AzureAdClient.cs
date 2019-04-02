@@ -15,8 +15,8 @@ using Newtonsoft.Json.Linq;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi;
-using System.IO;
 using Xyzies.SSO.Identity.Data.Core;
+using static Xyzies.SSO.Identity.Data.Helpers.Consts;
 
 namespace Xyzies.SSO.Identity.Data.Repository.Azure
 {
@@ -89,7 +89,13 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             var response = await SendRequest(HttpMethod.Post, Consts.GraphApi.UserEntity, content);
             if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException("Can not create user with current parameters");
+                var responseMessage = await response?.Content?.ReadAsAsync<ErrorResponse>();
+                if (responseMessage.Odata.Message.Value == GraphApi.Errors.UserAlreadyExist)
+                {
+                    throw new ApplicationException("User already exist");
+                }
+                throw new ApplicationException($"Can not create user with current parameters\n {responseMessage.Odata.Message.Value}");
+
             }
             var createdUser = await response?.Content?.ReadAsStringAsync();
             var value = JsonConvert.DeserializeObject(createdUser) as JToken;

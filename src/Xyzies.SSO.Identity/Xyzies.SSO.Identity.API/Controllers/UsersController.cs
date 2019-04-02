@@ -6,13 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Models.User;
-using Xyzies.SSO.Identity.API.Filters;
 using Xyzies.SSO.Identity.Data.Helpers;
-using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Data.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
