@@ -27,6 +27,8 @@ using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Helpers;
 
 using Xyzies.SSO.Identity.UserMigration;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -107,19 +109,36 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
+
             services.AddSwaggerGen(options =>
             {
+                options.SwaggerGeneratorOptions.IgnoreObsoleteActions = true;
+
                 options.SwaggerDoc("v1", new Info
                 {
-                    Title = "Identity",
+                    Title = "Xyzies.Identity",
                     Version = $"v1.0.0",
                     Description = ""
                 });
 
+                options.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    In = "header",
+                    Name = "Authorization",
+                    Description = "Please enter JWT with Bearer into field",
+                    Type = "apiKey"
+                });
+
+                options.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", Enumerable.Empty<string>() }
+                });
+
+                options.CustomSchemaIds(x => x.FullName);
                 options.EnableAnnotations();
                 options.DescribeAllEnumsAsStrings();
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
-                    string.Concat(Assembly.GetExecutingAssembly().GetName().Name, ".xml")));
+                   string.Concat(Assembly.GetExecutingAssembly().GetName().Name, ".xml")));
             });
 
             TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
@@ -155,10 +174,15 @@ namespace Xyzies.SSO.Identity.API
                 .UseCors("dev")
                 .UseResponseCompression()
                 .UseMvc()
-                .UseSwagger()
+                .UseSwagger(options =>
+                {
+                    options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = "/api/identity/");
+                    options.RouteTemplate = "/swagger/{documentName}/swagger.json";
+                })
                 .UseSwaggerUI(uiOptions =>
                 {
-                    uiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", $"v1.0.0");
+                    uiOptions.SwaggerEndpoint("v1/swagger.json", $"v1.0.0");
+                    //uiOptions.RoutePrefix = "/api/identity";
                     uiOptions.DisplayRequestDuration();
                 });
 
