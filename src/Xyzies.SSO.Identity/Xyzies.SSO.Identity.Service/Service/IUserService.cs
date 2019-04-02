@@ -16,7 +16,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         Task<Profile> CreateUserAsync(ProfileCreatable model);
         Task DeleteUserByIdAsync(string id);
         Task SetUsersCache();
-        Task UploadAvatar(AvatarModel avatarModel);
+        Task UploadAvatar(string userId, AvatarModel avatarModel);
         Task DeleteAvatar(string userId);
         Task<FileModel> GetAvatar(string userId);
     }

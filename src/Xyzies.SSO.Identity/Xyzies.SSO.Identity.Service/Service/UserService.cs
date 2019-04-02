@@ -268,8 +268,13 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         }
 
-        public async Task UploadAvatar(AvatarModel model)
+        public async Task UploadAvatar(string userId, AvatarModel model)
         {
+            if(string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
             if (model == null)
             {
                 throw new ArgumentNullException(nameof(model));
@@ -279,7 +284,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 MemoryStream stream = new MemoryStream();
                 await model.Avatar.CopyToAsync(stream);
-                await _azureClient.PutAvatar(model.UserId, stream.ToArray());
+                await _azureClient.PutAvatar(userId, stream.ToArray());
             }
             catch (ApplicationException)
             {
