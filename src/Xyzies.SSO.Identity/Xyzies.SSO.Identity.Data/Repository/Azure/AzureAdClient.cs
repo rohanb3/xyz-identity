@@ -102,7 +102,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             return value.ToObject<AzureUser>();
         }
 
-        private async Task<HttpResponseMessage> SendRequest(HttpMethod method, string entity, StringContent content = null, string additional = null, string query = "")
+        private async Task<HttpResponseMessage> SendRequest(HttpMethod method, string entity, HttpContent content = null, string additional = null, string query = "")
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -110,22 +110,10 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
                 return method == HttpMethod.Get ? await httpClient.GetAsync(httpClient.BaseAddress)
                      : method == HttpMethod.Delete ? await httpClient.DeleteAsync(httpClient.BaseAddress)
                      : method == HttpMethod.Post ? await httpClient.PostAsync(httpClient.BaseAddress, content)
+                     : method == HttpMethod.Put ? await httpClient.PutAsync(httpClient.BaseAddress, content)
                      : await httpClient.PatchAsync(httpClient.BaseAddress, content);
             }
         }
-
-        private async Task<HttpResponseMessage> SendAvatarRequest(HttpMethod method, string entity, ByteArrayContent content = null, string additional = null, string query = "")
-        {
-            using (HttpClient httpClient = new HttpClient())
-            {
-                await SetClient(httpClient, $"{entity}{(string.IsNullOrEmpty(additional) ? string.Empty : $"/{additional}")}", query);
-                return method == HttpMethod.Get ? await httpClient.GetAsync(httpClient.BaseAddress)
-                     : method == HttpMethod.Delete ? await httpClient.DeleteAsync(httpClient.BaseAddress)
-                     : method == HttpMethod.Post ? await httpClient.PostAsync(httpClient.BaseAddress, content)
-                     : await httpClient.PutAsync(httpClient.BaseAddress, content);
-            }
-        }
-
 
         // NOTE: The same as below
         private async Task SetClient(HttpClient client, string entity, string query = "")
@@ -176,27 +164,40 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
         }
 
         /// <summary>
-        /// if avatarfile == null, avatar was deleted from azure
+        /// Update avatar
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="avatarFile"></param>
         /// <returns></returns>
-        public async Task PutAvatar(string userId, byte[] avatarFile)
+        public async Task UpdateAvatar(string userId, byte[] avatarFile)
         {
-            HttpResponseMessage response;
-            ByteArrayContent byteContent = new ByteArrayContent(avatarFile);
-            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            response = await SendAvatarRequest(HttpMethod.Put, Consts.GraphApi.UserEntity, byteContent, additional: $"{userId}/thumbnailPhoto");
+            var response = await UpdateAndDeleteAvatar(userId, avatarFile);
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new ApplicationException($"Can not update or delete avatar in user with id: {userId}");
+                throw new ApplicationException($"Avatar was not udated");
+            }
+        }
+
+        /// <summary>
+        /// Delete avatar
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="avatarFile"></param>
+        /// <returns></returns>
+        public async Task DeleteAvatar(string userId, byte[] avatarFile)
+        {
+            var response = await UpdateAndDeleteAvatar(userId, avatarFile);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException($"Avatar was not deleted");
             }
         }
 
         public async Task<FileModel> GetAvatar(string userId)
         {
-            var response = await SendAvatarRequest(HttpMethod.Get, Consts.GraphApi.UserEntity, null, additional: $"{userId}/thumbnailPhoto");
+            var response = await SendRequest(HttpMethod.Get, Consts.GraphApi.UserEntity, null, additional: $"{userId}/thumbnailPhoto");
             if (!response.IsSuccessStatusCode)
             {
                 return null;
@@ -208,6 +209,14 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
                 FileBytes = avatarFile,
                 ContentType = response.Content.Headers.ContentType.MediaType
             };
+        }
+
+
+        private async Task<HttpResponseMessage> UpdateAndDeleteAvatar(string userId, byte[] avatarFile)
+        {
+            ByteArrayContent byteContent = new ByteArrayContent(avatarFile);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            return await SendRequest(HttpMethod.Put, Consts.GraphApi.UserEntity, byteContent, additional: $"{userId}/thumbnailPhoto");
         }
 
     }

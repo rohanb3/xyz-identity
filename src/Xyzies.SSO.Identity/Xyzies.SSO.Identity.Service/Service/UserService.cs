@@ -284,7 +284,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 MemoryStream stream = new MemoryStream();
                 await model.Avatar.CopyToAsync(stream);
-                await _azureClient.PutAvatar(userId, stream.ToArray());
+                await _azureClient.UpdateAvatar(userId, stream.ToArray());
             }
             catch (ApplicationException)
             {
@@ -300,7 +300,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
             try
             {
-                await _azureClient.PutAvatar(userId, new byte[0]);
+                await _azureClient.DeleteAvatar(userId, new byte[0]);
             }
             catch (ApplicationException)
             {

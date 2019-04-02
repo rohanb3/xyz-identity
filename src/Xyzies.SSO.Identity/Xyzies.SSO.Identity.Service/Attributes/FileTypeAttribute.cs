@@ -44,8 +44,7 @@ namespace Xyzies.SSO.Identity.Services.Attributes
                 }
 
                 string fileExtension = Path.GetExtension(file.FileName);
-
-                if (!_extensionList.Any(x => x.Equals(fileExtension)))
+                if (!_extensionList.Contains(fileExtension))
                 {
                     return new ValidationResult(string.Format(EXTENSION_ERROE_MESSAGE, fileExtension, string.Join(", ", _extensionList.ToArray())));
                 }
