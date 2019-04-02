@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (user.Role == Consts.Roles.SalesRep)
             {
-                var salesRep = await _azureClient.GetUserById(user.Id.ToString());
+                var salesRep = await GetUserByIdAsync(user.Id.ToString(), user); ;
                 return new LazyLoadedResult<Profile>()
                 {
                     Result = new List<Profile> { salesRep.Adapt<Profile>() },
@@ -266,5 +267,62 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
 
         }
+
+        public async Task UploadAvatar(string userId, AvatarModel model)
+        {
+            if(string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            try
+            {
+                MemoryStream stream = new MemoryStream();
+                await model.Avatar.CopyToAsync(stream);
+                await _azureClient.UpdateAvatar(userId, stream.ToArray());
+            }
+            catch (ApplicationException)
+            {
+                throw;
+            }
+        }
+
+        public async Task DeleteAvatar(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+            try
+            {
+                await _azureClient.DeleteAvatar(userId, new byte[0]);
+            }
+            catch (ApplicationException)
+            {
+                throw;
+            }
+        }
+
+        public async Task<FileModel> GetAvatar(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+            try
+            {
+                 return await _azureClient.GetAvatar(userId);
+            }
+            catch (ApplicationException)
+            {
+                throw;
+            }
+        }
+
     }
 }
