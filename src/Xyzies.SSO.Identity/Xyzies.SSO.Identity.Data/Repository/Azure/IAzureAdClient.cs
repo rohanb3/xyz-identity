@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 
 namespace Xyzies.SSO.Identity.Data.Repository.Azure
@@ -11,5 +12,8 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
         Task<AzureUser> PostUser(AzureUser user);
         Task PatchUser(string id, AzureUser user);
         Task DeleteUser(string id);
+        Task UpdateAvatar(string userId, byte[] avatarFile);
+        Task DeleteAvatar(string userId, byte[] avatarFile);
+        Task<FileModel> GetAvatar(string userId);
     }
 }
