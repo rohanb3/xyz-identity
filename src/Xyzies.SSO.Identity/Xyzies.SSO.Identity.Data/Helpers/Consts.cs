@@ -37,9 +37,9 @@
 
         public class Roles
         {
-            public const string SalesRep = "SalesRep";
-            public const string SuperAdmin = "SuperAdmin";
-            public const string RetailerAdmin = "RetailerAdmin";
+            public const string SalesRep = "salesrep";
+            public const string SuperAdmin = "superadmin";
+            public const string RetailerAdmin = "retaileradmin";
         }
 
         public class Cache

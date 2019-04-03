@@ -30,18 +30,18 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            if (user.Role == Consts.Roles.SuperAdmin)
+            if (user.Role.ToLower()== Consts.Roles.SuperAdmin)
             {
                 return await GetUsers(filter, sorting);
             }
 
-            if (user.Role == Consts.Roles.RetailerAdmin)
+            if (user.Role.ToLower()== Consts.Roles.RetailerAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
                 return await GetUsers(filter, sorting);
             }
 
-            if (user.Role == Consts.Roles.SalesRep)
+            if (user.Role.ToLower()== Consts.Roles.SalesRep)
             {
                 var salesRep = await GetUserByIdAsync(user.Id.ToString(), user); ;
                 return new LazyLoadedResult<Profile>()
@@ -120,19 +120,19 @@ namespace Xyzies.SSO.Identity.Services.Service
                     throw new ArgumentNullException("Id can not be null or empty");
                 }
 
-                if (user.Role == Consts.Roles.SalesRep && id != user.Id)
+                if (user.Role.ToLower()== Consts.Roles.SalesRep && id != user.Id)
                 {
                     throw new AccessException();
                 }
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
 
-                if (user.Role == Consts.Roles.SuperAdmin)
+                if (user.Role.ToLower()== Consts.Roles.SuperAdmin)
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
                     return result?.Adapt<Profile>();
                 }
 
-                if (user.Role == Consts.Roles.RetailerAdmin || user.Role == Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
+                if (user.Role.ToLower()== Consts.Roles.RetailerAdmin || user.Role.ToLower()== Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
                     if (result?.CompanyId != user.CompanyId)
