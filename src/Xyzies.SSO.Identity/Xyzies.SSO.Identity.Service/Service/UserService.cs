@@ -21,10 +21,12 @@ namespace Xyzies.SSO.Identity.Services.Service
     {
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
+        private readonly ILocaltionService _localtionService;
 
-        public UserService(IAzureAdClient azureClient, IMemoryCache cache)
+        public UserService(IAzureAdClient azureClient, IMemoryCache cache, ILocaltionService localtionService)
         {
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
+            _localtionService = localtionService ?? throw new ArgumentNullException(nameof(localtionService));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
@@ -75,12 +77,22 @@ namespace Xyzies.SSO.Identity.Services.Service
                 if (user != null)
                 {
                     MergeObjects(model.Adapt<AzureUser>(), user);
+                    if (string.IsNullOrEmpty(model.State))
+                    {
+                        model.State = user.State;
+                    }
                 }
                 else
                 {
                     usersInCache.Add(model.Adapt<AzureUser>());
                 }
                 _cache.Set(Consts.Cache.UsersKey, usersInCache);
+
+                if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
+                {
+                   await _localtionService.SetCity(model.City, model?.State);
+                   await _localtionService.SetState(model.State);
+                }
             }
             catch (ApplicationException)
             {
@@ -102,6 +114,12 @@ namespace Xyzies.SSO.Identity.Services.Service
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
                 usersInCache.Add(createdUser);
                 _cache.Set(Consts.Cache.UsersKey, usersInCache);
+
+                if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
+                {
+                    await _localtionService.SetCity(model.City, model.State);
+                    await _localtionService.SetState(model.State);
+                }
 
                 return createdUser.Adapt<Profile>();
             }

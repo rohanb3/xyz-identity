@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -19,12 +20,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         private readonly IAzureAdClient _azureClient;
         private readonly IUserService _userService;
         private readonly IRoleRepository _roleRepository;
+        private readonly ILocaltionService _locationService;
 
 
-        public MigrationService(ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService)
+        public MigrationService(ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
+            _locationService = locationService ?? throw new ArgumentNullException(nameof(locationService));
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
@@ -33,6 +36,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         {
             try
             {
+                List<State> usersState = new List<State>();
+                List<City> usersCity = new List<City>();
                 var users = await _cpUsersRepository.GetAsync(x => !(x.IsDeleted ?? false));
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
 
@@ -42,7 +47,19 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 {
                     user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName;
                     await _azureClient.PostUser(user.Adapt<AzureUser>());
+
+                    if (usersState.FirstOrDefault(x => x.Name == user.State) == null && !string.IsNullOrEmpty(user.State))
+                    {
+                        usersState.Add(new State { Name = user?.State, ShortName = user.State });
+                    }
+
+                    if (usersCity.FirstOrDefault(x => x.Name == user.City) == null && !string.IsNullOrEmpty(user.City) && !string.IsNullOrEmpty(user.State))
+                    {
+                        usersCity.Add(new City { Name = user?.City, State = new State { Name = user.State } });
+                    }
                 }
+                await _locationService.SetState(usersState);
+                await _locationService.SetCity(usersCity);
             }
             catch (ApplicationException)
             {
