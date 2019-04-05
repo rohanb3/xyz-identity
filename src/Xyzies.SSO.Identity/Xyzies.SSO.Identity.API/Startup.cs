@@ -58,8 +58,13 @@ namespace Xyzies.SSO.Identity.API
                 StartupException.Throw("Missing the connection string to database");
             }
             services //.AddEntityFrameworkSqlServer()
-                .AddDbContextPool<IdentityDataContext>(ctxOptions =>
+                .AddDbContext<IdentityDataContext>(ctxOptions =>
                     ctxOptions.UseSqlServer(dbConnectionString));
+
+            string cablePortalDBConnectionString = Configuration.GetConnectionString("cpdb");
+            services //.AddEntityFrameworkSqlServer()
+                .AddDbContextPool<CablePortalIdentityDataContext>(ctxOptions =>
+                     ctxOptions.UseSqlServer(cablePortalDBConnectionString));
 
             // Response compression
             // https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.2#brotli-compression-provider
@@ -96,6 +101,7 @@ namespace Xyzies.SSO.Identity.API
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
+            services.AddScoped<DbContext, CablePortalIdentityDataContext>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPermissionService, PermissionService>();
@@ -103,6 +109,9 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<IStateRepository, StateRepository>();
+            services.AddScoped<ILocaltionService, LocationService>();
             services.AddUserMigrationService();
             #endregion
 

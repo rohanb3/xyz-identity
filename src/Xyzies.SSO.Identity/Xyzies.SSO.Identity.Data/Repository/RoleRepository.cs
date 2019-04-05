@@ -8,7 +8,7 @@ namespace Xyzies.SSO.Identity.Data.Repository
 {
     public class RoleRepository : EfCoreBaseRepository<Guid, Role>, IRepository<Guid, Role>, IRoleRepository
     {
-        public RoleRepository(DbContext dbContext)
+        public RoleRepository(IdentityDataContext dbContext)
             : base(dbContext)
         {
 

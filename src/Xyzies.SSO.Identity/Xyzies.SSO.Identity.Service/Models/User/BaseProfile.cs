@@ -18,6 +18,8 @@ namespace Xyzies.SSO.Identity.Services.Models.User
         [StringLength(64)]
         public string City { get; set; }
 
+        public string State { get; set; }
+
         public int? CompanyId { get; set; }
 
         public int? RetailerId { get; set; }
