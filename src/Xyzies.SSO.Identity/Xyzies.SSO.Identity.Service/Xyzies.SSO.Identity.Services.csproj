@@ -5,6 +5,10 @@
     <RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\git\xyz\xyz-identity\src\Xyzies.SSO.Identity\Xyzies.SSO.Identity.Service\Xyzies.SSO.Identity.Services.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Mapster" Version="3.3.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />

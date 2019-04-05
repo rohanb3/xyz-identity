@@ -126,7 +126,6 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             }
         }
 
-
         // NOTE: The same as below
         private async Task SetClient(HttpClient client, string entity, string query = "")
         {
@@ -201,8 +200,8 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             {
                 return null;
             }
-            var avatarFile = await response.Content.ReadAsByteArrayAsync();
 
+            var avatarFile = await response.Content.ReadAsByteArrayAsync();
             return new FileModel()
             {
                 FileBytes = avatarFile,

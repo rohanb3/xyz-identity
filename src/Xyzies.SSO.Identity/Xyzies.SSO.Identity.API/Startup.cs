@@ -40,7 +40,10 @@ namespace Xyzies.SSO.Identity.API
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -50,14 +53,16 @@ namespace Xyzies.SSO.Identity.API
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
 
+            // TODO: Read version and build number from CI config
+
             string dbConnectionString = Configuration.GetConnectionString("db");
             if (string.IsNullOrEmpty(dbConnectionString))
             {
                 StartupException.Throw("Missing the connection string to database");
             }
-            services //.AddEntityFrameworkSqlServer()
-                .AddDbContextPool<IdentityDataContext>(ctxOptions =>
-                    ctxOptions.UseSqlServer(dbConnectionString));
+
+            services.AddDbContextPool<IdentityDataContext>(ctxOptions =>
+                ctxOptions.UseSqlServer(dbConnectionString));
 
             // Response compression
             // https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.2#brotli-compression-provider
@@ -91,6 +96,7 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
+
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -102,11 +108,13 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
             services.AddUserMigrationService();
+
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
+
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Info
@@ -127,8 +135,15 @@ namespace Xyzies.SSO.Identity.API
             RolesMappingConfigurations.ConfigureRoleMappers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+#pragma warning disable CA1822 // Mark members as static
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+#pragma warning restore CA1822 // Mark members as static
         {
             if (!env.IsDevelopment())
             {
@@ -145,6 +160,7 @@ namespace Xyzies.SSO.Identity.API
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
+                // TODO: Refactoring
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
                 userService.SetUsersCache();
             }

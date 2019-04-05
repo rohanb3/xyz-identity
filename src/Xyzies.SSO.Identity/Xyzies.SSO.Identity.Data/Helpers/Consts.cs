@@ -1,5 +1,8 @@
 ﻿namespace Xyzies.SSO.Identity.Data.Helpers
 {
+    /// <summary>
+    /// NOTE: Do not change constant values without full recompilation
+    /// </summary>
     public class Consts
     {
         private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";

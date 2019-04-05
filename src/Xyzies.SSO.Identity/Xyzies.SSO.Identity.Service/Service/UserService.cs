@@ -52,6 +52,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                     Total = 1
                 };
             }
+
             throw new ArgumentException("Unknown user role");
         }
 
@@ -80,6 +81,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 {
                     usersInCache.Add(model.Adapt<AzureUser>());
                 }
+
                 _cache.Set(Consts.Cache.UsersKey, usersInCache);
             }
             catch (ApplicationException)
@@ -113,19 +115,19 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task<Profile> GetUserByIdAsync(string id, UserIdentityParams user)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+
             try
             {
-                if (string.IsNullOrEmpty(id))
-                {
-                    throw new ArgumentNullException("Id can not be null or empty");
-                }
-
                 if (user.Role == Consts.Roles.SalesRep && id != user.Id)
                 {
                     throw new AccessException();
                 }
-                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
 
+                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
                 if (user.Role == Consts.Roles.SuperAdmin)
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
@@ -135,12 +137,14 @@ namespace Xyzies.SSO.Identity.Services.Service
                 if (user.Role == Consts.Roles.RetailerAdmin || user.Role == Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
-                    if (result?.CompanyId != user.CompanyId)
+                    if (result == null && result?.CompanyId != user.CompanyId)
                     {
                         throw new AccessException();
                     }
-                    return result?.Adapt<Profile>();
+
+                    return await Task.FromResult(result.Adapt<Profile>());
                 }
+
                 throw new AccessException();
             }
             catch (KeyNotFoundException)
@@ -174,7 +178,6 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
-
         public Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds, UserSortingParameters sorting, LazyLoadParameters lazyParameters)
         {
             var result = new Dictionary<string, int>();
@@ -186,8 +189,10 @@ namespace Xyzies.SSO.Identity.Services.Service
                     var usersInCompanyCount = usersInCache.Where(x => x.CompanyId == companyId).Count();
                     result.Add(companyId, usersInCompanyCount);
                 }
+
                 return result;
             }
+
             var grouped = usersInCache.GroupBy(x => x.CompanyId);
             if (sorting.By == Consts.UsersSorting.Descending)
             {
@@ -198,27 +203,17 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 grouped = grouped.OrderBy(x => x.Count());
             }
-            grouped = grouped.Where(x => x.Key != null).Skip(lazyParameters.Offset.HasValue ? lazyParameters.Offset.Value : 0)
-                              .Take(lazyParameters.Limit.HasValue ? lazyParameters.Limit.Value : grouped.Count());
+
+            grouped = grouped.Where(x => x.Key != null)
+                .Skip(lazyParameters.Offset ?? 0)
+                .Take(lazyParameters.Limit ?? grouped.Count());
 
             foreach (var value in grouped)
             {
                 result.Add(value.Key, value.Count());
             }
-            return result;
-        }
 
-        private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
-        {
-            var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-            var searchedUsers = users.GetByParameters(filter, sorting);
-            return new LazyLoadedResult<Profile>
-            {
-                Result = searchedUsers.Adapt<IEnumerable<Profile>>(),
-                Limit = filter.Limit,
-                Offset = filter.Offset,
-                Total = searchedUsers.Count
-            };
+            return result;
         }
 
         public async Task SetUsersCache()
@@ -228,44 +223,11 @@ namespace Xyzies.SSO.Identity.Services.Service
             usersToCache.AddRange(users.Users);
             while (!string.IsNullOrEmpty(users.NextLink))
             {
-                users = await _azureClient.GetUsers(users.NextLink.Split('?').Last(), 999, true);
+                users = await _azureClient.GetUsers(users.NextLink.Split('?').LastOrDefault(), 999, true);
                 usersToCache.AddRange(users.Users);
             }
+
             _cache.Set(Consts.Cache.UsersKey, usersToCache);
-        }
-
-        private bool IsPropertyAccessible(PropertyInfo prop)
-        {
-            return prop.CanRead && prop.CanWrite;
-        }
-
-        public void MergeObjects<T1, T2>(T1 source, T2 destination)
-        {
-            Type t1Type = typeof(T1);
-            Type t2Type = typeof(T2);
-
-            IEnumerable<PropertyInfo> t1PropertyInfos =
-                t1Type.GetProperties().Where(IsPropertyAccessible);
-            IEnumerable<PropertyInfo> t2PropertyInfos =
-                t2Type.GetProperties().Where(IsPropertyAccessible);
-
-
-            foreach (PropertyInfo t1PropertyInfo in t1PropertyInfos)
-            {
-                var propertyValue = t1PropertyInfo.GetValue(source);
-                if (propertyValue != null)
-                {
-                    foreach (PropertyInfo t2PropertyInfo in t2PropertyInfos)
-                    {
-                        if (t1PropertyInfo.Name == t2PropertyInfo.Name)
-                        {
-                            t2PropertyInfo.SetValue(destination, propertyValue);
-                            break;
-                        }
-                    }
-                }
-            }
-
         }
 
         public async Task UploadAvatar(string userId, AvatarModel model)
@@ -298,9 +260,10 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 throw new ArgumentNullException(nameof(userId));
             }
+
             try
             {
-                await _azureClient.PutAvatar(userId, new byte[0]);
+                await _azureClient.PutAvatar(userId, Array.Empty<byte>());
             }
             catch (ApplicationException)
             {
@@ -314,6 +277,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 throw new ArgumentNullException(nameof(userId));
             }
+
             try
             {
                  return await _azureClient.GetAvatar(userId);
@@ -324,5 +288,51 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
+        #region Helpers
+
+        private static bool IsPropertyAccessible(PropertyInfo prop) => prop.CanRead && prop.CanWrite;
+
+        private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
+        {
+            var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            var searchedUsers = users.GetByParameters(filter, sorting);
+
+            return await Task.FromResult(new LazyLoadedResult<Profile>
+            {
+                Result = searchedUsers.Adapt<IEnumerable<Profile>>(),
+                Limit = filter.Limit,
+                Offset = filter.Offset,
+                Total = searchedUsers.Count
+            });
+        }
+
+        private static void MergeObjects<T1, T2>(T1 source, T2 destination)
+        {
+            Type t1Type = typeof(T1);
+            Type t2Type = typeof(T2);
+
+            IEnumerable<PropertyInfo> t1PropertyInfos =
+                t1Type.GetProperties().Where(IsPropertyAccessible);
+            IEnumerable<PropertyInfo> t2PropertyInfos =
+                t2Type.GetProperties().Where(IsPropertyAccessible);
+
+            foreach (PropertyInfo t1PropertyInfo in t1PropertyInfos)
+            {
+                var propertyValue = t1PropertyInfo.GetValue(source);
+                if (propertyValue != null)
+                {
+                    foreach (PropertyInfo t2PropertyInfo in t2PropertyInfos)
+                    {
+                        if (t1PropertyInfo.Name == t2PropertyInfo.Name)
+                        {
+                            t2PropertyInfo.SetValue(destination, propertyValue);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }

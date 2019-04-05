@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Xyzies.SSO.Identity.Services</name>
+    </assembly>
+    <members>
+        <member name="T:Xyzies.SSO.Identity.Services.Attributes.FileTypeAttribute">
+            <summary>
+            Validate file
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.Services.Attributes.FileTypeAttribute.#ctor(System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="extension"></param>
+            <param name="maxSize"></param>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.Services.Models.User.UserAuthorizeOptions">
+            <summary>
+            Represents data for user authorization
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.Services.Models.User.UserAuthorizeOptions.Username">
+            <summary>
+            Username or login
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.Services.Models.User.UserAuthorizeOptions.Password">
+            <summary>
+            User password
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.Services.Models.User.UserAuthorizeOptions.Scope">
+            <summary>
+            User scope
+            </summary>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.Services.Models.User.UserRefreshOptions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.Services.Models.User.UserRefreshOptions.RefreshToken">
+            <summary>
+            Token to allow refresh auth token
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.Services.Service.SelectConditions.GetSelectQuery(System.Collections.Generic.List{System.String})">
+            <summary>
+            Creates a query param string to select passed properties from Azure user entity
+            </summary>
+            <param name="paramNames">List of user's property names</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
