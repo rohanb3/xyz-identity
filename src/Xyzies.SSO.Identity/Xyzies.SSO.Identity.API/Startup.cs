@@ -29,6 +29,7 @@ using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.UserMigration;
 using System.Collections.Generic;
 using System.Linq;
+using Xyzies.SSO.Identity.Services.Models;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -51,6 +52,8 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
+
+            services.Configure<ProjectSettingsOption>(option => Configuration.Bind("ProjectSettings", option));
 
             string dbConnectionString = Configuration.GetConnectionString("db");
             if (string.IsNullOrEmpty(dbConnectionString))

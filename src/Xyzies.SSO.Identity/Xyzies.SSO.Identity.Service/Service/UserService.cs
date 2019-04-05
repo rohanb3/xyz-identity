@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,7 @@ using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.User;
 
 namespace Xyzies.SSO.Identity.Services.Service
@@ -22,12 +24,14 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
+        private readonly string _projectUrl;
 
-        public UserService(IAzureAdClient azureClient, IMemoryCache cache, ILocaltionService localtionService)
+        public UserService(IAzureAdClient azureClient, IMemoryCache cache, ILocaltionService localtionService, IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
             _localtionService = localtionService ?? throw new ArgumentNullException(nameof(localtionService));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _projectUrl = options.CurrentValue?.ProjectUrl;
         }
 
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
@@ -45,7 +49,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (user.Role.ToLower() == Consts.Roles.SalesRep)
             {
-                var salesRep = await GetUserByIdAsync(user.Id.ToString(), user); ;
+                var salesRep = await GetUserByIdAsync(user.Id.ToString(), user);
+                salesRep.AvatarUrl = FormUrlForDownloadUserAvatar(salesRep.ObjectId);
                 return new LazyLoadedResult<Profile>()
                 {
                     Result = new List<Profile> { salesRep.Adapt<Profile>() },
@@ -230,6 +235,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         {
             var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
             var searchedUsers = users.GetByParameters(filter, sorting);
+            searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
             return new LazyLoadedResult<Profile>
             {
                 Result = searchedUsers.Adapt<IEnumerable<Profile>>(),
@@ -341,6 +347,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw;
             }
         }
+
+        private string FormUrlForDownloadUserAvatar(string userId) => $"{_projectUrl}/users/{userId}/avatar";
 
     }
 }
