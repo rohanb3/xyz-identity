@@ -19,6 +19,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
         }
 
+#pragma warning disable CS1572 // XML comment has a param tag, but there is no parameter by that name
         /// <summary>
         /// Authorizes user with passed credentials
         /// </summary>
@@ -27,15 +28,22 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <param name="scope">scope what user will use to work with. Example - xyzies.authorization.reviews.admin</param>
         /// <returns>Access token with additional info</returns>
         [HttpPost("token")]
+#pragma warning restore CS1572 // XML comment has a param tag, but there is no parameter by that name
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ContentResult))]
+#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         public async Task<IActionResult> Token(UserAuthorizeOptions credentials)
+#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                var passwordResult = await _authorizationService.AuthorizeAsync(credentials);
-                return Ok(passwordResult);
+                return Ok(await _authorizationService.AuthorizeAsync(credentials));
             }
             catch (ArgumentException ex)
             {
@@ -43,14 +51,18 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (AccessException ex)
             {
-                return new ContentResult { StatusCode = 403, Content = ex.Message, ContentType = "application/json" };
+                return new ContentResult
+                {
+                    StatusCode = 403,
+                    Content = ex.Message,
+                    ContentType = "application/json"
+                };
             }
         }
 
         /// <summary>
         /// Return refreshed access_token
         /// </summary>
-        /// <param name="refresh_token">Refresh token</param>
         /// <returns>Refreshed access_token</returns>
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
@@ -60,12 +72,16 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                var refreshResult = await _authorizationService.RefreshAsync(refresh);
-                return Ok(refreshResult);
+                return Ok(await _authorizationService.RefreshAsync(refresh));
             }
             catch (AccessException ex)
             {
-                return new ContentResult { StatusCode = 403, Content = ex.Message, ContentType = "application/json" };
+                return new ContentResult
+                {
+                    StatusCode = 403,
+                    Content = ex.Message,
+                    ContentType = "application/json"
+                };
             }
         }
     }

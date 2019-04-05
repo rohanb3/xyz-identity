@@ -1,20 +1,24 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Models.User;
-using Xyzies.SSO.Identity.Data.Helpers;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Data.Core;
-using Microsoft.AspNetCore.Authorization;
+using Xyzies.SSO.Identity.Data.Helpers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
+    /// <summary>
+    /// AAD Users Endpoints
+    /// </summary>
     [Route("api/users")]
     [ApiController]
     [Authorize]
@@ -22,9 +26,14 @@ namespace Xyzies.SSO.Identity.API.Controllers
     {
         private readonly IUserService _userService;
 
+        /// <summary>
+        /// Ctor with dependencies
+        /// </summary>
+        /// <param name="userService"></param>
         public UsersController(IUserService userService)
         {
-            _userService = userService;
+            _userService = userService ??
+                throw new ArgumentNullException(nameof(userService));
         }
 
         /// <summary>
@@ -46,6 +55,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
+
                 return Ok(users);
             }
             catch (ArgumentException ex)
@@ -63,7 +73,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet]
         [Route("total")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> GetTotalInCompanies([FromQuery] List<string> companyIds, [FromQuery] UserSortingParameters sorting, [FromQuery] LazyLoadParameters lazyParameters)
+        public IActionResult GetTotalInCompanies([FromQuery] List<string> companyIds, [FromQuery] UserSortingParameters sorting, [FromQuery] LazyLoadParameters lazyParameters)
         {
             try
             {
@@ -72,7 +82,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 {
                     return new ContentResult { StatusCode = 403 };
                 }
+
                 var usersCount = _userService.GetUsersCountInCompanies(companyIds, sorting, lazyParameters);
+
                 return Ok(usersCount);
             }
             catch (ArgumentException ex)
@@ -226,7 +238,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Update avatar for user
+        /// Update a user photo thumbnail
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="avatarModel"></param>
@@ -250,7 +262,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Delete avatar for user
+        /// Delete a user photo thumbnail
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
@@ -273,17 +285,27 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Get avatar for user
+        /// Get a user photo thumbnail
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
         /// <response code="200">If avatar updated successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If avatar not found</response>
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Produces("image/*")]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK /* 200 */)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [HttpGet("{userId}/avatar")]
-        public async Task<IActionResult> GetAvatar([FromRoute][Required] string userId)
+        public async Task<IActionResult> GetAvatar([FromRoute, Required] string userId)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var avatarFile = await _userService.GetAvatar(userId);
@@ -291,6 +313,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 {
                     return NotFound();
                 }
+
                 return File(avatarFile.FileBytes, avatarFile.ContentType);
             }
             catch (ApplicationException ex)
