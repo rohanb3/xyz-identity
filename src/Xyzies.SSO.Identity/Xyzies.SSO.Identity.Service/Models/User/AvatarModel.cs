@@ -10,7 +10,7 @@ namespace Xyzies.SSO.Identity.Services.Models.User
     public class AvatarModel
     {
         [Required]
-        [FileType(".jpg, .jpeg, .png, .ico", 102400)]
+        [FileType(".jpg,.jpeg,.png,.ico", 102400)]
         public IFormFile Avatar { get; set; }
     }
 }
