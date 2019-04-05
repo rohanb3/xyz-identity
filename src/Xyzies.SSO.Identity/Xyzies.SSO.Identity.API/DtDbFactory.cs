@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Xyzies.SSO.Identity.API
 {
-
+    /// <summary>
+    /// TODO: Remove before release
+    /// </summary>
     public class IdentityDataContextFactory : IDesignTimeDbContextFactory<IdentityDataContext>
     {
         public IdentityDataContext CreateDbContext(string[] args)
