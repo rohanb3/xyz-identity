@@ -292,7 +292,8 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="200">If avatar updated successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If avatar not found</response>
-        [Produces("image/*")]
+        // TODO: Fix 'image/*' to valid type
+        //[Produces("image/*")] 
         [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK /* 200 */)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
