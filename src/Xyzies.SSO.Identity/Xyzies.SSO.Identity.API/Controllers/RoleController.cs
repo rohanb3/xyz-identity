@@ -19,8 +19,8 @@ namespace Xyzies.SSO.Identity.API.Controllers
     [Authorize]
     public class RoleController : ControllerBase
     {
-        private readonly IRoleService _roleService = null;
         private readonly ILogger<RoleController> _logger = null;
+        private readonly IRoleService _roleService = null;
         private readonly IPermissionService _permissionService = null;
 
         /// <summary>
@@ -28,15 +28,25 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="roleRepository"></param>
+        /// <param name="permissionService"></param>
         public RoleController(ILogger<RoleController> logger,
             IRoleService roleRepository,
             IPermissionService permissionService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _roleService = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
-            _permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _roleService = roleRepository ??
+                throw new ArgumentNullException(nameof(roleRepository));
+            _permissionService = permissionService ??
+                throw new ArgumentNullException(nameof(permissionService));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="role"></param>
+        /// <returns></returns>
         [HttpHead]
         public async Task<IActionResult> HasPermission([FromQuery] string[] scope, [FromQuery] string role)
         {
@@ -46,6 +56,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return new ContentResult { StatusCode = 403 };
             }
+
             return Ok();
         }
 
@@ -58,6 +69,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         public async Task<IActionResult> Get()
         {
             var roles = await _roleService.GetAllAsync();
+
             return Ok(roles);
         }
     }

@@ -94,7 +94,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             var result = BaseOptions;
 
             result.Add(new KeyValuePair<string, string>("grant_type", GrantTypes.RefreshToken));
-            result.Add(new KeyValuePair<string, string>("refresh_token", options.refresh_token));
+            result.Add(new KeyValuePair<string, string>("refresh_token", options.RefreshToken));
 
             return result;
         }

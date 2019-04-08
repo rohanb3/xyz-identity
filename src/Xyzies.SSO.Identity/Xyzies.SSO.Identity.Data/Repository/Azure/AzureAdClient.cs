@@ -202,8 +202,8 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             {
                 return null;
             }
-            var avatarFile = await response.Content.ReadAsByteArrayAsync();
 
+            var avatarFile = await response.Content.ReadAsByteArrayAsync();
             return new FileModel()
             {
                 FileBytes = avatarFile,
