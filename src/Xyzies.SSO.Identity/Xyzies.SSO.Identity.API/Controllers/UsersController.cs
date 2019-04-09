@@ -190,7 +190,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (AccessViolationException)
+            catch (AccessException)
             {
                 return new ContentResult { StatusCode = 403 };
             }
