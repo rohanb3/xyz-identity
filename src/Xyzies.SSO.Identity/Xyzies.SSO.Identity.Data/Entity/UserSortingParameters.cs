@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Xyzies.SSO.Identity.Data.Entity
+﻿namespace Xyzies.SSO.Identity.Data.Entity
 {
     public class UserSortingParameters
     {

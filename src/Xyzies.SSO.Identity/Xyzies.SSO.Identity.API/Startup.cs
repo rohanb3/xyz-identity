@@ -30,6 +30,7 @@ using Xyzies.SSO.Identity.UserMigration;
 using System.Collections.Generic;
 using System.Linq;
 using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Mailer;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -124,6 +125,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
             services.AddUserMigrationService();
+            services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
 
             #endregion
 

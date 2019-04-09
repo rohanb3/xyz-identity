@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Xyzies.SSO.Identity.Data\Xyzies.SSO.Identity.Data.csproj" />
+    <ProjectReference Include="..\Xyzies.SSO.Identity.Mailer\Xyzies.SSO.Identity.Mailer.csproj" />
     <ProjectReference Include="..\Xyzies.SSO.Identity.Service\Xyzies.SSO.Identity.Services.csproj" />
     <ProjectReference Include="..\Xyzies.SSO.Identity.UserMigration\Xyzies.SSO.Identity.CPUserMigration.csproj" />
   </ItemGroup>

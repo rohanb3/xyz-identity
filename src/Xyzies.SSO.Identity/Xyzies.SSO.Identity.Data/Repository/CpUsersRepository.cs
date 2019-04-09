@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Xyzies.SSO.Identity.Data.Entity;
+﻿using Xyzies.SSO.Identity.Data.Entity;
 
 namespace Xyzies.SSO.Identity.Data.Repository
 {

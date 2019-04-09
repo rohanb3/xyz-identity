@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Xyzies.SSO.Identity.Data.Core;
 
 namespace Xyzies.SSO.Identity.Data.Entity

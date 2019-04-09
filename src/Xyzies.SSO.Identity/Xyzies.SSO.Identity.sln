@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.Services", "Xyzies.SSO.Identity.Service\Xyzies.SSO.Identity.Services.csproj", "{BFB2E0AD-E2F0-4E61-A782-CD1BFA90118C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xyzies.SSO.Identity.CPUserMigration", "Xyzies.SSO.Identity.UserMigration\Xyzies.SSO.Identity.CPUserMigration.csproj", "{DE8E415C-E811-470E-B055-6689958F9908}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.CPUserMigration", "Xyzies.SSO.Identity.UserMigration\Xyzies.SSO.Identity.CPUserMigration.csproj", "{DE8E415C-E811-470E-B055-6689958F9908}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xyzies.SSO.Identity.Mailer", "Xyzies.SSO.Identity.Mailer\Xyzies.SSO.Identity.Mailer.csproj", "{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{DE8E415C-E811-470E-B055-6689958F9908}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE8E415C-E811-470E-B055-6689958F9908}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE8E415C-E811-470E-B055-6689958F9908}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

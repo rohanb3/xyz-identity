@@ -84,5 +84,12 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 };
             }
         }
+
+        [HttpPost("send-reset-link")]
+        public async Task<IActionResult> SendResetLink([FromBody] string email)
+        {
+
+            return Ok(email);
+        }
     }
 }

@@ -5,10 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
-using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
-using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.UserMigration.Models;
 
