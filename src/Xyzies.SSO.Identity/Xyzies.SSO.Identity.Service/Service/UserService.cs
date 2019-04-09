@@ -59,6 +59,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (user.Role.ToLower() == Consts.Roles.RetailerAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
+                filter.Role = new List<string> { Consts.Roles.RetailerAdmin, Consts.Roles.SalesRep };
                 return await GetUsers(filter, sorting);
             }
 
@@ -114,8 +115,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 
                 if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
                 {
-                   await _localtionService.SetCity(model.City, model?.State);
-                   await _localtionService.SetState(model.State);
+                    await _localtionService.SetCity(model.City, model?.State);
+                    await _localtionService.SetState(model.State);
                 }
             }
             catch (ApplicationException)
@@ -217,7 +218,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
             catch (AccessViolationException)
             {
-                throw;
+                throw new AccessException();
             }
         }
 

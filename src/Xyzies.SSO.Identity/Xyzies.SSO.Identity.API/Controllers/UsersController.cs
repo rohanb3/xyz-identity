@@ -62,6 +62,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
         }
 
         /// <summary>
@@ -186,7 +190,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (AccessViolationException)
+            catch (AccessException)
             {
                 return new ContentResult { StatusCode = 403 };
             }
@@ -310,7 +314,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             try
             {
                 var avatarFile = await _userService.GetAvatar(userId);
-                if(avatarFile == null)
+                if (avatarFile == null)
                 {
                     return NotFound();
                 }

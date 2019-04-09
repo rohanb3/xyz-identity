@@ -61,7 +61,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private static List<AzureUser> GetFiltered(this List<AzureUser> users, UserFilteringParams filters)
         {
             UserFilters condition = null;
-            if (filters.Role != null)
+            if (filters.Role != null && filters.Role.Any())
             {
                 condition += (AzureUser user) => filters.Role.Select(role => role.ToLower()).Contains(user.Role?.ToLower());
             }

@@ -20,7 +20,7 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         public string State { get; set; }
 
-        public int? CompanyId { get; set; }
+        public virtual int? CompanyId { get; set; }
 
         public int? RetailerId { get; set; }
 
