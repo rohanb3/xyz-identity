@@ -63,17 +63,17 @@ namespace Xyzies.SSO.Identity.Services.Service
             UserFilters condition = null;
             if (filters.Role != null)
             {
-                condition += (AzureUser user) => filters.Role.Contains(user.Role?.ToLower());
+                condition += (AzureUser user) => filters.Role.Select(role => role.ToLower()).Contains(user.Role?.ToLower());
             }
 
             if (filters.State != null && filters.State.Any())
             {
-                condition += (AzureUser user) => filters.State.Contains(user.State?.ToLower());
+                condition += (AzureUser user) => filters.State.Select(role => role.ToLower()).Contains(user.State?.ToLower());
             }
 
             if (filters.City != null && filters.City.Any())
             {
-                condition += (AzureUser user) => filters.City.Contains(user.City?.ToLower());
+                condition += (AzureUser user) => filters.City.Select(role => role.ToLower()).Contains(user.City?.ToLower());
             }
 
             if (filters.UserName != null)
