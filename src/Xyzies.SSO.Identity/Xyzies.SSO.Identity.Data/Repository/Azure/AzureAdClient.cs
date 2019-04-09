@@ -43,7 +43,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
             }
             if (response.StatusCode == HttpStatusCode.Forbidden)
             {
-                throw new AccessException();
+                throw new AccessViolationException();
             }
         }
 

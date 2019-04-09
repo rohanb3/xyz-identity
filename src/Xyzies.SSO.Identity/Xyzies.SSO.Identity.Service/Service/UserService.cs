@@ -216,9 +216,9 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 throw;
             }
-            catch (AccessException)
+            catch (AccessViolationException)
             {
-                throw;
+                throw new AccessException();
             }
         }
 
