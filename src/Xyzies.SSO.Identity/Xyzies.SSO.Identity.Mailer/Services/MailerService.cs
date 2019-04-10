@@ -18,15 +18,17 @@ namespace Xyzies.SSO.Identity.Mailer.Services
             _client = new SendGridClient(options.ApiKey);
         }
 
-        public async Task SendMail(MailSendingModel model)
+        public async Task<Response> SendMail(MailSendingModel model)
         {
             var msg = MailHelper.CreateSingleEmail(model.From, model.ReplyTo, model.Subject, model.PlainTextContent, model.HtmlContent);
             var response = await _client.SendEmailAsync(msg);
 
-            if(response.StatusCode != System.Net.HttpStatusCode.OK)
+            if(response.StatusCode != System.Net.HttpStatusCode.Accepted)
             {
-                throw new ApplicationException();
+                throw new ApplicationException(response.StatusCode.ToString());
             }
+
+            return response;
         }
     }
 }

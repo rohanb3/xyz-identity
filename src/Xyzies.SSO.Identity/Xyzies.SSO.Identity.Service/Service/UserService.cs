@@ -154,6 +154,46 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
+        public async Task UpdateUserPasswordAsync(string userMail, string password)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(password))
+                {
+                    throw new ArgumentException("invalid password", nameof(password));
+                }
+
+                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                var userToChange = usersInCache.FirstOrDefault(user => user.SignInNames.FirstOrDefault(signInName => signInName.Type == "emailAddress")?.Value == userMail) ?? throw new KeyNotFoundException();
+
+                MergeObjects(new ProfileCreatable
+                {
+                    PasswordProfile = new PasswordProfile
+                    {
+                        EnforceChangePasswordPolicy = false,
+                        ForceChangePasswordNextLogin = false,
+                        Password = password
+                    }
+                    
+                }, userToChange);
+
+                await _azureClient.PatchUser(userToChange.ObjectId, userToChange);
+
+                usersInCache.RemoveAll(user => user.ObjectId == userToChange.ObjectId);
+                usersInCache.Add(userToChange);
+
+                _cache.Set(Consts.Cache.UsersKey, usersInCache);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+        }
+
         /// <inheritdoc />
         public async Task<Profile> GetUserByIdAsync(string id, UserIdentityParams user)
         {

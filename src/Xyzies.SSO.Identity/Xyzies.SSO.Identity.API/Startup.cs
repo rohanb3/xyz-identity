@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Mailer;
+using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -121,11 +122,13 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
+            services.AddScoped<IPasswordResetRequestRepository, PasswordResetRequestRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
-            services.AddUserMigrationService();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
+            services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddUserMigrationService();
 
             #endregion
 
@@ -189,7 +192,7 @@ namespace Xyzies.SSO.Identity.API
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
-                //context.Database.Migrate();
+                context.Database.Migrate();
             }
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
