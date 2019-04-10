@@ -24,8 +24,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 users = users.GetSorted(sorting);
             }
 
-            return users.Skip(filters.Offset.HasValue ? filters.Offset.Value : 0)
-                              .Take(filters.Limit.HasValue ? filters.Limit.Value : users.Count()).ToList();
+            return users.Skip(filters?.Offset ?? 0)
+                              .Take(filters?.Limit ?? users.Count).ToList();
         }
 
 
