@@ -193,7 +193,7 @@ namespace Xyzies.SSO.Identity.API
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
-                context.Database.Migrate();
+                //context.Database.Migrate();
             }
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
