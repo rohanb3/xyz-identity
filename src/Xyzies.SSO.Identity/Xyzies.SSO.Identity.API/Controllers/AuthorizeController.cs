@@ -97,6 +97,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <returns></returns>
         [HttpPost("request-verification-code")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         public async Task<IActionResult> SendResetLink([FromBody] RequestVerificationCodeModel options)
         {
             await _resetPasswordService.SendConfirmationCodeAsync(options.Email);
@@ -108,16 +109,16 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// Verifys confirmation code for passed email
         /// </summary>
         /// <param name="options"></param>
-        /// <returns>If success, returns reset hash to reset password for konfirmed user</returns>
+        /// <returns>If success, returns reset token to reset password for konfirmed user</returns>
         [HttpPost("verify-code")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResetTokenResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
         public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeModel options)
         {
             try
             {
                 var result = await _resetPasswordService.ValidateConfirmationCodeAsync(options.Email, options.Code);
-                return Ok(result);
+                return Ok(new ResetTokenResponse { ResetToken = result });
             }
             catch (KeyNotFoundException)
             {
@@ -126,10 +127,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Verifys confirmation code for passed email
+        /// Resets password by resetToken
         /// </summary>
         /// <param name="options"></param>
-        /// <returns>If success, returns reset hash to reset password for konfirmed user</returns>
+        /// <returns>If success, resets password for konfirmed user</returns>
         [HttpPost("reset-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Entity;
+using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Mailer.Services;
 
@@ -13,12 +14,17 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         private readonly IMailerService _mailerService;
         private readonly IUserService _userService;
         private readonly IPasswordResetRequestRepository _passwordResetRequestRepository;
+        private readonly IConfigurationRepository _configurationRepository;
 
-        public ResetPasswordService(IMailerService mailerService, IPasswordResetRequestRepository passwordResetRequestRepository, IUserService userService)
+        public ResetPasswordService(IMailerService mailerService,
+            IPasswordResetRequestRepository passwordResetRequestRepository,
+            IUserService userService,
+            IConfigurationRepository configurationRepository)
         {
             _mailerService = mailerService ?? throw new ArgumentNullException(nameof(mailerService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _passwordResetRequestRepository = passwordResetRequestRepository ?? throw new ArgumentNullException(nameof(passwordResetRequestRepository));
+            _configurationRepository = configurationRepository ?? throw new ArgumentNullException(nameof(configurationRepository));
         }
 
         public async Task ResetPassword(string resetToken, string newPassword)
@@ -55,13 +61,20 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
                     Code = code
                 });
 
+                var htmlTemplate =
+                    (await _configurationRepository.GetByAsync(config => config.Id == Consts.ConfigurationKeys.HTMLCodeEmailTemplate))?.Value
+                    ?? throw new ArgumentException("Missing html template for reset code mail");
+                var textTemplate =
+                    (await _configurationRepository.GetByAsync(config => config.Id == Consts.ConfigurationKeys.TextCodeEmailTemplate))?.Value
+                    ?? throw new ArgumentException("Missing text template for reset code mail");
+
                 var response = await _mailerService.SendMail(new Mailer.Models.MailSendingModel
                 {
-                    From = new SendGrid.Helpers.Mail.EmailAddress("andrii.matiushenko@ardas.dp.ua"),
+                    From = new SendGrid.Helpers.Mail.EmailAddress("xyzies.support@xyzies.com"),
                     ReplyTo = new SendGrid.Helpers.Mail.EmailAddress(email),
-                    PlainTextContent = "Test",
-                    HtmlContent = $"<html><p><b>TEST HTML</b></p><h1>Code: {code}</h1></html>",
-                    Subject = "Subject"
+                    PlainTextContent = FillTemplateWithValues(textTemplate, code, email),
+                    HtmlContent = FillTemplateWithValues(htmlTemplate, code, email),
+                    Subject = "Verify your account"
                 });
 
             }
@@ -90,6 +103,11 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         {
             var random = new Random();
             return random.Next(0, 9999).ToString().PadLeft(4, '0');
+        }
+
+        private string FillTemplateWithValues(string template, string codeValue, string emailValue)
+        {
+            return template.Replace("{code}", codeValue).Replace("{email}", emailValue);
         }
     }
 }

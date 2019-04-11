@@ -30,6 +30,8 @@ namespace Xyzies.SSO.Identity.Data
 
         public DbSet<PasswordResetRequest> PasswordResetRequest { get; set; }
 
+        public DbSet<Configuration> Configuration { get; set; }
+
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)

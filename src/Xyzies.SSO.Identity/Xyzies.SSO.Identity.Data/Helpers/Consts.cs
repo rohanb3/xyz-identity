@@ -81,5 +81,11 @@
             public const string DisablePasswordExpiration = "DisablePasswordExpiration";
             public const string DisablePasswordString = "DisableStrongPassword";
         }
+
+        public class ConfigurationKeys
+        {
+            public const string HTMLCodeEmailTemplate= "HTMLCodeEmailTemplate";
+            public const string TextCodeEmailTemplate = "TextCodeEmailTemplate";
+        }
     }
 }

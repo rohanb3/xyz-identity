@@ -126,6 +126,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
+            services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddUserMigrationService();
