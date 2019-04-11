@@ -69,6 +69,42 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
+        /// Returns collection of users for trusted service
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet]
+        [Route("{token}/trusted")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetAllForTrustedService(string token)
+        {
+            try
+            {
+                if (token != Consts.Security.StaticToken)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+
+                var currentUser = new UserIdentityParams
+                {
+                    Role = Consts.Roles.SuperAdmin
+                };
+                var users = await _userService.GetAllUsersAsync(currentUser);
+
+                return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
+        }
+
+        /// <summary>
         /// Returns total count of users
         /// </summary>
         /// <returns>Collection of users</returns>

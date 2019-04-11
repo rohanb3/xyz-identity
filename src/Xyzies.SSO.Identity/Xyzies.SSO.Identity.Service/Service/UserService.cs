@@ -390,10 +390,10 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             return await Task.FromResult(new LazyLoadedResult<Profile>
             {
-                Result = searchedUsers.Adapt<IEnumerable<Profile>>(),
-                Limit = filter.Limit,
-                Offset = filter.Offset,
-                Total = searchedUsers.Count
+                Result = searchedUsers?.Adapt<IEnumerable<Profile>>(),
+                Limit = filter?.Limit,
+                Offset = filter?.Offset,
+                Total = searchedUsers?.Count
             });
         }
 
