@@ -4,16 +4,13 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models.User;
 using static Xyzies.SSO.Identity.Data.Helpers.Consts;
 using Microsoft.Extensions.Options;
 using Xyzies.SSO.Identity.Services.Helpers;
-using System.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 
 namespace Xyzies.SSO.Identity.Services.Service

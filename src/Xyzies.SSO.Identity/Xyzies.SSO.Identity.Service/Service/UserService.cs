@@ -11,7 +11,6 @@ using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
-using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models;

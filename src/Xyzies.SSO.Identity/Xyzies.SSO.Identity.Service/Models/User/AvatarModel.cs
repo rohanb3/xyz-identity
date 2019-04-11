@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Xyzies.SSO.Identity.Services.Attributes;
 
 namespace Xyzies.SSO.Identity.Services.Models.User

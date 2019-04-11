@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -17,17 +18,17 @@ namespace Xyzies.SSO.Identity.Services.Service
             _cityRepo = cityRepo;
         }
 
-        public async Task<List<string>> GetAllCities()
+        public async Task<List<City>> GetAllCities()
         {
             var cities = await _cityRepo.GetAsync();
-            return cities.Select(x => x.Name).ToList();
+            return cities.Include(city => city.State).ToList();
         }
 
-        public async Task<List<string>> GetAllCities(string stateName)
+        public async Task<List<City>> GetAllCities(string stateName)
         {
             var state = await _stateRepo.GetByAsync(s => s.Name == stateName || s.ShortName == stateName);
             var cities = await _cityRepo.GetAsync(c => c.State.Id == state.Id);
-            return cities.Select(x => x.Name).ToList();
+            return cities.ToList();
         }
 
         public async Task<List<State>> GetAllStates()

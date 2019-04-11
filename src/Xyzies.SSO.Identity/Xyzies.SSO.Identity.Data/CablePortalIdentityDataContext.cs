@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using Xyzies.SSO.Identity.Data.Entity;
-using Xyzies.SSO.Identity.Data.Entity.Relationship;
 
 namespace Xyzies.SSO.Identity.Data
 {
