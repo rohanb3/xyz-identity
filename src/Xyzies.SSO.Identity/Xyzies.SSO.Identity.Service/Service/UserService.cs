@@ -164,7 +164,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                var userToChange = usersInCache.FirstOrDefault(user => user.SignInNames.FirstOrDefault(signInName => signInName.Type == "emailAddress")?.Value == userMail) ?? throw new KeyNotFoundException();
+                var userToChange = usersInCache.FirstOrDefault(user => user.SignInNames.FirstOrDefault(signInName => signInName.Type == "emailAddress")?.Value.ToLower() == userMail.ToLower()) ?? throw new KeyNotFoundException();
 
                 MergeObjects(new ProfileCreatable
                 {
@@ -191,6 +191,15 @@ namespace Xyzies.SSO.Identity.Services.Service
             catch (ArgumentException)
             {
                 throw;
+            }
+            catch (ApplicationException ex)
+            {
+                if (ex.Message == "Can not update user with current parameters")
+                {
+                    throw new ArgumentException("Not valid password");
+                }
+
+                throw ex;
             }
         }
 

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Mailer.Services;
+using Xyzies.SSO.Identity.Services.Models;
+using SendGrid.Helpers.Mail;
 
 namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 {
@@ -15,16 +18,21 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         private readonly IUserService _userService;
         private readonly IPasswordResetRequestRepository _passwordResetRequestRepository;
         private readonly IConfigurationRepository _configurationRepository;
+        private readonly string _serviceEmail;
 
-        public ResetPasswordService(IMailerService mailerService,
+        public ResetPasswordService(
+            IMailerService mailerService,
             IPasswordResetRequestRepository passwordResetRequestRepository,
             IUserService userService,
-            IConfigurationRepository configurationRepository)
+            IConfigurationRepository configurationRepository,
+            IOptionsMonitor<ResetPasswordOptions> _resetPassOptionsMonitor
+            )
         {
             _mailerService = mailerService ?? throw new ArgumentNullException(nameof(mailerService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _passwordResetRequestRepository = passwordResetRequestRepository ?? throw new ArgumentNullException(nameof(passwordResetRequestRepository));
             _configurationRepository = configurationRepository ?? throw new ArgumentNullException(nameof(configurationRepository));
+            _serviceEmail = _resetPassOptionsMonitor.CurrentValue?.ServiceEmailAddress ?? throw new ArgumentNullException(nameof(_resetPassOptionsMonitor.CurrentValue));
         }
 
         public async Task ResetPassword(string resetToken, string newPassword)
@@ -70,8 +78,8 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 
                 var response = await _mailerService.SendMail(new Mailer.Models.MailSendingModel
                 {
-                    From = new SendGrid.Helpers.Mail.EmailAddress("xyzies.support@xyzies.com"),
-                    ReplyTo = new SendGrid.Helpers.Mail.EmailAddress(email),
+                    From = new EmailAddress(_serviceEmail),
+                    ReplyTo = new EmailAddress(email),
                     PlainTextContent = FillTemplateWithValues(textTemplate, code, email),
                     HtmlContent = FillTemplateWithValues(htmlTemplate, code, email),
                     Subject = "Verify your account"
@@ -89,7 +97,7 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         {
             try
             {
-                var resetHash = (await _passwordResetRequestRepository.GetByAsync(request => request.Email == email && request.Code == code))?.Id;
+                var resetHash = (await _passwordResetRequestRepository.GetByAsync(request => request.Email.ToLower() == email.ToLower() && request.Code.ToLower() == code.ToLower()))?.Id;
 
                 return resetHash?.ToString() ?? throw new KeyNotFoundException();
             }

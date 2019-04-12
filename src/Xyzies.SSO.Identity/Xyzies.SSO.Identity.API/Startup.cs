@@ -136,6 +136,7 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
+            services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
 
             services.AddSwaggerGen(options =>
             {
