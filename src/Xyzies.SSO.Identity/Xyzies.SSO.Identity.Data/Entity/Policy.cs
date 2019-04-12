@@ -27,5 +27,5 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         [NotMapped]
         public virtual IEnumerable<Permission> Permissions { get => RelationToPermission == null ? Enumerable.Empty<Permission>() : RelationToPermission.Select(rp => rp.Entity1); }
-}
+    }
 }

@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.API.Models;
+using Xyzies.SSO.Identity.Services.Service.ResetPassword;
+using System.Collections.Generic;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -13,10 +16,12 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class AuthorizeController : ControllerBase
     {
         private readonly IAuthService _authorizationService;
+        private readonly IResetPasswordService _resetPasswordService;
 
-        public AuthorizeController(IAuthService authorizationService)
+        public AuthorizeController(IAuthService authorizationService, IResetPasswordService resetPasswordService)
         {
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+            _resetPasswordService = resetPasswordService ?? throw new ArgumentNullException(nameof(resetPasswordService));
         }
 
 #pragma warning disable CS1572 // XML comment has a param tag, but there is no parameter by that name
@@ -82,6 +87,64 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     Content = ex.Message,
                     ContentType = "application/json"
                 };
+            }
+        }
+
+        /// <summary>
+        /// Sends verification code to current email, creates row in DB with reset password request data
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        [HttpPost("request-verification-code")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+        public async Task<IActionResult> SendResetLink([FromBody] RequestVerificationCodeModel options)
+        {
+            await _resetPasswordService.SendConfirmationCodeAsync(options.Email);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Verifys confirmation code for passed email
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns>If success, returns reset token to reset password for konfirmed user</returns>
+        [HttpPost("verify-code")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResetTokenResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeModel options)
+        {
+            try
+            {
+                var result = await _resetPasswordService.ValidateConfirmationCodeAsync(options.Email, options.Code);
+                return Ok(new ResetTokenResponse { ResetToken = result });
+            }
+            catch (KeyNotFoundException)
+            {
+                return BadRequest();
+            }
+        }
+
+        /// <summary>
+        /// Resets password by resetToken
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns>If success, resets password for konfirmed user</returns>
+        [HttpPost("reset-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        public async Task<IActionResult> ResetPassword([FromBody] PasswordModel options)
+        {
+            try
+            {
+                await _resetPasswordService.ResetPassword(options.ResetToken, options.Password);
+
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return BadRequest();
             }
         }
     }

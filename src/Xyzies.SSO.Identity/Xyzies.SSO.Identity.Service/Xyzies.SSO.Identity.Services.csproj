@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Xyzies.SSO.Identity.Data\Xyzies.SSO.Identity.Data.csproj" />
+    <ProjectReference Include="..\Xyzies.SSO.Identity.Mailer\Xyzies.SSO.Identity.Mailer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

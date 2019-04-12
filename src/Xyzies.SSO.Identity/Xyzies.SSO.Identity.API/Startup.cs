@@ -30,6 +30,8 @@ using Xyzies.SSO.Identity.UserMigration;
 using System.Collections.Generic;
 using System.Linq;
 using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Mailer;
+using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -120,9 +122,13 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
+            services.AddScoped<IPasswordResetRequestRepository, PasswordResetRequestRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
+            services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+            services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
+            services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddUserMigrationService();
 
             #endregion
@@ -130,6 +136,7 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
+            services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
 
             services.AddSwaggerGen(options =>
             {
