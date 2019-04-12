@@ -113,6 +113,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpPost("verify-code")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResetTokenResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(NotFoundObjectResult))]
         public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeModel options)
         {
             try
@@ -122,7 +123,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return BadRequest();
+                return NotFound();
             }
         }
 
