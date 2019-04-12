@@ -8,6 +8,7 @@ using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.API.Models;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -124,6 +125,17 @@ namespace Xyzies.SSO.Identity.API.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    errors = new
+                    {
+                        Code = new[] { "Code is not valid" }
+                    },
+                    status = StatusCodes.Status400BadRequest
+                });
             }
         }
 

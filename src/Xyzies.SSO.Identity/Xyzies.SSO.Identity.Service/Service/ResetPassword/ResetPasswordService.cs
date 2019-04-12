@@ -95,9 +95,16 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 
         public async Task<string> ValidateConfirmationCodeAsync(string email, string code)
         {
-            var resetHash = (await _passwordResetRequestRepository.GetByAsync(request => request.Email.ToLower() == email.ToLower() && request.Code.ToLower() == code.ToLower()))?.Id;
+            var request = (await _passwordResetRequestRepository.GetByAsync(r => r.Email.ToLower() == email.ToLower()));
 
-            return resetHash?.ToString() ?? throw new KeyNotFoundException();
+            if (request == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            return request.Code.ToLower() == code.ToLower() 
+                ? request.Id.ToString() 
+                : throw new ArgumentException("Code is not valid");
         }
 
         private string GenerateFourDigitCode()
