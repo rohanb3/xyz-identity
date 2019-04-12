@@ -6,8 +6,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 {
     public interface ILocaltionService
     {
-        Task<List<string>> GetAllCities();
-        Task<List<string>> GetAllCities(string state);
+        Task<List<City>> GetAllCities();
+        Task<List<City>> GetAllCities(string state);
         Task<List<State>> GetAllStates();
         Task SetState(string stateName);
         Task SetState(List<State> state);
