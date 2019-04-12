@@ -43,23 +43,44 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 
                 foreach (var user in users)
                 {
-                    user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName;
-                    await _azureClient.PostUser(user.Adapt<AzureUser>());
-
-                    if (usersState.FirstOrDefault(x => x.Name == user.State) == null && !string.IsNullOrEmpty(user.State))
+                    try
                     {
-                        usersState.Add(new State { Name = user?.State, ShortName = user.State });
+
+                        user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName;
+                        if(user.City == "")
+                        {
+                            user.City = null;
+                        }
+
+                        if (user.State == "")
+                        {
+                            user.State = null;
+                        }
+
+                        await _azureClient.PostUser(user.Adapt<AzureUser>());
+
+                        if (usersState.FirstOrDefault(x => x.Name == user.State) == null && !string.IsNullOrEmpty(user.State))
+                        {
+                            usersState.Add(new State { Name = user?.State, ShortName = user.State });
+                        }
+
+                        if (usersCity.FirstOrDefault(x => x.Name == user.City) == null && !string.IsNullOrEmpty(user.City) && !string.IsNullOrEmpty(user.State))
+                        {
+                            usersCity.Add(new City { Name = user?.City, State = new State { Name = user.State } });
+                        }
                     }
-
-                    if (usersCity.FirstOrDefault(x => x.Name == user.City) == null && !string.IsNullOrEmpty(user.City) && !string.IsNullOrEmpty(user.State))
+                    catch (ApplicationException ex)
                     {
-                        usersCity.Add(new City { Name = user?.City, State = new State { Name = user.State } });
+                        //if(ex.Message != "User already exist" && ex.Message != "Can not create user with current parameters\n One or more properties contains invalid values.")
+                        //{
+                        //    throw ex;
+                        //}
                     }
                 }
                 await _locationService.SetState(usersState);
                 await _locationService.SetCity(usersCity);
             }
-            catch (ApplicationException)
+            catch (ApplicationException ex)
             {
                 throw;
             }
