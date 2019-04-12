@@ -5,7 +5,6 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 {
     public class BaseProfile
     {
-        [Required]
         [StringLength(64)]
         public string DisplayName { get; set; }
 
