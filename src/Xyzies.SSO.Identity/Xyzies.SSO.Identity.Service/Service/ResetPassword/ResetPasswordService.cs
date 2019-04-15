@@ -8,6 +8,7 @@ using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Mailer.Services;
 using Xyzies.SSO.Identity.Services.Models;
 using SendGrid.Helpers.Mail;
+using System.Linq;
 
 namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 {
@@ -60,6 +61,11 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         {
             try
             {
+                if (await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == email)) == null)
+                {
+                    throw new ArgumentException("User does not exist");
+                }
+
                 var code = GenerateFourDigitCode();
                 var previusRequest = await _passwordResetRequestRepository.GetByAsync(request => request.Email == email);
 
