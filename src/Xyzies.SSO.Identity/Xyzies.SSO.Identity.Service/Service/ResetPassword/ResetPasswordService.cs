@@ -61,13 +61,23 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
             try
             {
                 var code = GenerateFourDigitCode();
+                var previusRequest = await _passwordResetRequestRepository.GetByAsync(request => request.Email == email);
 
-                await _passwordResetRequestRepository.AddAsync(new PasswordResetRequest
+                if (previusRequest != null)
                 {
-                    Id = Guid.NewGuid(),
-                    Email = email,
-                    Code = code
-                });
+                    previusRequest.Code = code;
+
+                    await _passwordResetRequestRepository.UpdateAsync(previusRequest);
+                }
+                else
+                {
+                    await _passwordResetRequestRepository.AddAsync(new PasswordResetRequest
+                    {
+                        Id = Guid.NewGuid(),
+                        Email = email,
+                        Code = code
+                    });
+                }
 
                 var htmlTemplate =
                     (await _configurationRepository.GetByAsync(config => config.Id == Consts.ConfigurationKeys.HTMLCodeEmailTemplate))?.Value
@@ -95,16 +105,16 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 
         public async Task<string> ValidateConfirmationCodeAsync(string email, string code)
         {
-            try
-            {
-                var resetHash = (await _passwordResetRequestRepository.GetByAsync(request => request.Email.ToLower() == email.ToLower() && request.Code.ToLower() == code.ToLower()))?.Id;
+            var request = (await _passwordResetRequestRepository.GetByAsync(r => r.Email.ToLower() == email.ToLower()));
 
-                return resetHash?.ToString() ?? throw new KeyNotFoundException();
-            }
-            catch (Exception)
+            if (request == null)
             {
-                throw;
+                throw new KeyNotFoundException();
             }
+
+            return request.Code.ToLower() == code.ToLower()
+                ? request.Id.ToString()
+                : throw new ArgumentException("Code is not valid");
         }
 
         private string GenerateFourDigitCode()

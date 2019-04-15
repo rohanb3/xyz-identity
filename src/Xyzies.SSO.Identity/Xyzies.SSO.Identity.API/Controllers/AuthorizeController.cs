@@ -8,6 +8,7 @@ using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.API.Models;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -113,6 +114,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpPost("verify-code")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResetTokenResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(NotFoundObjectResult))]
         public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeModel options)
         {
             try
@@ -122,7 +124,20 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return BadRequest();
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                if (ex.Message == "Code is not valid")
+                {
+                    return BadRequest(new ValidationErrorResponse()
+                    {
+                        Status = 400,
+                        Errors = new List<KeyValuePair<string, List<string>>> { new KeyValuePair<string, List<string>>("Code", new List<string> { "Code is not valid" }) }
+                    });
+                }
+
+                throw ex;
             }
         }
 

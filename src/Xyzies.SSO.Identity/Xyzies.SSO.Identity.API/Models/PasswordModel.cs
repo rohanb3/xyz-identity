@@ -17,6 +17,7 @@ namespace Xyzies.SSO.Identity.API.Models
         /// </summary>
         [Required]
         [StringLength(64, MinimumLength = 8)]
+        [RegularExpression("^.*[A-Z]+.*$", ErrorMessage = "Password must contain at least 1 capital letter")]
         public string Password { get; set; }
     }
 }
