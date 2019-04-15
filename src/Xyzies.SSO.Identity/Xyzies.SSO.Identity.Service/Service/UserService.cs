@@ -139,11 +139,13 @@ namespace Xyzies.SSO.Identity.Services.Service
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
                 usersInCache.Add(createdUser);
                 _cache.Set(Consts.Cache.UsersKey, usersInCache);
-
+                if (!string.IsNullOrEmpty(model.State))
+                {
+                    await _localtionService.SetState(model.State);
+                }
                 if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
                 {
                     await _localtionService.SetCity(model.City, model.State);
-                    await _localtionService.SetState(model.State);
                 }
 
                 return createdUser.Adapt<Profile>();
