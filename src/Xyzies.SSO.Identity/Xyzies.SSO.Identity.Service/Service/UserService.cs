@@ -186,6 +186,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                     
                 }, userToChange);
 
+                userToChange.PasswordPolicies = Consts.PasswordPolicy.DisablePasswordExpirationAndStrong;
+
                 await _azureClient.PatchUser(userToChange.ObjectId, userToChange);
 
                 usersInCache.RemoveAll(user => user.ObjectId == userToChange.ObjectId);

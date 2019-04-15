@@ -49,7 +49,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
                             new KeyValuePair<string, string[]>("Username", new string[] { "This email is not registered in the system. Please, check and try again" })
                         })));
-                }              
+                }
 
                 throw ex;
             }
@@ -176,7 +176,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return BadRequest();
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("ResetToken", new string[] { "Token is not valid" })
+                        })));
             }
         }
     }

@@ -49,7 +49,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task<TokenResponse> AuthorizeAsync(UserAuthorizeOptions options)
         {
-            if (await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == options.Username)) == null)
+            var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == options.Username));
+            if (user == null)
             {
                 throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
             }

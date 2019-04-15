@@ -61,7 +61,8 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         {
             try
             {
-                if (await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == email)) == null)
+                var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == email));
+                if (user == null)
                 {
                     throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
                 }
