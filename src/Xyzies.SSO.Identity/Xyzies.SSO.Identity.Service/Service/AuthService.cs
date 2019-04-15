@@ -1,29 +1,32 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using Xyzies.SSO.Identity.Services.Exceptions;
-using Xyzies.SSO.Identity.Services.Models.User;
-using static Xyzies.SSO.Identity.Data.Helpers.Consts;
-using Microsoft.Extensions.Options;
-using Xyzies.SSO.Identity.Services.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Xyzies.SSO.Identity.Data.Helpers;
+using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Services.Helpers;
+using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service.Permission;
+using static Xyzies.SSO.Identity.Data.Helpers.Consts;
 
 namespace Xyzies.SSO.Identity.Services.Service
 {
     public class AuthService : IAuthService
     {
         private readonly IPermissionService _permissionService;
+        private readonly IUserService _userService;
         private readonly AuthServiceOptions _options;
 
-        public AuthService(IPermissionService permissionService, IOptionsMonitor<AuthServiceOptions> authServiceOptionsMonitor)
+        public AuthService(IPermissionService permissionService, IUserService userService, IOptionsMonitor<AuthServiceOptions> authServiceOptionsMonitor)
         {
             _permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
             _options = authServiceOptionsMonitor.CurrentValue ?? throw new ArgumentNullException(nameof(authServiceOptionsMonitor));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         private async Task<TokenResponse> RequestAzureEndpoint(FormUrlEncodedContent content)
@@ -46,6 +49,12 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task<TokenResponse> AuthorizeAsync(UserAuthorizeOptions options)
         {
+            var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == options.Username));
+            if (user == null)
+            {
+                throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
+            }
+
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
             var jwtToken = new JwtSecurityToken(result.Access_token);
             var roleName = jwtToken.Claims.FirstOrDefault(claim => claim.Type == RoleClaimType)?.Value ?? throw new ArgumentNullException("Can't get role");

@@ -79,6 +79,15 @@ namespace Xyzies.SSO.Identity.Services.Service
             throw new ArgumentException("Unknown user role");
         }
 
+
+        public Task<Profile> GetUserBy(Func<AzureUser, bool> predicate)
+        {
+            return Task.FromResult(_cache
+                .Get<List<AzureUser>>(Consts.Cache.UsersKey)
+                .FirstOrDefault(predicate)
+                .Adapt<Profile>());
+        }
+
         /// <inheritdoc />
         public async Task UpdateUserByIdAsync(string id, BaseProfile model)
         {
@@ -176,6 +185,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                     }
                     
                 }, userToChange);
+
+                userToChange.PasswordPolicies = Consts.PasswordPolicy.DisablePasswordExpirationAndStrong;
 
                 await _azureClient.PatchUser(userToChange.ObjectId, userToChange);
 
@@ -432,6 +443,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
             }
         }
+
 
         #endregion
     }
