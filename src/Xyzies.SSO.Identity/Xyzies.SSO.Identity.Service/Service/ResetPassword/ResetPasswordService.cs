@@ -61,13 +61,23 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
             try
             {
                 var code = GenerateFourDigitCode();
+                var previusRequest = await _passwordResetRequestRepository.GetByAsync(request => request.Email == email);
 
-                await _passwordResetRequestRepository.AddAsync(new PasswordResetRequest
+                if (previusRequest != null)
                 {
-                    Id = Guid.NewGuid(),
-                    Email = email,
-                    Code = code
-                });
+                    previusRequest.Code = code;
+
+                    await _passwordResetRequestRepository.UpdateAsync(previusRequest);
+                }
+                else
+                {
+                    await _passwordResetRequestRepository.AddAsync(new PasswordResetRequest
+                    {
+                        Id = Guid.NewGuid(),
+                        Email = email,
+                        Code = code
+                    });
+                }
 
                 var htmlTemplate =
                     (await _configurationRepository.GetByAsync(config => config.Id == Consts.ConfigurationKeys.HTMLCodeEmailTemplate))?.Value
@@ -102,8 +112,8 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
                 throw new KeyNotFoundException();
             }
 
-            return request.Code.ToLower() == code.ToLower() 
-                ? request.Id.ToString() 
+            return request.Code.ToLower() == code.ToLower()
+                ? request.Id.ToString()
                 : throw new ArgumentException("Code is not valid");
         }
 

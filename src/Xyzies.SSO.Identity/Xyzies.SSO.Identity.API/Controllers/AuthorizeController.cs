@@ -128,14 +128,16 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new
+                if (ex.Message == "Code is not valid")
                 {
-                    errors = new
+                    return BadRequest(new ValidationErrorResponse()
                     {
-                        Code = new[] { "Code is not valid" }
-                    },
-                    status = StatusCodes.Status400BadRequest
-                });
+                        Status = 400,
+                        Errors = new List<KeyValuePair<string, List<string>>> { new KeyValuePair<string, List<string>>("Code", new List<string> { "Code is not valid" }) }
+                    });
+                }
+
+                throw ex;
             }
         }
 
