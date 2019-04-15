@@ -8,6 +8,7 @@ using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Mailer.Services;
 using Xyzies.SSO.Identity.Services.Models;
 using SendGrid.Helpers.Mail;
+using System.Linq;
 
 namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 {
@@ -60,6 +61,12 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         {
             try
             {
+                var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == email));
+                if (user == null)
+                {
+                    throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
+                }
+
                 var code = GenerateFourDigitCode();
                 var previusRequest = await _passwordResetRequestRepository.GetByAsync(request => request.Email == email);
 
@@ -114,7 +121,7 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 
             return request.Code.ToLower() == code.ToLower()
                 ? request.Id.ToString()
-                : throw new ArgumentException("Code is not valid");
+                : throw new ArgumentException(Consts.ErrorReponses.CodeIsNotValid);
         }
 
         private string GenerateFourDigitCode()

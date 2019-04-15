@@ -1,14 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Xyzies.SSO.Identity.Services.Service;
-using Xyzies.SSO.Identity.Services.Models.User;
-using Xyzies.SSO.Identity.Services.Exceptions;
-using Xyzies.SSO.Identity.API.Models;
-using Xyzies.SSO.Identity.Services.Service.ResetPassword;
+using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Threading.Tasks;
+using Xyzies.SSO.Identity.API.Models;
+using Xyzies.SSO.Identity.Data.Helpers;
+using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Services.Models.User;
+using Xyzies.SSO.Identity.Services.Service;
+using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -25,7 +25,6 @@ namespace Xyzies.SSO.Identity.API.Controllers
             _resetPasswordService = resetPasswordService ?? throw new ArgumentNullException(nameof(resetPasswordService));
         }
 
-#pragma warning disable CS1572 // XML comment has a param tag, but there is no parameter by that name
         /// <summary>
         /// Authorizes user with passed credentials
         /// </summary>
@@ -34,29 +33,35 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <param name="scope">scope what user will use to work with. Example - xyzies.authorization.reviews.admin</param>
         /// <returns>Access token with additional info</returns>
         [HttpPost("token")]
-#pragma warning restore CS1572 // XML comment has a param tag, but there is no parameter by that name
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ContentResult))]
-#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         public async Task<IActionResult> Token(UserAuthorizeOptions credentials)
-#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             try
             {
                 return Ok(await _authorizationService.AuthorizeAsync(credentials));
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
+                {
+                    return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("Username", new string[] { "This email is not registered in the system. Please, check and try again" })
+                        })));
+                }
+
+                throw ex;
             }
             catch (AccessException ex)
             {
+                if (ex.Message.Contains(Consts.ErrorReponses.AzureLoginError))
+                {
+                    return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("Password", new string[] { "Password incorrect. Please, check it correctness and try again." })
+                        })));
+                }
+
                 return new ContentResult
                 {
                     StatusCode = 403,
@@ -72,7 +77,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <returns>Refreshed access_token</returns>
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ContentResult))]
         public async Task<IActionResult> Refresh(UserRefreshOptions refresh)
         {
@@ -99,11 +104,25 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpPost("request-verification-code")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
-        public async Task<IActionResult> SendResetLink([FromBody] RequestVerificationCodeModel options)
+        public async Task<IActionResult> SendResetCode([FromBody] RequestVerificationCodeModel options)
         {
-            await _resetPasswordService.SendConfirmationCodeAsync(options.Email);
+            try
+            {
+                await _resetPasswordService.SendConfirmationCodeAsync(options.Email);
 
-            return Ok();
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
+                {
+                    return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("Username", new string[] { "User does not exist" })
+                        })));
+                }
+
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -113,7 +132,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <returns>If success, returns reset token to reset password for konfirmed user</returns>
         [HttpPost("verify-code")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ResetTokenResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestObjectResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(NotFoundObjectResult))]
         public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeModel options)
         {
@@ -128,13 +147,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                if (ex.Message == "Code is not valid")
+                if (ex.Message == Consts.ErrorReponses.CodeIsNotValid)
                 {
-                    return BadRequest(new ValidationErrorResponse()
-                    {
-                        Status = 400,
-                        Errors = new List<KeyValuePair<string, List<string>>> { new KeyValuePair<string, List<string>>("Code", new List<string> { "Code is not valid" }) }
-                    });
+                    return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("Code", new string[] { "Code is not valid" })
+                        })));
                 }
 
                 throw ex;
@@ -159,7 +176,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return BadRequest();
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("ResetToken", new string[] { "Token is not valid" })
+                        })));
             }
         }
     }
