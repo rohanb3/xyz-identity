@@ -63,7 +63,7 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
             {
                 if (await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == email)) == null)
                 {
-                    throw new ArgumentException("User does not exist");
+                    throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
                 }
 
                 var code = GenerateFourDigitCode();
@@ -120,7 +120,7 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
 
             return request.Code.ToLower() == code.ToLower()
                 ? request.Id.ToString()
-                : throw new ArgumentException("Code is not valid");
+                : throw new ArgumentException(Consts.ErrorReponses.CodeIsNotValid);
         }
 
         private string GenerateFourDigitCode()

@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.Services.Models.User;
@@ -50,7 +51,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         {
             if (await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == options.Username)) == null)
             {
-                throw new ArgumentException("User does not exist");
+                throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
             }
 
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));

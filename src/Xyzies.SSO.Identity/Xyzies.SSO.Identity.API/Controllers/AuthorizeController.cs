@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.API.Models;
+using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
@@ -43,17 +44,24 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                if (ex.Message == "User does not exist")
+                if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                            new KeyValuePair<string, string[]>("Username", new string[] { "User does not exist" })
+                            new KeyValuePair<string, string[]>("Username", new string[] { "This email is not registered in the system. Please, check and try again" })
                         })));
-                }
+                }              
 
                 throw ex;
             }
             catch (AccessException ex)
             {
+                if (ex.Message.Contains(Consts.ErrorReponses.AzureLoginError))
+                {
+                    return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>("Password", new string[] { "Password incorrect. Please, check it correctness and try again." })
+                        })));
+                }
+
                 return new ContentResult
                 {
                     StatusCode = 403,
@@ -106,7 +114,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                if (ex.Message == "User does not exist")
+                if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
                             new KeyValuePair<string, string[]>("Username", new string[] { "User does not exist" })
@@ -139,7 +147,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                if (ex.Message == "Code is not valid")
+                if (ex.Message == Consts.ErrorReponses.CodeIsNotValid)
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
                             new KeyValuePair<string, string[]>("Code", new string[] { "Code is not valid" })

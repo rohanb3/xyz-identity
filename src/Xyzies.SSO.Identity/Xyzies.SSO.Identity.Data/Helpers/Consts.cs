@@ -92,5 +92,12 @@
             public const string HTMLCodeEmailTemplate= "HTMLCodeEmailTemplate";
             public const string TextCodeEmailTemplate = "TextCodeEmailTemplate";
         }
+
+        public class ErrorReponses
+        {
+            public const string CodeIsNotValid = "Code is not valid";
+            public const string UserDoesNotExits = "User does not exist";
+            public const string AzureLoginError = "The username or password provided in the request are invalid";
+        }
     }
 }
