@@ -1,3 +1,5 @@
+USE [xyzies-identity]
+GO
 insert into [Permissions] values ('814615e0-7785-4396-9f0d-b3715a135b9b', 'xyzies.reviews.templates.read', 1);  	 --0
 insert into [Permissions] values ('40ea2f94-1214-4c2c-aa8e-6db0175e798b', 'xyzies.reviews.templates.write', 1);		 --1
 insert into [Permissions] values ('74338e7a-b8bd-4c22-ab27-22c31a41884d', 'xyzies.reviews.templates.update', 1);	 --2
@@ -21,10 +23,10 @@ insert into [Policies] values ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'ReviewsM
 insert into [Policies] values ('b695018c-c264-4246-9e33-9dce90f338c2', 'VspOperatorLogin'); --4
 insert into [Policies] values ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'VspMobileLogin'); --5
 
-insert into [TWC_Role] values ('0578455d-6fcb-4c25-aa90-2144914b6635', 1, 'SuperAdmin', getutcdate(), 1); --0
-insert into [TWC_Role] values ('cb308b73-acf0-4f23-89b0-509b6bc0e7e6', 1, 'RetailerAdmin', getutcdate(), 1); --1
-insert into [TWC_Role] values ('5459404d-ffb7-4efe-bcb9-8ea84942a575', 1, 'SalesRep', getutcdate(), 1); --2
-insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2725', 1, 'Operator', getutcdate(), 1); --3
+insert into [TWC_Role] values ('0578455d-6fcb-4c25-aa90-2144914b6635', 1, 'SuperAdmin', NULL, getdate(), 1); --0
+insert into [TWC_Role] values ('cb308b73-acf0-4f23-89b0-509b6bc0e7e6', 2, 'RetailerAdmin', NULL,  getdate(), 1); --1
+insert into [TWC_Role] values ('5459404d-ffb7-4efe-bcb9-8ea84942a575', 3, 'SalesRep', NULL,  getdate(), 1); --2
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2725', 4, 'Operator', NULL,  getdate(), 1); --3
 
 insert into [PermissionToPolicy] values ('814615e0-7785-4396-9f0d-b3715a135b9b', '415b2993-7e32-4859-8b59-2b527bcdeea1'); --templates permissions to Templates Full Policy
 insert into [PermissionToPolicy] values ('40ea2f94-1214-4c2c-aa8e-6db0175e798b', '415b2993-7e32-4859-8b59-2b527bcdeea1'); --templates permissions to Templates Full Policy
