@@ -117,7 +117,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                            new KeyValuePair<string, string[]>("Username", new string[] { "User does not exist" })
+                            new KeyValuePair<string, string[]>("Email", new string[] { "User does not exist" })
                         })));
                 }
 
