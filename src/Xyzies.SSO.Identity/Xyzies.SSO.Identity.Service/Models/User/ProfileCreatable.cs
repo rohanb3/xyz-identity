@@ -16,7 +16,6 @@ namespace Xyzies.SSO.Identity.Services.Models.User
         [Required(ErrorMessage = "There must be at least one SignIn name")]
         public List<SignInName> SignInNames { get; set; }
 
-        [Required(ErrorMessage = "User must have Company Id")]
         public override int? CompanyId { get; set; }
     }
 }
