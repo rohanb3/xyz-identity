@@ -47,7 +47,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                            new KeyValuePair<string, string[]>("Username", new string[] { "This email is not registered in the system. Please, check and try again" })
+                            new KeyValuePair<string, string[]>("Email", new string[] { "This email is not registered in the system. Please, check and try again" })
                         })));
                 }
 
