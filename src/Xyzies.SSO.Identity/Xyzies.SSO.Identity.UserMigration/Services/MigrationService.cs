@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         private readonly ILocaltionService _locationService;
 
 
-        public MigrationService(ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
+        public MigrationService(IMemoryCache cache, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
@@ -41,7 +42,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 
                 var roles = (await _roleRepository.GetAsync()).ToList();
 
-                foreach (var user in users)
+                foreach (var user in users.ToList())
                 {
                     try
                     {
@@ -59,17 +60,17 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 
                         await _azureClient.PostUser(user.Adapt<AzureUser>());
 
-                        if (usersState.FirstOrDefault(x => x.Name == user.State) == null && !string.IsNullOrEmpty(user.State))
+                        if (usersState.FirstOrDefault(x => x?.Name?.ToLower() == user?.State?.ToLower()) == null && !string.IsNullOrEmpty(user?.State))
                         {
-                            usersState.Add(new State { Name = user?.State, ShortName = user.State });
+                            usersState.Add(new State { Name = user?.State, ShortName = user?.State });
                         }
 
-                        if (usersCity.FirstOrDefault(x => x.Name == user.City) == null && !string.IsNullOrEmpty(user.City) && !string.IsNullOrEmpty(user.State))
+                        if (usersCity.FirstOrDefault(x => x?.Name?.ToLower() == user?.City?.ToLower()) == null && !string.IsNullOrEmpty(user?.City) && !string.IsNullOrEmpty(user?.State))
                         {
-                            usersCity.Add(new City { Name = user?.City, State = new State { Name = user.State } });
+                            usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
                         }
                     }
-                    catch (ApplicationException ex)
+                    catch (Exception ex)
                     {
                         //if(ex.Message != "User already exist" && ex.Message != "Can not create user with current parameters\n One or more properties contains invalid values.")
                         //{
