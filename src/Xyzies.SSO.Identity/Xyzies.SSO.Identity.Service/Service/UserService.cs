@@ -238,7 +238,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                     return result?.Adapt<Profile>();
                 }
 
-                if (user.Role.ToLower() == Consts.Roles.RetailerAdmin || user.Role.ToLower() == Consts.Roles.SalesRep && !string.IsNullOrEmpty(user.CompanyId))
+                if (user.Role.ToLower() == Consts.Roles.RetailerAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.Operator && !string.IsNullOrEmpty(user.CompanyId))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
                     if (result == null && result?.CompanyId != user.CompanyId)
