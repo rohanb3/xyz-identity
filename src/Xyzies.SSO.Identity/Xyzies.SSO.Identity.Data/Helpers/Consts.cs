@@ -3,9 +3,18 @@
     /// <summary>
     /// NOTE: Do not change constant values without full recompilation
     /// </summary>
+    /// 
     public class Consts
     {
-        private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";
+        /// <summary>
+        /// The following code is needed to replace the constant value, depends on appsettings.json.
+        /// For local development, uncomment the first line and comment out the second.
+        /// 
+        /// Template to replace is 'variable58b049a55e71e'
+        /// </summary>
+        //private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";
+        private const string _extensionPropertyTemplate = "extension_variable58b049a55e71e_";
+
         public const string RoleClaimType = "extension_Group";
         public const string CompanyIdClaimType = "extension_CompanyId";
         public const string BranchIdClaimType = "extension_BranchId";
@@ -54,7 +63,7 @@
 
         public class Scopes
         {
-            public const string AzureAccessScope = "https://ardasdev.onmicrosoft.com/api/user_impersonation";
+            public const string AzureAccessScope = "https://xyzies.onmicrosoft.com/identity/user_impersonation";
             public const string Full = "xyzies.sso.identity.full";
             public const string Edit = "xyzies.sso.identity.edit";
             public const string Read = "xyzies.sso.identity.read";
@@ -89,7 +98,7 @@
 
         public class ConfigurationKeys
         {
-            public const string HTMLCodeEmailTemplate= "HTMLCodeEmailTemplate";
+            public const string HTMLCodeEmailTemplate = "HTMLCodeEmailTemplate";
             public const string TextCodeEmailTemplate = "TextCodeEmailTemplate";
         }
 
