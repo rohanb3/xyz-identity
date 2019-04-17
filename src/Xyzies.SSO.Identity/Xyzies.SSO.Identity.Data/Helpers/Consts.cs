@@ -52,6 +52,7 @@
             public const string SalesRep = "salesrep";
             public const string SuperAdmin = "superadmin";
             public const string RetailerAdmin = "retaileradmin";
+            public const string Operator = "operator";
         }
 
         public class Cache
