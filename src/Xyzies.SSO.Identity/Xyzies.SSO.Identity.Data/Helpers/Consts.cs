@@ -5,7 +5,7 @@
     /// </summary>
     public class Consts
     {
-        private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";
+        private const string _extensionPropertyTemplate = "variable58b049a55e71e";
         public const string RoleClaimType = "extension_Group";
         public const string CompanyIdClaimType = "extension_CompanyId";
         public const string BranchIdClaimType = "extension_BranchId";
