@@ -78,7 +78,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private List<KeyValuePair<string, string>> BaseOptions
         {
             get => new List<KeyValuePair<string, string>> {
-                 new KeyValuePair<string, string>("scope", $"openid offline_access {Scopes.AzureAccessScope}"),
+                 new KeyValuePair<string, string>("scope", $"openid offline_access {_options.Scope}"),
                  new KeyValuePair<string, string>("response_type", "id_token"),
                  new KeyValuePair<string, string>("client_id", _options.ClientId)
             };

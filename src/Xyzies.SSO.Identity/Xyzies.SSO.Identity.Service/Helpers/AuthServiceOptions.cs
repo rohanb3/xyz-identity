@@ -8,5 +8,7 @@ namespace Xyzies.SSO.Identity.Services.Helpers
         public string ClientId { get; set; }
         [Required]
         public string TokenEndpoint { get; set; }
+        [Required]
+        public string Scope { get; set; }
     }
 }
