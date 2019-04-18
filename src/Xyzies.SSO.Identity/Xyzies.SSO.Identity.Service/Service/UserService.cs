@@ -58,7 +58,9 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (user.Role.ToLower() == Consts.Roles.RetailerAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
-                filter.Role = new List<string> { Consts.Roles.RetailerAdmin, Consts.Roles.SalesRep };
+
+                filter.Role = filter.Role?.Where(role => role.ToLower() != Consts.Roles.SuperAdmin.ToLower())?.ToList()
+                    ?? new List<string> { Consts.Roles.RetailerAdmin, Consts.Roles.SalesRep, Consts.Roles.Operator };
                 return await GetUsers(filter, sorting);
             }
 
@@ -185,7 +187,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                         ForceChangePasswordNextLogin = false,
                         Password = password
                     }
-                    
+
                 }, userToChange);
 
                 userToChange.PasswordPolicies = Consts.PasswordPolicy.DisablePasswordExpirationAndStrong;
@@ -445,7 +447,6 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
             }
         }
-
 
         #endregion
     }
