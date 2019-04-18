@@ -69,6 +69,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                         {
                             usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
                         }
+
+                        Console.WriteLine($"Success , {user.Name} {user.LastName}");
                     }
                     catch (Exception ex)
                     {

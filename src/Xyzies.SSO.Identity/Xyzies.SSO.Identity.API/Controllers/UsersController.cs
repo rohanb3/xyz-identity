@@ -13,6 +13,7 @@ using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Xyzies.SSO.Identity.UserMigration.Services;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -21,19 +22,22 @@ namespace Xyzies.SSO.Identity.API.Controllers
     /// </summary>
     [Route("api/users")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IMigrationService _migrationService;
 
         /// <summary>
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IMigrationService migrationService)
         {
             _userService = userService ??
                 throw new ArgumentNullException(nameof(userService));
+            _migrationService = migrationService ??
+                throw new ArgumentNullException(nameof(migrationService));
         }
 
         /// <summary>
@@ -131,6 +135,13 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("migrate")]
+        public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset)
+        {
+            await _migrationService.MigrateAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset });
+            return Ok();
         }
 
         /// <summary>
