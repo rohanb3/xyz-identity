@@ -37,8 +37,12 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             {
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
-                var users = await _cpUsersRepository.GetAsync(x => !(x.IsDeleted ?? false));
-                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
+                var users = await _cpUsersRepository.GetAsync(x => x.IsDeleted != true);
+                if (options.Emails.Length > 0)
+                {
+                    users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
+                }
+                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());               
 
                 var roles = (await _roleRepository.GetAsync()).ToList();
 

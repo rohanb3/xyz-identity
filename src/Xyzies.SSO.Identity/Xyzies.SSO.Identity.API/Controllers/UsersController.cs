@@ -22,7 +22,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
     /// </summary>
     [Route("api/users")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -137,10 +137,18 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Migrate users from CP base to Azure
+        /// </summary>
+        /// <param name="limit">Limit of users from CP base</param>
+        /// <param name="offset">Offset for users from CP base</param>
+        /// <param name="emails">Specify users by their mail</param>
+        /// <returns></returns>
         [HttpGet("migrate")]
-        public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
         {
-            await _migrationService.MigrateAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset });
+            await _migrationService.MigrateAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
             return Ok();
         }
 
