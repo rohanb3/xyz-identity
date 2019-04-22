@@ -39,6 +39,9 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         [JsonProperty(Consts.BranchIdPropertyName)]
         public Guid? BranchId { get; set; }
 
+        [JsonProperty(Consts.DepartmentIdPropertyName)]
+        public Guid? DepartmentId { get; set; }
+
         public string City { get; set; }
 
         public string State { get; set; }

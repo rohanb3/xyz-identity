@@ -236,13 +236,13 @@ namespace Xyzies.SSO.Identity.Services.Service
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
                 if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
                     return result?.Adapt<Profile>();
                 }
 
                 if (user.Role.ToLower() == Consts.Roles.RetailerAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.Operator && !string.IsNullOrEmpty(user.CompanyId))
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id);
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found"); 
                     if (result == null && result?.CompanyId != user.CompanyId)
                     {
                         throw new AccessException();

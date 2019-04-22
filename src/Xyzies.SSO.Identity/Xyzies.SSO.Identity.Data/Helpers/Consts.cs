@@ -20,6 +20,7 @@
         public const string BranchIdClaimType = "extension_BranchId";
 
         public const string RolePropertyName = _extensionPropertyTemplate + "Group";
+        public const string DepartmentIdPropertyName = _extensionPropertyTemplate + "DepartmentId";
         public const string RetailerIdPropertyName = _extensionPropertyTemplate + "RetailerId";
         public const string CompanyIdPropertyName = _extensionPropertyTemplate + "CompanyId";
         public const string BranchIdPropertyName = _extensionPropertyTemplate + "BranchId";
