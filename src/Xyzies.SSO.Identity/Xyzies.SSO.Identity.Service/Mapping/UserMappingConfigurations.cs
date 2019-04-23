@@ -21,14 +21,14 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                .Map(dest => dest.DisplayName, src => src.Name + " " + src.LastName)
                .Map(dest => dest.Surname, src => src.LastName)
                .Map(dest => dest.GivenName, src => src.Name)
-               .Map(dest => dest.AccountEnabled, src => (src.IsActive.HasValue && src.IsActive.Value) && (src.IsDeleted.HasValue && !src.IsDeleted.Value))
+               .Map(dest => dest.AccountEnabled, src => src.IsActive)
                .Map(dest => dest.AvatarUrl, src => src.ImageName);
 
             TypeAdapterConfig<User, AzureUser>.NewConfig()
                .Map(dest => dest.DisplayName, src => src.Name + " " + src.LastName)
                .Map(dest => dest.Surname, src => src.LastName)
                .Map(dest => dest.GivenName, src => src.Name)
-               .Map(dest => dest.AccountEnabled, src => (src.IsActive.HasValue && src.IsActive.Value) && (src.IsDeleted.HasValue && !src.IsDeleted.Value))
+               .Map(dest => dest.AccountEnabled, src => src.IsActive)
                .Map(dest => dest.AvatarUrl, src => src.ImageName)
                .Map(dest => dest.SignInNames, src => new List<SignInName>()
                {

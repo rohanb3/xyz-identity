@@ -42,7 +42,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 {
                     users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
-                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());               
+                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
 
                 var roles = (await _roleRepository.GetAsync()).ToList();
 
@@ -52,7 +52,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                     {
 
                         user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName;
-                        if(user.City == "")
+                        if (user.City == "")
                         {
                             user.City = null;
                         }
@@ -86,6 +86,35 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 }
                 await _locationService.SetState(usersState);
                 await _locationService.SetCity(usersCity);
+            }
+            catch (ApplicationException ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task SyncEnabledUsers(MigrationOptions options)
+        {
+            try
+            {
+                var users = await _cpUsersRepository.GetAsync(x => x.IsDeleted != true);
+                if (options.Emails.Length > 0)
+                {
+                    users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
+                }
+                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
+
+                foreach (var user in users.ToList())
+                {
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == user.Email);
+                    if (user.IsActive == true)
+                    {
+                        await _userService.UpdateUserByIdAsync(existUser.ObjectId, new Identity.Services.Models.User.BaseProfile { AccountEnabled = user.IsActive ?? false });
+                    }
+
+                    Console.WriteLine($"Enable updated, {user.Name} {user.LastName}");
+
+                }
             }
             catch (ApplicationException ex)
             {

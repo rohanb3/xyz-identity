@@ -6,5 +6,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
     public interface IMigrationService
     {
         Task MigrateAsync(MigrationOptions options);
+        Task SyncEnabledUsers(MigrationOptions options);
     }
 }
