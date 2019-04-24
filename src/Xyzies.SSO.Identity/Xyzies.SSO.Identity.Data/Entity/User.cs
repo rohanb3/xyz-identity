@@ -29,7 +29,6 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public int? SalesPersonID { get; set; }
 
-        [NotMapped]
         public string Role { get; set; }
 
         public Guid? BranchId { get; set; }
