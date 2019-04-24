@@ -23,13 +23,13 @@ insert into [Policies] values ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'ReviewsM
 insert into [Policies] values ('b695018c-c264-4246-9e33-9dce90f338c2', 'VspOperatorLogin'); --4
 insert into [Policies] values ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'VspMobileLogin'); --5
 
-insert into [TWC_Role] values ('0578455d-6fcb-4c25-aa90-2144914b6635', 1, 'OperationAdmin', NULL, getdate(), 0); --0
-insert into [TWC_Role] values ('cb308b73-acf0-4f23-89b0-509b6bc0e7e6', 2, 'SuperAdmin', NULL,  getdate(), 0); --1
-insert into [TWC_Role] values ('5459404d-ffb7-4efe-bcb9-8ea84942a575', 3, 'SalesRep', NULL,  getdate(), 0); --2
-insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2727', 4, 'Operator', NULL,  getdate(), 0); --3
+insert into [TWC_Role] values ('0578455d-6fcb-4c25-aa90-2144914b6635', 9, 'OperationAdmin', NULL, getdate(), 0); --0
+insert into [TWC_Role] values ('cb308b73-acf0-4f23-89b0-509b6bc0e7e6', 1, 'SuperAdmin', NULL,  getdate(), 0); --1
+insert into [TWC_Role] values ('5459404d-ffb7-4efe-bcb9-8ea84942a575', 2, 'SalesRep', NULL,  getdate(), 0); --2
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2727', 3, 'Operator', NULL,  getdate(), 0); --3
 insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2728', 5, 'SystemAdmin', NULL,  getdate(), 0); --4
-insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2729', 6, 'AccountAdmin', NULL,  getdate(), 0); --5
-insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2720', 7, 'SupportAdmin', NULL,  getdate(), 0); --6
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2729', 8, 'AccountAdmin', NULL,  getdate(), 0); --5
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2720', 4, 'SupportAdmin', NULL,  getdate(), 0); --6
 
 insert into [PermissionToPolicy] values ('814615e0-7785-4396-9f0d-b3715a135b9b', '415b2993-7e32-4859-8b59-2b527bcdeea1'); --templates permissions to Templates Full Policy
 insert into [PermissionToPolicy] values ('40ea2f94-1214-4c2c-aa8e-6db0175e798b', '415b2993-7e32-4859-8b59-2b527bcdeea1'); --templates permissions to Templates Full Policy
