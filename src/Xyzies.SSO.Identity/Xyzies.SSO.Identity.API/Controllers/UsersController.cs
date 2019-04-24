@@ -92,7 +92,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
 
                 var currentUser = new UserIdentityParams
                 {
-                    Role = Consts.Roles.SuperAdmin
+                    Role = Consts.Roles.OperationsAdmin
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser);
 
@@ -122,7 +122,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             try
             {
                 var userRole = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
-                if (!string.IsNullOrEmpty(userRole) && userRole.ToLower() != Consts.Roles.SuperAdmin)
+                if (!string.IsNullOrEmpty(userRole) && userRole.ToLower() != Consts.Roles.OperationsAdmin)
                 {
                     return new ContentResult { StatusCode = 403 };
                 }
@@ -148,7 +148,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
         {
-            await _migrationService.MigrateAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
+            await _migrationService.SyncEnabledUsers(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
             return Ok();
         }
 

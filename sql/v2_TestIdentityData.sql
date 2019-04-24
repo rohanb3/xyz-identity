@@ -23,10 +23,13 @@ insert into [Policies] values ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'ReviewsM
 insert into [Policies] values ('b695018c-c264-4246-9e33-9dce90f338c2', 'VspOperatorLogin'); --4
 insert into [Policies] values ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'VspMobileLogin'); --5
 
-insert into [TWC_Role] values ('0578455d-6fcb-4c25-aa90-2144914b6635', 1, 'SuperAdmin', NULL, getdate(), 1); --0
-insert into [TWC_Role] values ('cb308b73-acf0-4f23-89b0-509b6bc0e7e6', 2, 'RetailerAdmin', NULL,  getdate(), 1); --1
-insert into [TWC_Role] values ('5459404d-ffb7-4efe-bcb9-8ea84942a575', 3, 'SalesRep', NULL,  getdate(), 1); --2
-insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2725', 4, 'Operator', NULL,  getdate(), 1); --3
+insert into [TWC_Role] values ('0578455d-6fcb-4c25-aa90-2144914b6635', 1, 'OperationAdmin', NULL, getdate(), 0); --0
+insert into [TWC_Role] values ('cb308b73-acf0-4f23-89b0-509b6bc0e7e6', 2, 'SuperAdmin', NULL,  getdate(), 0); --1
+insert into [TWC_Role] values ('5459404d-ffb7-4efe-bcb9-8ea84942a575', 3, 'SalesRep', NULL,  getdate(), 0); --2
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2727', 4, 'Operator', NULL,  getdate(), 0); --3
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2728', 5, 'SystemAdmin', NULL,  getdate(), 0); --4
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2729', 6, 'AccountAdmin', NULL,  getdate(), 0); --5
+insert into [TWC_Role] values ('8c5f7cc1-1cba-44cf-bcc5-6755323c2720', 7, 'SupportAdmin', NULL,  getdate(), 0); --6
 
 insert into [PermissionToPolicy] values ('814615e0-7785-4396-9f0d-b3715a135b9b', '415b2993-7e32-4859-8b59-2b527bcdeea1'); --templates permissions to Templates Full Policy
 insert into [PermissionToPolicy] values ('40ea2f94-1214-4c2c-aa8e-6db0175e798b', '415b2993-7e32-4859-8b59-2b527bcdeea1'); --templates permissions to Templates Full Policy
@@ -44,13 +47,25 @@ insert into [PermissionToPolicy] values ('3a8a3a6c-4b9f-4425-81f1-476cddd436da',
 insert into [PermissionToPolicy] values ('96bf3985-0536-4bea-9bb1-8c71a86da6fc', 'b695018c-c264-4246-9e33-9dce90f338c2'); --xyzies.authorization.vsp.operator permissions to Vsp Operator Login Policy
 insert into [PermissionToPolicy] values ('cace7e20-c5f9-4e98-984d-76fd8c35c4d5', '9ffce075-3299-4227-aae3-859f3c6e9eb6'); --authorization.vsp.mobile permissions to Vsp Mobile Login Policy
 
-insert into [PolicyToRole] values ('415b2993-7e32-4859-8b59-2b527bcdeea1', '0578455d-6fcb-4c25-aa90-2144914b6635'); --TemplatesFull policy for super admin
-insert into [PolicyToRole] values ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', '0578455d-6fcb-4c25-aa90-2144914b6635'); --ReviewsFull policy for super admin
-insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', '0578455d-6fcb-4c25-aa90-2144914b6635'); --ReviewsAdminLogin policy for super admin
+insert into [PolicyToRole] values ('415b2993-7e32-4859-8b59-2b527bcdeea1', '0578455d-6fcb-4c25-aa90-2144914b6635'); --TemplatesFull policy for operation admin
+insert into [PolicyToRole] values ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', '0578455d-6fcb-4c25-aa90-2144914b6635'); --ReviewsFull policy for operation admin
+insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', '0578455d-6fcb-4c25-aa90-2144914b6635'); --ReviewsAdminLogin policy for operation admin
 
-insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'); --ReviewsAdminLogin policy for retailer admin
-insert into [PolicyToRole] values ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'); --VspMobileLogin policy for retailer admin
+insert into [PolicyToRole] values ('415b2993-7e32-4859-8b59-2b527bcdeea1', '8c5f7cc1-1cba-44cf-bcc5-6755323c2728'); --TemplatesFull policy for System admin
+insert into [PolicyToRole] values ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', '8c5f7cc1-1cba-44cf-bcc5-6755323c2728'); --ReviewsFull policy for System admin
+insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', '8c5f7cc1-1cba-44cf-bcc5-6755323c2728'); --ReviewsAdminLogin policy for System admin
 
-insert into [PolicyToRole] values ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'); --ReviewsMobileLogin policies for SalesRep
+insert into [PolicyToRole] values ('415b2993-7e32-4859-8b59-2b527bcdeea1', '8c5f7cc1-1cba-44cf-bcc5-6755323c2729'); --TemplatesFull policy for account admin
+insert into [PolicyToRole] values ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', '8c5f7cc1-1cba-44cf-bcc5-6755323c2729'); --ReviewsFull policy for account admin
+insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', '8c5f7cc1-1cba-44cf-bcc5-6755323c2729'); --ReviewsAdminLogin policy for account admin
 
-insert into [PolicyToRole] values ('b695018c-c264-4246-9e33-9dce90f338c2', '8c5f7cc1-1cba-44cf-bcc5-6755323c2725'); --VspOperatorLogin policies for Operator
+insert into [PolicyToRole] values ('415b2993-7e32-4859-8b59-2b527bcdeea1', '8c5f7cc1-1cba-44cf-bcc5-6755323c2720'); --TemplatesFull policy for supportadmin
+insert into [PolicyToRole] values ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', '8c5f7cc1-1cba-44cf-bcc5-6755323c2720'); --ReviewsFull policy for support admin
+insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', '8c5f7cc1-1cba-44cf-bcc5-6755323c2720'); --ReviewsAdminLogin policy for support admin
+
+insert into [PolicyToRole] values ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'); --ReviewsAdminLogin policy for super admin
+insert into [PolicyToRole] values ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'); --VspMobileLogin policy for super admin
+
+insert into [PolicyToRole] values ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', '5459404d-ffb7-4efe-bcb9-8ea84942a575'); --ReviewsMobileLogin policies for SalesRep
+
+insert into [PolicyToRole] values ('b695018c-c264-4246-9e33-9dce90f338c2', '8c5f7cc1-1cba-44cf-bcc5-6755323c2727'); --VspOperatorLogin policies for Operator

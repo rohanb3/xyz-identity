@@ -50,17 +50,17 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <inheritdoc />
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
+            if (user.Role.ToLower() == Consts.Roles.OperationsAdmin)
             {
                 return await GetUsers(filter, sorting);
             }
 
-            if (user.Role.ToLower() == Consts.Roles.RetailerAdmin)
+            if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
 
-                filter.Role = filter.Role?.Where(role => role.ToLower() != Consts.Roles.SuperAdmin.ToLower())?.ToList()
-                    ?? new List<string> { Consts.Roles.RetailerAdmin, Consts.Roles.SalesRep, Consts.Roles.Operator };
+                filter.Role = filter.Role?.Where(role => role.ToLower() != Consts.Roles.OperationsAdmin.ToLower())?.ToList()
+                    ?? new List<string> { Consts.Roles.SuperAdmin, Consts.Roles.SalesRep, Consts.Roles.Operator };
                 return await GetUsers(filter, sorting);
             }
 
@@ -234,13 +234,13 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
+                if (user.Role.ToLower() == Consts.Roles.OperationsAdmin)
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
                     return result?.Adapt<Profile>();
                 }
 
-                if (user.Role.ToLower() == Consts.Roles.RetailerAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.Operator && !string.IsNullOrEmpty(user.CompanyId))
+                if (user.Role.ToLower() == Consts.Roles.SuperAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.Operator && !string.IsNullOrEmpty(user.CompanyId))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found"); 
                     if (result == null && result?.CompanyId != user.CompanyId)

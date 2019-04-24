@@ -51,8 +51,11 @@
         public class Roles
         {
             public const string SalesRep = "salesrep";
+            public const string OperationsAdmin = "operationsadmin";
             public const string SuperAdmin = "superadmin";
-            public const string RetailerAdmin = "retaileradmin";
+            public const string SystemAdmin = "systemadmin";
+            public const string AccountAdmin = "accountadmin";
+            public const string SupportAdmin = "supportadmin";
             public const string Operator = "operator";
         }
 
