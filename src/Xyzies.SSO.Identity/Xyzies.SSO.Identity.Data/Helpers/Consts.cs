@@ -1,4 +1,6 @@
-﻿namespace Xyzies.SSO.Identity.Data.Helpers
+﻿using System.Collections.Generic;
+
+namespace Xyzies.SSO.Identity.Data.Helpers
 {
     /// <summary>
     /// NOTE: Do not change constant values without full recompilation
@@ -51,12 +53,19 @@
         public class Roles
         {
             public const string SalesRep = "salesrep";
-            public const string OperationsAdmin = "operationsadmin";
+            public const string Operator = "operator";
             public const string SuperAdmin = "superadmin";
+
+            public const string OperationsAdmin = "operationadmin";
             public const string SystemAdmin = "systemadmin";
             public const string AccountAdmin = "accountadmin";
             public const string SupportAdmin = "supportadmin";
-            public const string Operator = "operator";
+            public static readonly List<string> GlobalAdmins = new List<string> {
+                SystemAdmin,
+                SupportAdmin,
+                AccountAdmin,
+                OperationsAdmin
+            };
         }
 
         public class Cache

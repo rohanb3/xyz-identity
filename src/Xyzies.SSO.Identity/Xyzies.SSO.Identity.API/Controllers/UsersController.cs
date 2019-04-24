@@ -122,7 +122,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             try
             {
                 var userRole = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
-                if (!string.IsNullOrEmpty(userRole) && userRole.ToLower() != Consts.Roles.OperationsAdmin)
+                if (!string.IsNullOrEmpty(userRole) && !Consts.Roles.GlobalAdmins.Contains(userRole.ToLower()))
                 {
                     return new ContentResult { StatusCode = 403 };
                 }

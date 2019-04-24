@@ -50,7 +50,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <inheritdoc />
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            if (user.Role.ToLower() == Consts.Roles.OperationsAdmin)
+            if (Consts.Roles.GlobalAdmins.Contains(user.Role.ToLower()))
             {
                 return await GetUsers(filter, sorting);
             }
@@ -59,7 +59,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
 
-                filter.Role = filter.Role?.Where(role => role.ToLower() != Consts.Roles.OperationsAdmin.ToLower())?.ToList()
+                filter.Role = filter.Role?.Where(role => !Consts.Roles.GlobalAdmins.Contains(role.ToLower()))?.ToList()
                     ?? new List<string> { Consts.Roles.SuperAdmin, Consts.Roles.SalesRep, Consts.Roles.Operator };
                 return await GetUsers(filter, sorting);
             }
@@ -234,7 +234,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                if (user.Role.ToLower() == Consts.Roles.OperationsAdmin)
+                if (Consts.Roles.GlobalAdmins.Contains(user.Role.ToLower()))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
                     return result?.Adapt<Profile>();
