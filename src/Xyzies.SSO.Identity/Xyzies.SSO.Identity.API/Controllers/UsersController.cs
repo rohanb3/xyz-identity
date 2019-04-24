@@ -92,7 +92,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
 
                 var currentUser = new UserIdentityParams
                 {
-                    Role = Consts.Roles.SuperAdmin
+                    Role = Consts.Roles.OperationsAdmin
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser);
 
@@ -122,7 +122,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
             try
             {
                 var userRole = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
-                if (!string.IsNullOrEmpty(userRole) && userRole.ToLower() != Consts.Roles.SuperAdmin)
+                if (!string.IsNullOrEmpty(userRole) && !Consts.Roles.GlobalAdmins.Contains(userRole.ToLower()))
                 {
                     return new ContentResult { StatusCode = 403 };
                 }
