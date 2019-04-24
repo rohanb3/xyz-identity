@@ -43,7 +43,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                     users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
-
                 var roles = (await _roleRepository.GetAsync()).ToList();
 
                 foreach (var user in users.ToList())
@@ -86,6 +85,39 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 }
                 await _locationService.SetState(usersState);
                 await _locationService.SetCity(usersCity);
+            }
+            catch (ApplicationException ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task ResetCPRolesForExistingUsersAsync(MigrationOptions options)
+        {
+            try
+            {
+                var roles = (await _roleRepository.GetAsync()).ToList();
+
+                var users = await _cpUsersRepository.GetAsync(x => x.IsDeleted != true & (x.RoleId == 4 || x.RoleId == 8 || x.RoleId == 9 || x.RoleId == 5));
+
+                if (options.Emails.Length > 0)
+                {
+                    users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
+                }
+
+                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
+
+                foreach (var user in users.ToList())
+                {
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == user.Email);
+                    if (existUser != null)
+                    {
+                        await _userService.UpdateUserByIdAsync(existUser.ObjectId, new Identity.Services.Models.User.BaseProfile { Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName });
+
+                        Console.WriteLine($"Role updated, {user.Name} {user.LastName} {user.Role}");
+                    }
+
+                }
             }
             catch (ApplicationException ex)
             {
