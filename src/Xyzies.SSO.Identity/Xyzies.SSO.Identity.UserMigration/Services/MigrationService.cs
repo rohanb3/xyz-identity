@@ -91,6 +91,24 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 Console.WriteLine($"Role filled, {user.DisplayName}");
             }
         }
+        public async Task SetAllEmailsToLowerCase(MigrationOptions options)
+        {
+            var users = await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin });
+            var lazyLoadedUsers = users.Result.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Result.Count());
+            foreach (var user in lazyLoadedUsers)
+            {
+                if (user.Email != null)
+                {
+                    await _azureClient.PatchUser(user.ObjectId, new AzureUser { SignInNames = new List<SignInName> { new SignInName { Type = "emailAddress", Value = user.Email.ToLower() } } });
+                    Console.WriteLine($"Sign in name reset, {user.Email.ToLower()}");
+                }
+                else
+                {
+                    Console.WriteLine("NULL EMAIL!!!");
+                }
+            }
+        }
+
         public async Task SyncEnabledUsers(MigrationOptions options)
         {
             try
@@ -146,5 +164,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 user.State = null;
             }
         }
+
     }
 }

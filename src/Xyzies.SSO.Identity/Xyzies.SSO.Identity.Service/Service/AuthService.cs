@@ -49,10 +49,12 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task<TokenResponse> AuthorizeAsync(UserAuthorizeOptions options)
         {
+            options.Username = options.Username.ToLower();
+
             var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == options.Username));
             if (user == null)
             {
-                throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
+                throw new ArgumentException(ErrorReponses.UserDoesNotExits);
             }
 
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
