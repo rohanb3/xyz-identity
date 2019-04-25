@@ -7,8 +7,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
     {
         Task MigrateAsync(MigrationOptions options);
         Task SyncEnabledUsers(MigrationOptions options);
-
-        Task ResetCPRolesForExistingUsersAsync(MigrationOptions options);
-
+        Task FillNullRolesWithAnonymous();
     }
 }

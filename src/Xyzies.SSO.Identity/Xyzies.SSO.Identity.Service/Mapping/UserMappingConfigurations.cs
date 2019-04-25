@@ -18,14 +18,14 @@ namespace Xyzies.SSO.Identity.Services.Mapping
 
             TypeAdapterConfig<User, Profile>.NewConfig()
                .Map(dest => dest.ObjectId, src => src.Id)
-               .Map(dest => dest.DisplayName, src => src.Name + " " + src.LastName)
+               .Map(dest => dest.DisplayName, src => ReplaceNullOrEmpty($"{src.Name ?? ""} {src.LastName ?? ""}".Trim()))
                .Map(dest => dest.Surname, src => src.LastName)
                .Map(dest => dest.GivenName, src => src.Name)
                .Map(dest => dest.AccountEnabled, src => src.IsActive)
                .Map(dest => dest.AvatarUrl, src => src.ImageName);
 
             TypeAdapterConfig<User, AzureUser>.NewConfig()
-               .Map(dest => dest.DisplayName, src => src.Name + " " + src.LastName)
+               .Map(dest => dest.DisplayName, src => ReplaceNullOrEmpty($"{src.Name ?? ""} {src.LastName ?? ""}".Trim()))
                .Map(dest => dest.Surname, src => src.LastName)
                .Map(dest => dest.GivenName, src => src.Name)
                .Map(dest => dest.AccountEnabled, src => src.IsActive)
@@ -34,18 +34,15 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                {
                    new SignInName()
                    {
-                       Type = "userName",
-                       Value = src.Name
-                   },
-                   new SignInName()
-                   {
                        Type = "emailAddress",
                        Value = src.Email
                    }
                })
                .Map(dest => dest.PasswordProfile, src => new PasswordProfile()
                {
-                   Password = src.Password
+                   Password = src.Password,
+                   EnforceChangePasswordPolicy = false,
+                   ForceChangePasswordNextLogin = false
                })
                .Map(dest => dest.AccountEnabled, src => src.IsActive)
                .Map(dest => dest.CreationType, src => "LocalAccount")
@@ -54,9 +51,8 @@ namespace Xyzies.SSO.Identity.Services.Mapping
 
         }
 
-        private static string GetSignInNameValue(SignInName name)
-        {
-            return name?.Value;
-        }
+        private static string GetSignInNameValue(SignInName name) => name?.Value;
+
+        private static string ReplaceNullOrEmpty(string val) => string.IsNullOrWhiteSpace(val) ? "DEFAULT" : val;
     }
 }
