@@ -6,8 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
+using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
+using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.UserMigration.Models;
 
@@ -49,39 +51,26 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 {
                     try
                     {
-
-                        user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName;
-                        if (user.City == "")
-                        {
-                            user.City = null;
-                        }
-
-                        if (user.State == "")
-                        {
-                            user.State = null;
-                        }
-
+                        PrepeareUserProperties(user, roles);
                         await _azureClient.PostUser(user.Adapt<AzureUser>());
+                        HandleUserProperties(usersState, usersCity, user);
 
-                        if (usersState.FirstOrDefault(x => x?.Name?.ToLower() == user?.State?.ToLower()) == null && !string.IsNullOrEmpty(user?.State))
-                        {
-                            usersState.Add(new State { Name = user?.State, ShortName = user?.State });
-                        }
-
-                        if (usersCity.FirstOrDefault(x => x?.Name?.ToLower() == user?.City?.ToLower()) == null && !string.IsNullOrEmpty(user?.City) && !string.IsNullOrEmpty(user?.State))
-                        {
-                            usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
-                        }
-
-                        Console.WriteLine($"Success , {user.Name} {user.LastName}");
+                        Console.WriteLine($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                     }
                     catch (Exception ex)
                     {
-                        //if(ex.Message != "User already exist" && ex.Message != "Can not create user with current parameters\n One or more properties contains invalid values.")
-                        //{
-                        //    throw ex;
-                        //}
+                        if (ex.Message == "User already exist")
+                        {
+                            var existUser = (await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == user.Email));
+                            var adaptedUser = user.Adapt<AzureUser>();
+
+                            await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
+                            HandleUserProperties(usersState, usersCity, user);
+
+                            Console.WriteLine($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                        }
                     }
+
                 }
                 await _locationService.SetState(usersState);
                 await _locationService.SetCity(usersCity);
@@ -92,39 +81,16 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             }
         }
 
-        public async Task ResetCPRolesForExistingUsersAsync(MigrationOptions options)
+        public async Task FillNullRolesWithAnonymous()
         {
-            try
+            var users = (await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin })).Result.Where(user => user.Role == null);
+
+            foreach (var user in users)
             {
-                var roles = (await _roleRepository.GetAsync()).ToList();
-
-                var users = await _cpUsersRepository.GetAsync(x => x.IsDeleted != true & (x.RoleId == 4 || x.RoleId == 8 || x.RoleId == 9 || x.RoleId == 5));
-
-                if (options.Emails.Length > 0)
-                {
-                    users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
-                }
-
-                users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
-
-                foreach (var user in users.ToList())
-                {
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == user.Email);
-                    if (existUser != null)
-                    {
-                        await _userService.UpdateUserByIdAsync(existUser.ObjectId, new Identity.Services.Models.User.BaseProfile { Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName });
-
-                        Console.WriteLine($"Role updated, {user.Name} {user.LastName} {user.Role}");
-                    }
-
-                }
-            }
-            catch (ApplicationException ex)
-            {
-                throw;
+                await _azureClient.PatchUser(user.ObjectId, new AzureUser { Role = "Anonyumous" });
+                Console.WriteLine($"Role filled, {user.DisplayName}");
             }
         }
-
         public async Task SyncEnabledUsers(MigrationOptions options)
         {
             try
@@ -151,6 +117,33 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             catch (ApplicationException ex)
             {
                 throw;
+            }
+        }
+
+        private void HandleUserProperties(List<State> usersState, List<City> usersCity, User user)
+        {
+            if (usersState.FirstOrDefault(x => x?.Name?.ToLower() == user?.State?.ToLower()) == null && !string.IsNullOrEmpty(user?.State))
+            {
+                usersState.Add(new State { Name = user?.State, ShortName = user?.State });
+            }
+
+            if (usersCity.FirstOrDefault(x => x?.Name?.ToLower() == user?.City?.ToLower()) == null && !string.IsNullOrEmpty(user?.City) && !string.IsNullOrEmpty(user?.State))
+            {
+                usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
+            }
+        }
+
+        private void PrepeareUserProperties(User user, List<Role> roles)
+        {
+            user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName ?? "Anonymous";
+            if (user.City == "")
+            {
+                user.City = null;
+            }
+
+            if (user.State == "")
+            {
+                user.State = null;
             }
         }
     }
