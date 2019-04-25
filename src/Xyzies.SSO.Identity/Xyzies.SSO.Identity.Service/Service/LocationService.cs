@@ -63,8 +63,12 @@ namespace Xyzies.SSO.Identity.Services.Service
             foreach (var city in cities)
             {
                 city.State.Id = (states.FirstOrDefault(x => x.Name == city.State.Name)).Id;
+                var cityInDb = await _cityRepo.GetByAsync(x => x.Name.ToLower() == city.Name.ToLower());
+                if(cityInDb == null)
+                {
+                    await _cityRepo.AddAsync(city);
+                }
             }
-            await _cityRepo.AddRangeAsync(cities);
         }
 
         public async Task SetState(string stateName)
@@ -76,9 +80,16 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
-        public async Task SetState(List<State> state)
+        public async Task SetState(List<State> states)
         {
-            await _stateRepo.AddRangeAsync(state);
+            foreach (var state in states)
+            {
+                var stateInDb = await _stateRepo.GetByAsync(x => x.Name.ToLower() == state.Name.ToLower());
+                if(stateInDb == null)
+                {
+                    await _stateRepo.AddAsync(state);
+                }
+            }
         }
     }
 }
