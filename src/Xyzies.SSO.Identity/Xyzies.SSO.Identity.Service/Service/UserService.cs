@@ -59,8 +59,6 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
 
-                filter.Role = filter.Role?.Where(role => !Consts.Roles.GlobalAdmins.Contains(role.ToLower()))?.ToList()
-                    ?? new List<string> { Consts.Roles.SuperAdmin, Consts.Roles.SalesRep, Consts.Roles.Operator };
                 return await GetUsers(filter, sorting);
             }
 
