@@ -32,6 +32,8 @@ using System.Linq;
 using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
+using Xyzies.SSO.Identity.Services.Service.Relation;
+using Microsoft.AspNetCore.Http;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -59,6 +61,7 @@ namespace Xyzies.SSO.Identity.API
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
 
             services.Configure<ProjectSettingsOption>(option => Configuration.Bind("ProjectSettings", option));
+            services.Configure<ServiceOption>(option => Configuration.Bind("Services", option));
 
             // TODO: Read version and build number from CI config
 
@@ -127,10 +130,11 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+            services.AddScoped<IHttpClientRelationsService, HttpClientRelationsService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddUserMigrationService();
-
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));

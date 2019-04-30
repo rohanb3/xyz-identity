@@ -15,6 +15,7 @@ using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.User;
+using Xyzies.SSO.Identity.Services.Service.Relation;
 
 namespace Xyzies.SSO.Identity.Services.Service
 {
@@ -26,6 +27,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
+        private readonly IHttpClientRelationsService _relationsService = null;
         private readonly string _projectUrl;
 
         /// <summary>
@@ -34,8 +36,13 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="azureClient"></param>
         /// <param name="cache"></param>
         /// <param name="localtionService"></param>
+        /// <param name="relationsService"></param>
         /// <param name="options"></param>
-        public UserService(IAzureAdClient azureClient, IMemoryCache cache, ILocaltionService localtionService, IOptionsMonitor<ProjectSettingsOption> options)
+        public UserService(IAzureAdClient azureClient, 
+            IMemoryCache cache, 
+            ILocaltionService localtionService,
+            IHttpClientRelationsService relationsService,
+            IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ??
                 throw new ArgumentNullException(nameof(azureClient));
@@ -43,6 +50,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(localtionService));
             _cache = cache ??
                 throw new ArgumentNullException(nameof(cache));
+            _relationsService = relationsService ??
+                throw new AccessViolationException(nameof(relationsService));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
         }
@@ -145,6 +154,11 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
+                if(!string.IsNullOrWhiteSpace(model.Role))
+                {
+                    await ValidationUserByRole(model);
+                }
+
                 var createdUser = await _azureClient.PostUser(model.Adapt<AzureUser>());
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
@@ -445,6 +459,70 @@ namespace Xyzies.SSO.Identity.Services.Service
                         }
                     }
                 }
+            }
+        }
+
+        private async Task ValidationUserByRole(ProfileCreatable model)
+        {
+            if (model.Role.ToLower() == Consts.Roles.SuperAdmin || model.Role.ToLower() == Consts.Roles.Operator)
+            {
+                await ValidationByCompany(model.CompanyId);
+                if (model.BranchId.HasValue)
+                {
+                    await ValidationByBranche(model.BranchId);
+                }
+            }
+            else if (model.Role.ToLower() == Consts.Roles.SalesRep)
+            {
+                await ValidationByCompany(model.CompanyId);
+                await ValidationByBranche(model.BranchId);
+            }
+            else
+            {
+                if (model.CompanyId.HasValue)
+                {
+                    await ValidationByCompany(model.CompanyId);
+                }
+                if (model.BranchId.HasValue)
+                {
+                    await ValidationByBranche(model.BranchId);
+                }
+
+            }
+        }
+
+        private async Task ValidationByCompany(int? companyId)
+        {
+            if (!companyId.HasValue)
+            {
+                throw new ApplicationException($"{nameof(companyId)} is required for this role");
+            }
+            var company = await _relationsService.GetCompanyById(companyId.Value);
+            if (company == null)
+            {
+                throw new ApplicationException($"Company with id: {companyId.Value.ToString()} is not exist");
+            }
+        }
+
+        private async Task ValidationByBranche(Guid? branchId)
+        {
+            if (!branchId.HasValue)
+            {
+                throw new ApplicationException($"{nameof(branchId)} is required for this role");
+            }
+            var branch = await _relationsService.GetBranchById(branchId.Value);
+            if (branch == null)
+            {
+                throw new ApplicationException($"Branch with id: {branchId.Value.ToString()} is not exist");
+            }
+            if (!branch.CompanyId.HasValue)
+            {
+                throw new ApplicationException($"Branch not connected anyone company");
+            }
+            var company = await _relationsService.GetCompanyById(branch.CompanyId.Value);
+            if (company == null)
+            {
+                throw new ApplicationException($"Company from branch is not exist");
             }
         }
 
