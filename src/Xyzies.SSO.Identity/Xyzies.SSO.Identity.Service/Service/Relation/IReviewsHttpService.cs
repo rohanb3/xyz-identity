@@ -10,20 +10,22 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
     /// <summary>
     /// Http clien for communication with microservices
     /// </summary>
-    public interface IHttpClientRelationsService
+    public interface IReviewsHttpService
     {
         /// <summary>
         /// Get company by id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        Task<CompanyModel> GetCompanyById(int id);
+        Task<CompanyModel> GetCompanyById(int id, string token = null);
 
         /// <summary>
         /// Get branch by id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        Task<BranchModel> GetBranchById(Guid id);
+        Task<BranchModel> GetBranchById(Guid id, string token = null);
     }
 }

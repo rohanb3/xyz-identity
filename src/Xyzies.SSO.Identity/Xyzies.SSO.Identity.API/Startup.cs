@@ -130,11 +130,10 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
-            services.AddScoped<IHttpClientRelationsService, HttpClientRelationsService>();
+            services.AddScoped<IReviewsHttpService, ReviewsHttpService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddUserMigrationService();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));

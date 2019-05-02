@@ -18,38 +18,34 @@ using Xyzies.SSO.Identity.Services.Models.Company;
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
     /// <inheritdoc />
-    public class HttpClientRelationsService : IHttpClientRelationsService
+    public class ReviewsHttpService : IReviewsHttpService
     {
         private readonly string _publicApiUrl = null;
-        private readonly IHttpContextAccessor _httpContextAccessor = null;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="httpContextAccessor"></param>
-        /// <param name="options"></param>
-        public HttpClientRelationsService(IHttpContextAccessor httpContextAccessor, IOptionsMonitor<ServiceOption> options)
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <param name="options"></param>
+        public ReviewsHttpService(IOptionsMonitor<ServiceOption> options)
         {
             _publicApiUrl = options.CurrentValue?.PublicApiUrl ??
                 throw new InvalidOperationException("Missing URL to public-api");
-            _httpContextAccessor = httpContextAccessor ?? 
-                throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         /// <inheritdoc />
-        public async Task<CompanyModel> GetCompanyById(int id)
+        public async Task<CompanyModel> GetCompanyById(int id, string token = null)
         {
             var uri = new Uri($"{_publicApiUrl}company/{id}");
-            var responseString = await SendGetRequest(uri);
+            var responseString = await SendGetRequest(uri, token);
 
             return GetPublicApiResponse<CompanyModel>(responseString);
         }
 
         /// <inheritdoc />
-        public async Task<BranchModel> GetBranchById(Guid id)
+        public async Task<BranchModel> GetBranchById(Guid id, string token = null)
         {
             var uri = new Uri($"{_publicApiUrl}/branch/{id.ToString()}");
-            var responseString = await SendGetRequest(uri);
+            var responseString = await SendGetRequest(uri, token);
 
             return GetPublicApiResponse<BranchModel>(responseString);
         }
@@ -68,13 +64,15 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             return JsonConvert.DeserializeObject<T>(responseString);
         }
 
-        private async Task<string> SendGetRequest(Uri uri)
+        private async Task<string> SendGetRequest(Uri uri, string token = null)
         {
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = uri;
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
-                   _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault());
+                if(!string.IsNullOrWhiteSpace(token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
                 var response = await client.GetAsync(client.BaseAddress);
                 if (response.StatusCode == HttpStatusCode.Forbidden)
                 {
