@@ -302,19 +302,19 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
 
             var grouped = usersInCache.GroupBy(x => x.CompanyId);
-            if (sorting.By == Consts.UsersSorting.Descending)
+            if (sorting?.By == Consts.UsersSorting.Descending)
             {
                 grouped = grouped.OrderByDescending(x => x.Count());
             }
 
-            if (sorting.By == Consts.UsersSorting.Ascending)
+            if (sorting?.By == Consts.UsersSorting.Ascending)
             {
                 grouped = grouped.OrderBy(x => x.Count());
             }
 
             grouped = grouped.Where(x => x.Key != null)
-                .Skip(lazyParameters.Offset ?? 0)
-                .Take(lazyParameters.Limit ?? grouped.Count());
+                .Skip(lazyParameters?.Offset ?? 0)
+                .Take(lazyParameters?.Limit ?? grouped.Count());
 
             foreach (var value in grouped)
             {

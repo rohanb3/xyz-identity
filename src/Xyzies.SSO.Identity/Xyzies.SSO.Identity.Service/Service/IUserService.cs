@@ -8,12 +8,13 @@ using Xyzies.SSO.Identity.Services.Models.User;
 
 namespace Xyzies.SSO.Identity.Services.Service
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public interface IUserService
     {
         Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null);
         Task<Profile> GetUserByIdAsync(string id, UserIdentityParams user);
         Task<Profile> GetUserBy(Func<AzureUser, bool> predicate);
-        Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds, UserSortingParameters sorting, LazyLoadParameters lazyParameters);
+        Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds = null, UserSortingParameters sorting = null, LazyLoadParameters lazyParameters = null);
         Task UpdateUserByIdAsync(string id, BaseProfile model);
         Task<Profile> CreateUserAsync(ProfileCreatable model);
         Task DeleteUserByIdAsync(string id);
@@ -23,4 +24,5 @@ namespace Xyzies.SSO.Identity.Services.Service
         Task<FileModel> GetAvatar(string userId);
         Task UpdateUserPasswordAsync(string userMail, string password);
     }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
