@@ -51,7 +51,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         {
             options.Username = options.Username.ToLower();
 
-            var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == options.Username));
+            var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value.ToLower() == options.Username));
             if (user == null)
             {
                 throw new ArgumentException(ErrorReponses.UserDoesNotExits);
