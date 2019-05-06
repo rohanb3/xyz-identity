@@ -16,7 +16,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         Task<Profile> GetUserBy(Func<AzureUser, bool> predicate);
         Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds = null, UserSortingParameters sorting = null, LazyLoadParameters lazyParameters = null);
         Task UpdateUserByIdAsync(string id, BaseProfile model);
-        Task<Profile> CreateUserAsync(ProfileCreatable model);
+        Task<Profile> CreateUserAsync(ProfileCreatable model, string token);
         Task DeleteUserByIdAsync(string id);
         Task SetUsersCache();
         Task UploadAvatar(string userId, AvatarModel avatarModel);

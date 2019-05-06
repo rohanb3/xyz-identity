@@ -32,6 +32,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
+        /// <param name="migrationService"></param>
         public UsersController(IUserService userService, IMigrationService migrationService)
         {
             _userService = userService ??
@@ -289,12 +290,19 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                var userToResponse = await _userService.CreateUserAsync(userCreatable);
+                string token = HttpContext.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault();
+                var userToResponse = await _userService.CreateUserAsync(userCreatable, token);
                 return Ok(userToResponse);
             }
             catch (ApplicationException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>(ex.ParamName, new string[] { ex.Message })
+                        })));
             }
         }
 
