@@ -11,7 +11,6 @@ namespace Xyzies.SSO.Identity.API.Controllers
 {
     [Route("api/location")]
     [ApiController]
-    [Authorize]
     public class LocationController : ControllerBase
     {
         private readonly ILocaltionService _localtionService;

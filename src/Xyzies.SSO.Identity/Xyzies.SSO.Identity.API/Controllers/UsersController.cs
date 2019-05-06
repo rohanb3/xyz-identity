@@ -32,6 +32,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
+        /// <param name="migrationService"></param>
         public UsersController(IUserService userService, IMigrationService migrationService)
         {
             _userService = userService ??
@@ -80,8 +81,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         [Route("{token}/trusted")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> GetAllForTrustedService(string token)
+        public async Task<IActionResult> GetAllUsersForTrustedService(string token)
         {
             try
             {
@@ -128,6 +130,30 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 }
 
                 var usersCount = _userService.GetUsersCountInCompanies(companyIds, sorting, lazyParameters);
+
+                return Ok(usersCount);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Returns total count of users
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet]
+        [Route("total/{token}/trusted")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public IActionResult GetAllForTrustedService(string token)
+        {
+            try
+            {
+                var usersCount = _userService.GetUsersCountInCompanies();
 
                 return Ok(usersCount);
             }
@@ -264,12 +290,19 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                var userToResponse = await _userService.CreateUserAsync(userCreatable);
+                string token = HttpContext.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault();
+                var userToResponse = await _userService.CreateUserAsync(userCreatable, token);
                 return Ok(userToResponse);
             }
             catch (ApplicationException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                            new KeyValuePair<string, string[]>(ex.ParamName, new string[] { ex.Message })
+                        })));
             }
         }
 
