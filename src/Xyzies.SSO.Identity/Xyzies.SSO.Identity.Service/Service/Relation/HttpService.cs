@@ -35,7 +35,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <inheritdoc />
         public async Task<CompanyModel> GetCompanyById(int id, string token = null)
         {
-            var uri = new Uri($"{_publicApiUrl}company/{id}");
+            var uri = new Uri($"{_publicApiUrl}/company/{id}");
             var responseString = await SendGetRequest(uri, token);
 
             return GetPublicApiResponse<CompanyModel>(responseString);
