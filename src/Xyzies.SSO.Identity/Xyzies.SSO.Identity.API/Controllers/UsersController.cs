@@ -32,6 +32,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
+        /// <param name="migrationService"></param>
         public UsersController(IUserService userService, IMigrationService migrationService)
         {
             _userService = userService ??

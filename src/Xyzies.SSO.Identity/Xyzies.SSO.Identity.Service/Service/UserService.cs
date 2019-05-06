@@ -28,7 +28,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
-        private readonly IHttpService _relationsService = null;
+        private readonly IHttpService _httpService = null;
         private readonly IRoleRepository _roleRepository = null;
         private readonly string _projectUrl;
 
@@ -38,13 +38,13 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="azureClient"></param>
         /// <param name="cache"></param>
         /// <param name="localtionService"></param>
-        /// <param name="relationsService"></param>
+        /// <param name="httpService"></param>
         /// <param name="roleRepository"></param>
         /// <param name="options"></param>
         public UserService(IAzureAdClient azureClient, 
             IMemoryCache cache, 
             ILocaltionService localtionService,
-            IHttpService relationsService,
+            IHttpService httpService,
             IRoleRepository roleRepository,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
@@ -54,8 +54,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(localtionService));
             _cache = cache ??
                 throw new ArgumentNullException(nameof(cache));
-            _relationsService = relationsService ??
-                throw new ArgumentNullException(nameof(relationsService));
+            _httpService = httpService ??
+                throw new ArgumentNullException(nameof(httpService));
             _roleRepository = roleRepository ??
                 throw new ArgumentNullException(nameof(roleRepository));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
@@ -506,7 +506,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 throw new ApplicationException($"{nameof(companyId)} is required for this role");
             }
-            var company = await _relationsService.GetCompanyById(companyId.Value, token);
+            var company = await _httpService.GetCompanyById(companyId.Value, token);
             if (company == null)
             {
                 throw new ApplicationException($"Company with id: {companyId.Value.ToString()} is not exist");
@@ -519,7 +519,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 throw new ApplicationException($"{nameof(branchId)} is required for this role");
             }
-            var branch = await _relationsService.GetBranchById(branchId.Value, token);
+            var branch = await _httpService.GetBranchById(branchId.Value, token);
             if (branch == null)
             {
                 throw new ApplicationException($"Branch with id: {branchId.Value.ToString()} is not exist");
@@ -528,7 +528,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 throw new ApplicationException($"Branch not connected anyone company");
             }
-            var company = await _relationsService.GetCompanyById(branch.CompanyId.Value, token);
+            var company = await _httpService.GetCompanyById(branch.CompanyId.Value, token);
             if (company == null)
             {
                 throw new ApplicationException($"Company from branch is not exist");
