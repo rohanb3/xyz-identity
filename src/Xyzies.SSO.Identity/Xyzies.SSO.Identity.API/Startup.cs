@@ -33,7 +33,9 @@ using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
-using Microsoft.AspNetCore.Http;
+using Serilog;
+using Microsoft.Extensions.Logging;
+using Serilog.Sinks.Network;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -56,6 +58,14 @@ namespace Xyzies.SSO.Identity.API
             //services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>()
             //    .AddDefaultTokenProviders();
+            Log.Logger = new LoggerConfiguration()
+             .Enrich.FromLogContext()
+             .MinimumLevel.Information()
+             //.WriteTo.TCPSink("tls://192.168.0.54", 1337)
+             .WriteTo.File("../../../logs.txt")
+             .CreateLogger();
+
+            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
@@ -184,9 +194,12 @@ namespace Xyzies.SSO.Identity.API
         /// <param name="app"></param>
         /// <param name="env"></param>
 #pragma warning disable CA1822 // Mark members as static
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 #pragma warning restore CA1822 // Mark members as static
         {
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+
             if (!env.IsDevelopment())
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
