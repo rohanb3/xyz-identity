@@ -14,8 +14,8 @@ namespace Xyzies.SSO.Identity.Data.Helpers
         /// 
         /// Template to replace is 'variable58b049a55e71e'
         /// </summary>
-        //private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";
-        private const string _extensionPropertyTemplate = "extension_variable58b049a55e71e_";
+        private const string _extensionPropertyTemplate = "extension_dc2c5f0a6f0845c385858b049a55e71e_";
+        //private const string _extensionPropertyTemplate = "extension_variable58b049a55e71e_";
 
         public const string RoleClaimType = "extension_Group";
         public const string CompanyIdClaimType = "extension_CompanyId";
