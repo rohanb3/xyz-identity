@@ -11,10 +11,12 @@ using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
+using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.User;
+using Xyzies.SSO.Identity.Services.Service.Relation;
 
 namespace Xyzies.SSO.Identity.Services.Service
 {
@@ -26,6 +28,8 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
+        private readonly IHttpService _httpService = null;
+        private readonly IRoleRepository _roleRepository = null;
         private readonly string _projectUrl;
 
         /// <summary>
@@ -34,8 +38,15 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="azureClient"></param>
         /// <param name="cache"></param>
         /// <param name="localtionService"></param>
+        /// <param name="httpService"></param>
+        /// <param name="roleRepository"></param>
         /// <param name="options"></param>
-        public UserService(IAzureAdClient azureClient, IMemoryCache cache, ILocaltionService localtionService, IOptionsMonitor<ProjectSettingsOption> options)
+        public UserService(IAzureAdClient azureClient, 
+            IMemoryCache cache, 
+            ILocaltionService localtionService,
+            IHttpService httpService,
+            IRoleRepository roleRepository,
+            IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ??
                 throw new ArgumentNullException(nameof(azureClient));
@@ -43,6 +54,10 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(localtionService));
             _cache = cache ??
                 throw new ArgumentNullException(nameof(cache));
+            _httpService = httpService ??
+                throw new ArgumentNullException(nameof(httpService));
+            _roleRepository = roleRepository ??
+                throw new ArgumentNullException(nameof(roleRepository));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
         }
@@ -58,9 +73,9 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
+                ////////TODO: Remove then need /////////
+                filter.Role = null;
 
-                filter.Role = filter.Role?.Where(role => !Consts.Roles.GlobalAdmins.Contains(role.ToLower()))?.ToList()
-                    ?? new List<string> { Consts.Roles.SuperAdmin, Consts.Roles.SalesRep, Consts.Roles.Operator };
                 return await GetUsers(filter, sorting);
             }
 
@@ -136,7 +151,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         }
 
         /// <inheritdoc />
-        public async Task<Profile> CreateUserAsync(ProfileCreatable model)
+        public async Task<Profile> CreateUserAsync(ProfileCreatable model, string token)
         {
             if (model == null)
             {
@@ -145,6 +160,18 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
+                var azureUser = model.Adapt<AzureUser>();
+
+                if (await IsUserExist(GetUserEmail(azureUser)))
+                {
+                    throw new ArgumentException("User already exist", "User");
+                }
+                if (!string.IsNullOrWhiteSpace(model.Role))
+                {
+                    await ValidateUserRole(model);
+                    await ValidationUserByRole(model, token);
+                }
+
                 var createdUser = await _azureClient.PostUser(model.Adapt<AzureUser>());
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
@@ -177,7 +204,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                var userToChange = usersInCache.FirstOrDefault(user => user.SignInNames.FirstOrDefault(signInName => signInName.Type == "emailAddress")?.Value.ToLower() == userMail.ToLower()) ?? throw new KeyNotFoundException();
+                var userToChange = usersInCache.FirstOrDefault(user => GetUserEmail(user)?.ToLower() == userMail.ToLower()) ?? throw new KeyNotFoundException();
 
                 MergeObjects(new ProfileCreatable
                 {
@@ -302,19 +329,19 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
 
             var grouped = usersInCache.GroupBy(x => x.CompanyId);
-            if (sorting.By == Consts.UsersSorting.Descending)
+            if (sorting?.By == Consts.UsersSorting.Descending)
             {
                 grouped = grouped.OrderByDescending(x => x.Count());
             }
 
-            if (sorting.By == Consts.UsersSorting.Ascending)
+            if (sorting?.By == Consts.UsersSorting.Ascending)
             {
                 grouped = grouped.OrderBy(x => x.Count());
             }
 
             grouped = grouped.Where(x => x.Key != null)
-                .Skip(lazyParameters.Offset ?? 0)
-                .Take(lazyParameters.Limit ?? grouped.Count());
+                .Skip(lazyParameters?.Offset ?? 0)
+                .Take(lazyParameters?.Limit ?? grouped.Count());
 
             foreach (var value in grouped)
             {
@@ -448,6 +475,84 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
+        private async Task ValidationUserByRole(ProfileCreatable model, string token)
+        {
+            if (model.Role.ToLower() == Consts.Roles.SuperAdmin || model.Role.ToLower() == Consts.Roles.Operator)
+            {
+                await ValidationByCompany(model.CompanyId, token);
+            }
+            else if (model.Role.ToLower() == Consts.Roles.SalesRep)
+            {
+                await ValidationByCompany(model.CompanyId, token);
+                await ValidationByBranche(model.BranchId, token);
+            }
+            else
+            {
+                if (model.CompanyId.HasValue)
+                {
+                    await ValidationByCompany(model.CompanyId, token);
+                }
+                if (model.BranchId.HasValue)
+                {
+                    await ValidationByBranche(model.BranchId, token);
+                }
+
+            }
+        }
+
+        private async Task ValidationByCompany(int? companyId, string token)
+        {
+            if (!companyId.HasValue)
+            {
+                throw new ApplicationException($"{nameof(companyId)} is required for this role");
+            }
+            var company = await _httpService.GetCompanyById(companyId.Value, token);
+            if (company == null)
+            {
+                throw new ApplicationException($"Company with id: {companyId.Value.ToString()} is not exist");
+            }
+        }
+
+        private async Task ValidationByBranche(Guid? branchId, string token)
+        {
+            if (!branchId.HasValue)
+            {
+                throw new ApplicationException($"{nameof(branchId)} is required for this role");
+            }
+            var branch = await _httpService.GetBranchById(branchId.Value, token);
+            if (branch == null)
+            {
+                throw new ApplicationException($"Branch with id: {branchId.Value.ToString()} is not exist");
+            }
+            if (!branch.CompanyId.HasValue)
+            {
+                throw new ApplicationException($"Branch not connected anyone company");
+            }
+            var company = await _httpService.GetCompanyById(branch.CompanyId.Value, token);
+            if (company == null)
+            {
+                throw new ApplicationException($"Company from branch is not exist");
+            }
+        }
+
+        private async Task ValidateUserRole(ProfileCreatable model)
+        {
+            var role = await _roleRepository.GetByAsync(r => r.RoleName.ToLower() == model.Role.ToLower());
+
+            if (role == null)
+            {
+                throw new ArgumentException("Unknown role", "Role");
+            }
+        }
+
+        private async Task<bool> IsUserExist(string email)
+        {
+            var user = await GetUserBy(u => GetUserEmail(u)?.ToLower() == email.Trim().ToLower());
+
+            return user != null;
+        }
+
+        private string GetUserEmail(AzureUser user) => user.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value;
         #endregion
     }
 }
