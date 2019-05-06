@@ -28,7 +28,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
-        private readonly IReviewsHttpService _relationsService = null;
+        private readonly IHttpService _relationsService = null;
         private readonly IRoleRepository _roleRepository = null;
         private readonly string _projectUrl;
 
@@ -44,7 +44,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         public UserService(IAzureAdClient azureClient, 
             IMemoryCache cache, 
             ILocaltionService localtionService,
-            IReviewsHttpService relationsService,
+            IHttpService relationsService,
             IRoleRepository roleRepository,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
@@ -547,7 +547,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task<bool> IsUserExist(string email)
         {
-            var user = await GetUserBy(u => GetUserEmail(u)?.ToLower() == email.ToLower());
+            var user = await GetUserBy(u => GetUserEmail(u)?.ToLower() == email.Trim().ToLower());
 
             return user != null;
         }

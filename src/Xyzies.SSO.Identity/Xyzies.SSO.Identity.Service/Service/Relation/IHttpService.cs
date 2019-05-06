@@ -10,7 +10,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
     /// <summary>
     /// Http clien for communication with microservices
     /// </summary>
-    public interface IReviewsHttpService
+    public interface IHttpService
     {
         /// <summary>
         /// Get company by id

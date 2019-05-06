@@ -18,7 +18,7 @@ using Xyzies.SSO.Identity.Services.Models.Company;
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
     /// <inheritdoc />
-    public class ReviewsHttpService : IReviewsHttpService
+    public class HttpService : IHttpService
     {
         private readonly string _publicApiUrl = null;
 
@@ -26,7 +26,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
        /// 
        /// </summary>
        /// <param name="options"></param>
-        public ReviewsHttpService(IOptionsMonitor<ServiceOption> options)
+        public HttpService(IOptionsMonitor<ServiceOption> options)
         {
             _publicApiUrl = options.CurrentValue?.PublicApiUrl ??
                 throw new InvalidOperationException("Missing URL to public-api");
@@ -74,10 +74,6 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
                 var response = await client.GetAsync(client.BaseAddress);
-                if (response.StatusCode == HttpStatusCode.Forbidden)
-                {
-                    throw new AccessException("You don't have permissions to do that");
-                }
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
@@ -85,15 +81,6 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
                 var responseString = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
                 {
-                    var data = JToken.Parse(responseString);
-                    if (data as JObject != null)
-                    {
-                        if (int.Parse(data["status"].ToString()) == StatusCodes.Status404NotFound)
-                        {
-                            throw new KeyNotFoundException();
-                        }
-                    }
-
                     throw new ApplicationException(responseString);
                 }
 

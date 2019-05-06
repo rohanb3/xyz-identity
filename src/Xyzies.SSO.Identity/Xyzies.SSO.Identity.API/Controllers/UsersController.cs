@@ -22,7 +22,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
     /// </summary>
     [Route("api/users")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
