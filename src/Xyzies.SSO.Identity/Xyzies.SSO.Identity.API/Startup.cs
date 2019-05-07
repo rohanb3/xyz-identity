@@ -36,7 +36,7 @@ using Xyzies.SSO.Identity.Services.Service.Relation;
 using Serilog;
 using Microsoft.Extensions.Logging;
 using Serilog.Sinks.Network;
-using System.Text;
+using Xyzies.Logger;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -59,13 +59,6 @@ namespace Xyzies.SSO.Identity.API
             //services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>()
             //    .AddDefaultTokenProviders();
-            Log.Logger = new LoggerConfiguration()
-             .Enrich.FromLogContext()
-             .MinimumLevel.Information()
-             .WriteTo.TCPSink("tls://31.43.154.184", 28001)
-             .CreateLogger();
-
-            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
@@ -100,6 +93,8 @@ namespace Xyzies.SSO.Identity.API
                 options.Providers.Add<BrotliCompressionProvider>();
                 options.Providers.Add<GzipCompressionProvider>();
             });
+
+            services.AddTcpStreamLogging(options => Configuration.Bind("Logstash", options));
 
             services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
             services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
@@ -194,12 +189,9 @@ namespace Xyzies.SSO.Identity.API
         /// <param name="app"></param>
         /// <param name="env"></param>
 #pragma warning disable CA1822 // Mark members as static
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 #pragma warning restore CA1822 // Mark members as static
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (!env.IsDevelopment())
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
