@@ -1,0 +1,30 @@
+2019-05-07 14:33:35.524 +03:00 [INF] User profile is available. Using 'C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2019-05-07 14:33:36.263 +03:00 [INF] Entity Framework Core 2.2.3-servicing-35854 initialized 'IdentityDataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+2019-05-07 14:34:04.308 +03:00 [INF] Request starting HTTP/1.1 GET http://localhost:8081/api/users  
+2019-05-07 14:34:06.414 +03:00 [INF] Successfully validated the token.
+2019-05-07 14:34:06.474 +03:00 [INF] Executing endpoint 'Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API)'
+2019-05-07 14:34:06.518 +03:00 [INF] Route matched with {action = "Get", controller = "Users"}. Executing action Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API)
+2019-05-07 14:34:06.532 +03:00 [INF] Authorization was successful.
+2019-05-07 14:34:06.538 +03:00 [INF] Entity Framework Core 2.2.3-servicing-35854 initialized 'IdentityDataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+2019-05-07 14:34:06.564 +03:00 [INF] Entity Framework Core 2.2.3-servicing-35854 initialized 'CablePortalIdentityDataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: MaxPoolSize=128 
+2019-05-07 14:34:06.621 +03:00 [INF] Executing action method Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API) with arguments (["Xyzies.SSO.Identity.Data.Entity.UserFilteringParams","Xyzies.SSO.Identity.Data.Entity.UserSortingParameters"]) - Validation state: "Valid"
+2019-05-07 14:34:06.794 +03:00 [INF] Executed action method Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 161.74880000000002ms.
+2019-05-07 14:34:06.804 +03:00 [INF] Executing ObjectResult, writing value of type 'Xyzies.SSO.Identity.Data.Core.LazyLoadedResult`1[[Xyzies.SSO.Identity.Services.Models.User.Profile, Xyzies.SSO.Identity.Services, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2019-05-07 14:34:06.861 +03:00 [INF] Executed action Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API) in 337.28610000000003ms
+2019-05-07 14:34:06.862 +03:00 [INF] Executed endpoint 'Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API)'
+2019-05-07 14:34:06.871 +03:00 [INF] Request finished in 2563.1349ms 200 application/json; charset=utf-8
+2019-05-07 14:43:52.669 +03:00 [INF] User profile is available. Using 'C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2019-05-07 14:43:53.258 +03:00 [INF] Entity Framework Core 2.2.3-servicing-35854 initialized 'IdentityDataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+2019-05-07 14:44:02.612 +03:00 [INF] Request starting HTTP/1.1 GET http://localhost:8081/api/users  
+2019-05-07 14:44:05.041 +03:00 [INF] Successfully validated the token.
+2019-05-07 14:44:05.085 +03:00 [INF] Executing endpoint 'Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API)'
+2019-05-07 14:44:05.125 +03:00 [INF] Route matched with {action = "Get", controller = "Users"}. Executing action Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API)
+2019-05-07 14:44:05.136 +03:00 [INF] Authorization was successful.
+2019-05-07 14:44:05.143 +03:00 [INF] Entity Framework Core 2.2.3-servicing-35854 initialized 'IdentityDataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+2019-05-07 14:44:05.167 +03:00 [INF] Entity Framework Core 2.2.3-servicing-35854 initialized 'CablePortalIdentityDataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: MaxPoolSize=128 
+2019-05-07 14:44:05.215 +03:00 [INF] Executing action method Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API) with arguments (["Xyzies.SSO.Identity.Data.Entity.UserFilteringParams","Xyzies.SSO.Identity.Data.Entity.UserSortingParameters"]) - Validation state: "Valid"
+2019-05-07 14:44:05.323 +03:00 [INF] Executed action method Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API), returned result Microsoft.AspNetCore.Mvc.OkObjectResult in 100.82430000000001ms.
+2019-05-07 14:44:05.334 +03:00 [INF] Executing ObjectResult, writing value of type 'Xyzies.SSO.Identity.Data.Core.LazyLoadedResult`1[[Xyzies.SSO.Identity.Services.Models.User.Profile, Xyzies.SSO.Identity.Services, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2019-05-07 14:44:05.399 +03:00 [INF] Executed action Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API) in 266.505ms
+2019-05-07 14:44:05.401 +03:00 [INF] Executed endpoint 'Xyzies.SSO.Identity.API.Controllers.UsersController.Get (Xyzies.SSO.Identity.API)'
+2019-05-07 14:44:05.416 +03:00 [INF] Request finished in 2803.0644ms 200 application/json; charset=utf-8

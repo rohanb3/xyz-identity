@@ -36,6 +36,7 @@ using Xyzies.SSO.Identity.Services.Service.Relation;
 using Serilog;
 using Microsoft.Extensions.Logging;
 using Serilog.Sinks.Network;
+using System.Text;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -61,8 +62,7 @@ namespace Xyzies.SSO.Identity.API
             Log.Logger = new LoggerConfiguration()
              .Enrich.FromLogContext()
              .MinimumLevel.Information()
-             //.WriteTo.TCPSink("tls://192.168.0.54", 1337)
-             .WriteTo.File("../../../logs.txt")
+             .WriteTo.TCPSink("tls://31.43.154.184", 28001)
              .CreateLogger();
 
             services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
