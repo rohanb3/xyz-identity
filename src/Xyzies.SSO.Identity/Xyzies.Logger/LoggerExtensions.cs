@@ -21,11 +21,16 @@ namespace Xyzies.Logger
             var protocol = options.SecureConnection ? "tls" : "tcp";
             var uri = $"{protocol}://{options.Ip}:{options.Port}";
 
-            Log.Logger = new LoggerConfiguration()
+            var loggerConfig = new LoggerConfiguration()
                                 .MinimumLevel.Is(logLevel)
-                                .WriteTo.TCPSink(uri)
-                                .Enrich.With(enriches)
-                                .CreateLogger();
+                                .WriteTo.TCPSink(uri);
+
+            if ((enriches?.Length ?? 0) > 0)
+            {
+                loggerConfig.Enrich.With(enriches);
+            }
+
+            Log.Logger = loggerConfig.CreateLogger();
 
             services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: options.Dispose));
 
