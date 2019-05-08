@@ -33,7 +33,10 @@ using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
-using Microsoft.AspNetCore.Http;
+using Serilog;
+using Microsoft.Extensions.Logging;
+using Serilog.Sinks.Network;
+using Xyzies.Logger;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -90,6 +93,8 @@ namespace Xyzies.SSO.Identity.API
                 options.Providers.Add<BrotliCompressionProvider>();
                 options.Providers.Add<GzipCompressionProvider>();
             });
+
+            services.AddTcpStreamLogging(options => Configuration.Bind("Logstash", options));
 
             services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
             services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
