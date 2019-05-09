@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.API", "Xyzies.SSO.Identity.API\Xyzies.SSO.Identity.API.csproj", "{5DF08CF9-CBC6-4106-A74E-6E481DE75AE4}"
 EndProject
@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.CPUserMigration", "Xyzies.SSO.Identity.UserMigration\Xyzies.SSO.Identity.CPUserMigration.csproj", "{DE8E415C-E811-470E-B055-6689958F9908}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xyzies.SSO.Identity.Mailer", "Xyzies.SSO.Identity.Mailer\Xyzies.SSO.Identity.Mailer.csproj", "{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xyzies.SSO.Identity.Mailer", "Xyzies.SSO.Identity.Mailer\Xyzies.SSO.Identity.Mailer.csproj", "{06236063-50CD-4C4D-B2D4-DB4FADB16E6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
