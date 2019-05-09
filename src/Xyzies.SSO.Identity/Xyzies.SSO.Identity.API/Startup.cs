@@ -33,10 +33,7 @@ using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
-using Serilog;
-using Microsoft.Extensions.Logging;
-using Serilog.Sinks.Network;
-using Xyzies.Logger;
+using Ardas.AspNetCore.Logging;
 
 namespace Xyzies.SSO.Identity.API
 {

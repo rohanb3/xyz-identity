@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
+﻿using Ardas.AspNetCore.Logging.Formatters;
+using Ardas.AspNetCore.Logging.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.Network;
 using System;
-using Xyzies.Logger.Models;
 
-namespace Xyzies.Logger
+namespace Ardas.AspNetCore.Logging
 {
     public static class LoggerExtensions
     {
@@ -21,9 +19,13 @@ namespace Xyzies.Logger
             var protocol = options.SecureConnection ? "tls" : "tcp";
             var uri = $"{protocol}://{options.Ip}:{options.Port}";
 
+            var kibanaLogsFormatter = new KibanaLogsFormatter();
             var loggerConfig = new LoggerConfiguration()
                                 .MinimumLevel.Is(logLevel)
-                                .WriteTo.TCPSink(uri);
+                                .MinimumLevel.Override("System", LogEventLevel.Error)
+                                .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+                                .WriteTo.Console(kibanaLogsFormatter)
+                                .WriteTo.TCPSink(uri, kibanaLogsFormatter);
 
             if ((enriches?.Length ?? 0) > 0)
             {
@@ -32,7 +34,8 @@ namespace Xyzies.Logger
 
             Log.Logger = loggerConfig.CreateLogger();
 
-            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: options.Dispose));
+            services.AddLogging(loggingBuilder => loggingBuilder
+                                        .AddSerilog(dispose: options.Dispose));
 
             return services;
         }

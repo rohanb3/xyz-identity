@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ardas.AspNetCore.Logging", "Ardas.AspNetCore.Logging\Ardas.AspNetCore.Logging.csproj", "{FC9DAA54-C64D-45C6-B2A3-2ABD24C9768F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC9DAA54-C64D-45C6-B2A3-2ABD24C9768F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC9DAA54-C64D-45C6-B2A3-2ABD24C9768F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC9DAA54-C64D-45C6-B2A3-2ABD24C9768F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC9DAA54-C64D-45C6-B2A3-2ABD24C9768F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E41344A-7882-4907-83DD-29C0E639C7AF}
+	EndGlobalSection
+EndGlobal
