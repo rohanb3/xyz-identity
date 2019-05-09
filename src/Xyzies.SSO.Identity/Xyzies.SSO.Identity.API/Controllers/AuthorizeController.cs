@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,11 +19,13 @@ namespace Xyzies.SSO.Identity.API.Controllers
     {
         private readonly IAuthService _authorizationService;
         private readonly IResetPasswordService _resetPasswordService;
+        private readonly ILogger _logger;
 
-        public AuthorizeController(IAuthService authorizationService, IResetPasswordService resetPasswordService)
+        public AuthorizeController(IAuthService authorizationService, IResetPasswordService resetPasswordService, ILogger<AuthorizeController> logger)
         {
             _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
             _resetPasswordService = resetPasswordService ?? throw new ArgumentNullException(nameof(resetPasswordService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(resetPasswordService));
         }
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
+                _logger.LogError("Test logs. Login by {username},{scope}", credentials.Username, credentials.Scope);
                 return Ok(await _authorizationService.AuthorizeAsync(credentials));
             }
             catch (ArgumentException ex)
