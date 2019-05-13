@@ -23,6 +23,8 @@ namespace Xyzies.SSO.Identity.Services.Service
         Task DeleteAvatar(string userId);
         Task<FileModel> GetAvatar(string userId);
         Task UpdateUserPasswordAsync(string userMail, string password);
+
+        Task<ProfileSecure> GetOwnProfile(string userId);
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
