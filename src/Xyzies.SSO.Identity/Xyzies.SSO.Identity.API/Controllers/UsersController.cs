@@ -102,7 +102,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
+                    })));
             }
             catch (AccessException)
             {
