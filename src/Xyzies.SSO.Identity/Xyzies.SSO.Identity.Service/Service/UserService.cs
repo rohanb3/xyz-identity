@@ -16,6 +16,7 @@ using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.User;
+using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 
 namespace Xyzies.SSO.Identity.Services.Service
@@ -30,6 +31,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly ILocaltionService _localtionService;
         private readonly IHttpService _httpService = null;
         private readonly IRoleRepository _roleRepository = null;
+        private readonly IPermissionService _permissionService = null;
         private readonly string _projectUrl;
 
         /// <summary>
@@ -46,6 +48,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             ILocaltionService localtionService,
             IHttpService httpService,
             IRoleRepository roleRepository,
+            IPermissionService permissionService,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ??
@@ -58,8 +61,20 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(httpService));
             _roleRepository = roleRepository ??
                 throw new ArgumentNullException(nameof(roleRepository));
+            _permissionService = permissionService ??
+               throw new ArgumentNullException(nameof(permissionService));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
+        }
+
+        /// <inheritdoc />
+        public async Task<ProfileSecure> GetOwnProfile(string userId)
+        {
+            var user = await GetUserBy(u => u.ObjectId == userId);
+            var result = user.Adapt<ProfileSecure>();
+            result.Scopes = await _permissionService.GetScopesByRole(user.Role);
+
+            return result;
         }
 
         /// <inheritdoc />

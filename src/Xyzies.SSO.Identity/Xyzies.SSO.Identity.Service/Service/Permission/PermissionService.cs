@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Models.Permissions;
 using Xyzies.SSO.Identity.Services.Service.Roles;
@@ -47,6 +48,15 @@ namespace Xyzies.SSO.Identity.Services.Service.Permission
             {
                 await SetPermissionObject();
             }
+        }
+
+        public async Task<IEnumerable<string>> GetScopesByRole(string role)
+        {
+            await CheckPermissionExpiration();
+            var roles = _memoryCache.Get<List<RoleModel>>(Consts.Cache.PermissionKey);
+            var roleModel = roles.FirstOrDefault(r => r.RoleName.ToLower() == role.ToLower());
+
+            return roleModel?.Policies.SelectMany(policy => policy.Scopes.Select(scope => scope.ScopeName)) ?? throw new ArgumentException("Unknown role", "Role");
         }
 
         private async Task SetPermissionObject()

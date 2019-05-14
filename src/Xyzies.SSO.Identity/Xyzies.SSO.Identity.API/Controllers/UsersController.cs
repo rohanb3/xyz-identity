@@ -102,7 +102,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
+                    })));
             }
             catch (AccessException)
             {
@@ -222,20 +224,15 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="200">If user fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProfileSecure))]
         [HttpGet("profile")]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var currentUser = new UserIdentityParams
-                {
-                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
-                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
-                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
-                };
-                var user = await _userService.GetUserByIdAsync(currentUser.Id, currentUser);
-                return Ok(user);
+                var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value;
+
+                return Ok(await _userService.GetOwnProfile(userId));
             }
             catch (KeyNotFoundException ex)
             {
