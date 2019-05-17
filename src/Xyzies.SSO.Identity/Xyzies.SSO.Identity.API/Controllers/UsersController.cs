@@ -161,6 +161,46 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
+        /// Get user by his Cable Portal id
+        /// </summary>
+        /// <param name="id">Cable Portal id</param>
+        /// <returns>User with passed identifier, or not found response</returns>
+        /// <response code="200">If user fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        /// <response code="404">If user was not found</response>
+        [AllowAnonymous]
+        [HttpGet("cp/{id}", Name = "UserByCPId")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+        public async Task<IActionResult> Get(int id)
+        {
+            try
+            {
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                };
+                var user = await _userService.GetUserBy(u => u.CPUserId == id);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
+        }
+
+
+
+        /// <summary>
         /// Get user by his id, objectId or userPrincipalName
         /// </summary>
         /// <param name="id">Azure AD B2C user uniq identifier or integer. Can be objectId of userPrincipalName</param>
