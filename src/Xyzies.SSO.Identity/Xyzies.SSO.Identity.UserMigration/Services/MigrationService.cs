@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +23,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         private readonly ILocaltionService _locationService;
 
 
-        public MigrationService(IMemoryCache cache, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
+        public MigrationService(ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
@@ -34,7 +33,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         }
 
 
-        public async Task MigrateAzureToCPAsync(MigrationOptions options)
+        public async Task MigrateAzureToCPAsync()
         {
             try
             {
@@ -42,22 +41,21 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 {
                     Role = Consts.Roles.OperationsAdmin
                 });
+                var roles = _roleRepository.Get().ToList();
 
-                var usersToMigrate = users.Result.Where(user => !user.CPUserId.HasValue);
-
-                var adaptedUsers = usersToMigrate.Select(user => user.Adapt<User>());
-
-                var newUsers = adaptedUsers.Select(user =>
-                {
-                    user.Role = _roleRepository.GetBy(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
-                    return user;
-                });
+                var newUsers = users.Result
+                    .Where(user => !user.CPUserId.HasValue)
+                    .Select(user =>
+                        {
+                            var newUser = user.Adapt<User>();
+                            newUser.Role = roles.FirstOrDefault(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
+                            return newUser;
+                        });
 
                 foreach (var u in newUsers)
                 {
                     if (u.Email != null)
                     {
-
                         var cpu = await _cpUsersRepository.GetByAsync(us => us.Email == u.Email);
                         if (cpu == null)
                         {
@@ -72,15 +70,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                         }
                     }
                 }
-
-                await MigrateCPToAzureAsync(new MigrationOptions()
-                {
-                    Emails = usersToMigrate.Select(user => user.Email).ToArray()
-                });
             }
-            catch (Exception ex)
+            catch (ApplicationException ex)
             {
-                throw ex;
+                throw;
             }
         }
 

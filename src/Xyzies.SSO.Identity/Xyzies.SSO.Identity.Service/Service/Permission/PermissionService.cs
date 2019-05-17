@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Models.Permissions;
 using Xyzies.SSO.Identity.Services.Service.Roles;

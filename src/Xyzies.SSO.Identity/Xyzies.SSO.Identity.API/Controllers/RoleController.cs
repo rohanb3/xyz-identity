@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Serilog;
 using Xyzies.SSO.Identity.Services.Models.Permissions;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Service.Roles;

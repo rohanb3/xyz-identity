@@ -13,7 +13,6 @@ using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Xyzies.SSO.Identity.UserMigration.Services;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -22,23 +21,19 @@ namespace Xyzies.SSO.Identity.API.Controllers
     /// </summary>
     [Route("api/users")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IMigrationService _migrationService;
 
         /// <summary>
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
-        /// <param name="migrationService"></param>
-        public UsersController(IUserService userService, IMigrationService migrationService)
+        public UsersController(IUserService userService)
         {
             _userService = userService ??
                 throw new ArgumentNullException(nameof(userService));
-            _migrationService = migrationService ??
-                throw new ArgumentNullException(nameof(migrationService));
         }
 
         /// <summary>
@@ -163,21 +158,6 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Migrate users from CP base to Azure
-        /// </summary>
-        /// <param name="limit">Limit of users from CP base</param>
-        /// <param name="offset">Offset for users from CP base</param>
-        /// <param name="emails">Specify users by their mail</param>
-        /// <returns></returns>
-        [HttpGet("migrate")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
-        {
-            await _migrationService.MigrateAzureToCPAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
-            return Ok();
         }
 
         /// <summary>

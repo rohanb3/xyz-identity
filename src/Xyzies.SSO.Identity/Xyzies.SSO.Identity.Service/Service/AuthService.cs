@@ -7,7 +7,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.Services.Models.User;
