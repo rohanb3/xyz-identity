@@ -69,6 +69,45 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
+        /// Returns user for trusted service
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet]
+        [Route("{token}/trusted/{objectId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetAllUsersForTrustedService(string token, string objectId)
+        {
+            try
+            {
+                if (token != Consts.Security.StaticToken)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+
+                var currentUser = new UserIdentityParams
+                {
+                    Role = Consts.Roles.OperationsAdmin
+                };
+
+                var user = await _userService.GetUserByIdAsync(objectId, currentUser);
+                return Ok(user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
+                    })));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound("User with current id not found");
+            }
+        }
+
+        /// <summary>
         /// Returns collection of users for trusted service
         /// </summary>
         /// <returns>Collection of users</returns>
@@ -164,23 +203,23 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// Get user by his Cable Portal id
         /// </summary>
         /// <param name="id">Cable Portal id</param>
+        /// <param name="token">Static token</param>
         /// <returns>User with passed identifier, or not found response</returns>
         /// <response code="200">If user fetched successfully</response>
-        /// <response code="401">If authorization token is invalid</response>
+        /// <response code="403">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
         [AllowAnonymous]
-        [HttpGet("cp/{id}", Name = "UserByCPId")]
+        [HttpGet("{token}/cp/{id}", Name = "UserByCPId")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(string token, int id)
         {
             try
             {
-                var currentUser = new UserIdentityParams
+                if (token != Consts.Security.StaticToken)
                 {
-                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
-                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
-                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
-                };
+                    return new ContentResult { StatusCode = 403 };
+                }
+
                 var user = await _userService.GetUserBy(u => u.CPUserId == id);
                 return Ok(user);
             }
