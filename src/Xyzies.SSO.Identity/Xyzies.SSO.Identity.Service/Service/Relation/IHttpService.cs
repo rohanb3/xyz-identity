@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;

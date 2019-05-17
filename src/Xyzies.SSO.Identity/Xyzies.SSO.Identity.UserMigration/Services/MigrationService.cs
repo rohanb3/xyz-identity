@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +23,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         private readonly ILocaltionService _locationService;
 
 
-        public MigrationService(IMemoryCache cache, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
+        public MigrationService(ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
@@ -33,7 +32,53 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task MigrateAsync(MigrationOptions options)
+
+        public async Task MigrateAzureToCPAsync()
+        {
+            try
+            {
+                var users = await _userService.GetAllUsersAsync(new UserIdentityParams()
+                {
+                    Role = Consts.Roles.OperationsAdmin
+                });
+                var roles = _roleRepository.Get().ToList();
+
+                var newUsers = users.Result
+                    .Where(user => !user.CPUserId.HasValue)
+                    .Select(user =>
+                        {
+                            var newUser = user.Adapt<User>();
+                            newUser.Role = roles.FirstOrDefault(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
+                            return newUser;
+                        });
+
+                foreach (var newUser in newUsers)
+                {
+                    if (newUser.Email != null)
+                    {
+                        var cablePortalUser = await _cpUsersRepository.GetByAsync(user => user.Email == newUser.Email);
+
+                        if (cablePortalUser == null)
+                        {
+                            await _cpUsersRepository.AddAsync(newUser);
+                        }
+                        else
+                        {
+                            var existUser = (await _userService.GetUserBy(u2 => u2.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == newUser.Email));
+                            var adaptedUser = newUser.Adapt<AzureUser>();
+
+                            await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
+                        }
+                    }
+                }
+            }
+            catch (ApplicationException ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task MigrateCPToAzureAsync(MigrationOptions options)
         {
             try
             {
@@ -108,7 +153,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 }
             }
         }
-
         public async Task SyncEnabledUsers(MigrationOptions options)
         {
             try
@@ -138,6 +182,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             }
         }
 
+        #region Helpers
         private void HandleUserProperties(List<State> usersState, List<City> usersCity, User user)
         {
             if (usersState.FirstOrDefault(x => x?.Name?.ToLower() == user?.State?.ToLower()) == null && !string.IsNullOrEmpty(user?.State))
@@ -150,7 +195,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
             }
         }
-
         private void PrepeareUserProperties(User user, List<Role> roles)
         {
             user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName ?? "Anonymous";
@@ -164,6 +208,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 user.State = null;
             }
         }
-
+        #endregion
     }
 }
