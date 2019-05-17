@@ -33,7 +33,58 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task MigrateAsync(MigrationOptions options)
+
+        public async Task MigrateAzureToCPAsync(MigrationOptions options)
+        {
+            try
+            {
+                var users = await _userService.GetAllUsersAsync(new UserIdentityParams()
+                {
+                    Role = Consts.Roles.OperationsAdmin
+                });
+
+                var usersToMigrate = users.Result.Where(user => !user.CPUserId.HasValue);
+
+                var adaptedUsers = usersToMigrate.Select(user => user.Adapt<User>());
+
+                var newUsers = adaptedUsers.Select(user =>
+                {
+                    user.Role = _roleRepository.GetBy(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
+                    return user;
+                });
+
+                foreach (var u in newUsers)
+                {
+                    if (u.Email != null)
+                    {
+
+                        var cpu = await _cpUsersRepository.GetByAsync(us => us.Email == u.Email);
+                        if (cpu == null)
+                        {
+                            await _cpUsersRepository.AddAsync(u);
+                        }
+                        else
+                        {
+                            var existUser = (await _userService.GetUserBy(u2 => u2.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == u.Email));
+                            var adaptedUser = u.Adapt<AzureUser>();
+
+                            await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
+                        }
+                    }
+                }
+
+                await MigrateCPToAzureAsync(new MigrationOptions()
+                {
+                    Emails = usersToMigrate.Select(user => user.Email).ToArray()
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task MigrateCPToAzureAsync(MigrationOptions options)
         {
             try
             {
@@ -164,6 +215,5 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 user.State = null;
             }
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -24,7 +25,37 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                .Map(dest => dest.AccountEnabled, src => src.IsActive)
                .Map(dest => dest.AvatarUrl, src => src.ImageName);
 
+            TypeAdapterConfig<Profile, User>.NewConfig()
+               .Map(dest => dest.Email, src => src.Email)
+               .Map(dest => dest.IsActive, src => src.AccountEnabled)
+               .Map(dest => dest.LastName, src => src.Surname)
+               .Map(dest => dest.Name, src => src.GivenName)
+               .Map(dest => dest.IsActive, src => src.AccountEnabled)
+               .Map(dest => dest.ImageName, src => src.AvatarUrl)
+               .Map(dest => dest.Password, src => "Secret12345")
+               .Map(dest => dest.CreatedBy, src => 1)
+               .Map(dest => dest.ModifiedBy, src => 1)
+               .Map(dest => dest.IsDeleted, src => false)
+               .Map(dest => dest.UserGuid, src => src.ObjectId)
+               .Map(dest => dest.CreatedDate, src => DateTime.UtcNow)
+               .Map(dest => dest.ModifiedDate, src => DateTime.UtcNow)
+               //.Ignore(src => src.Email)
+               //.Ignore(src => src.IsActive)
+               //.Ignore(src => src.LastName)
+               //.Ignore(src => src.Name)
+               //.Ignore(src => src.IsActive)
+               //.Ignore(src => src.ImageName)
+               //.Ignore(src => src.Password)
+               //.Ignore(src => src.CreatedBy)
+               //.Ignore(src => src.ModifiedBy)
+               //.Ignore(src => src.IsDeleted)
+               //.Ignore(src => src.UserGuid)
+               //.Ignore(src => src.CreatedDate)
+               //.Ignore(src => src.ModifiedDate)
+               .Ignore(src => src.Role);
+
             TypeAdapterConfig<User, AzureUser>.NewConfig()
+               .Map(dest => dest.CPUserId, src => src.Id)
                .Map(dest => dest.DisplayName, src => ReplaceNullOrEmpty($"{src.Name ?? ""} {src.LastName ?? ""}".Trim()))
                .Map(dest => dest.Surname, src => src.LastName)
                .Map(dest => dest.GivenName, src => src.Name)

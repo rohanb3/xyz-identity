@@ -22,7 +22,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
     /// </summary>
     [Route("api/users")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -176,7 +176,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
         {
-            await _migrationService.MigrateAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
+            await _migrationService.MigrateAzureToCPAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
             return Ok();
         }
 
