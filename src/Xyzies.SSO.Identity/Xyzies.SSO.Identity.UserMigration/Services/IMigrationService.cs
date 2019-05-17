@@ -9,7 +9,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         Task SyncEnabledUsers(MigrationOptions options);
         Task FillNullRolesWithAnonymous();
         Task SetAllEmailsToLowerCase(MigrationOptions options);
-
         Task MigrateAzureToCPAsync();
     }
 }

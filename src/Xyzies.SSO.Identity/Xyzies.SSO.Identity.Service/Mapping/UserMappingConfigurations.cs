@@ -26,7 +26,6 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                .Map(dest => dest.AvatarUrl, src => src.ImageName);
 
             TypeAdapterConfig<Profile, User>.NewConfig()
-               .Map(dest => dest.Email, src => src.Email)
                .Map(dest => dest.IsActive, src => src.AccountEnabled)
                .Map(dest => dest.LastName, src => src.Surname)
                .Map(dest => dest.Name, src => src.GivenName)
@@ -38,21 +37,7 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                .Map(dest => dest.IsDeleted, src => false)
                .Map(dest => dest.UserGuid, src => src.ObjectId)
                .Map(dest => dest.CreatedDate, src => DateTime.UtcNow)
-               .Map(dest => dest.ModifiedDate, src => DateTime.UtcNow)
-               //.Ignore(src => src.Email)
-               //.Ignore(src => src.IsActive)
-               //.Ignore(src => src.LastName)
-               //.Ignore(src => src.Name)
-               //.Ignore(src => src.IsActive)
-               //.Ignore(src => src.ImageName)
-               //.Ignore(src => src.Password)
-               //.Ignore(src => src.CreatedBy)
-               //.Ignore(src => src.ModifiedBy)
-               //.Ignore(src => src.IsDeleted)
-               //.Ignore(src => src.UserGuid)
-               //.Ignore(src => src.CreatedDate)
-               //.Ignore(src => src.ModifiedDate)
-               .Ignore(src => src.Role);
+               .Map(dest => dest.ModifiedDate, src => DateTime.UtcNow);
 
             TypeAdapterConfig<User, AzureUser>.NewConfig()
                .Map(dest => dest.CPUserId, src => src.Id)
