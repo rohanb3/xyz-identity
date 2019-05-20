@@ -44,7 +44,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 var roles = _roleRepository.Get().ToList();
 
                 var newUsers = users.Result
-                    .Where(user => !user.CPUserId.HasValue)
+                    .Where(user => user.CPUserId == null || user.CPUserId == 0)
                     .Select(user =>
                         {
                             var newUser = user.Adapt<User>();
@@ -66,6 +66,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                         {
                             var existUser = (await _userService.GetUserBy(u2 => u2.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == newUser.Email));
                             var adaptedUser = newUser.Adapt<AzureUser>();
+                            adaptedUser.CPUserId = cablePortalUser.Id;
+                            adaptedUser.Role = roles.FirstOrDefault(role => int.TryParse(adaptedUser.Role, out int RoleId) && role.RoleId == RoleId)?.RoleName ?? "Anonymous";
 
                             await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
                         }
@@ -75,6 +77,23 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             catch (ApplicationException ex)
             {
                 throw;
+            }
+        }
+
+        public async Task ReplaceRoleIdWithRoleName()
+        {
+            var users = await _userService.GetAllUsersAsync(new UserIdentityParams()
+            {
+                Role = Consts.Roles.OperationsAdmin
+            });
+            var roles = _roleRepository.Get().ToList();
+            var filteredUsers = users.Result.Where(user => int.TryParse(user.Role, out int roleId));
+            foreach (var user in filteredUsers)
+            {
+                user.Role = roles.FirstOrDefault(role => int.TryParse(user.Role, out int RoleId) && role.RoleId == RoleId)?.RoleName ?? "Anonymous";
+                await _userService.UpdateUserByIdAsync(user.ObjectId, user.Adapt<BaseProfile>());
+
+                Console.WriteLine($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
             }
         }
 
