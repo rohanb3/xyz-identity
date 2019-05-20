@@ -29,6 +29,7 @@ namespace Xyzies.SSO.Identity.Data.Helpers
         public const string AvatarUrlPropertyName = _extensionPropertyTemplate + "AvatarUrl";
         public const string ManagerIdPropertyName = _extensionPropertyTemplate + "ManagerId";
         public const string PhonePropertyName = _extensionPropertyTemplate + "Phone";
+        public const string CPUserIdPropertyName = _extensionPropertyTemplate + "CPUserId";
 
         public const string CityPropertyName = "City";
         public const string StatePropertyName = "State";

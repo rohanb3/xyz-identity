@@ -22,8 +22,8 @@ namespace Ardas.AspNetCore.Logging
             var kibanaLogsFormatter = new KibanaLogsFormatter();
             var loggerConfig = new LoggerConfiguration()
                                 .MinimumLevel.Is(logLevel)
-                                .MinimumLevel.Override("System", LogEventLevel.Error)
-                                .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+                                .MinimumLevel.Override("System", logLevel)
+                                .MinimumLevel.Override("Microsoft", logLevel)
                                 .WriteTo.Console(kibanaLogsFormatter)
                                 .WriteTo.TCPSink(uri, kibanaLogsFormatter);
 

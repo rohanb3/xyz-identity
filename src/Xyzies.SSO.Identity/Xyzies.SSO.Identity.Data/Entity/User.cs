@@ -8,11 +8,12 @@ namespace Xyzies.SSO.Identity.Data.Entity
     public class User : BaseEntity<int>
     {
         [Column("UserId")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public override int Id { get; set; }
 
         public int? CompanyId { get; set; }
 
-        [Required, EmailAddress]
+        [Required]
         public string Email { get; set; }
 
         public string Password { get; set; }
