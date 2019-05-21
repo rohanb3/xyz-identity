@@ -5,7 +5,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 {
     public interface IMigrationService
     {
-        Task MigrateAsync(MigrationOptions options);
+        Task ReplaceRoleIdWithRoleName();
+        Task MigrateCPToAzureAsync(MigrationOptions options);
         Task SyncEnabledUsers(MigrationOptions options);
         Task FillNullRolesWithAnonymous();
         Task SetAllEmailsToLowerCase(MigrationOptions options);
