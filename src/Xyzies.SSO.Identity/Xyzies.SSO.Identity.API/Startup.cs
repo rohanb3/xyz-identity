@@ -36,6 +36,7 @@ using Ardas.AspNetCore.Logging;
 using Microsoft.Extensions.Hosting;
 using Hangfire;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -215,7 +216,11 @@ namespace Xyzies.SSO.Identity.API
             }
 
             app.UseHangfireDashboard();
+            app.UseHangfireServer();
 
+            RecurringJob.AddOrUpdate<IMigrationService>(service => service.PeriodicTask(), Cron.Minutely);
+
+            
             app.UseAuthentication()
                 .UseProcessClaims()
                 .UseHealthChecks("/healthz")

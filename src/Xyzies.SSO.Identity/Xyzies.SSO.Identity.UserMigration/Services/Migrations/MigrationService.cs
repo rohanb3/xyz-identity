@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -25,16 +24,18 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private readonly ILocaltionService _locationService;
         private readonly ILogger _logger;
 
-        public MigrationService(IMemoryCache cache, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
+        public MigrationService(ILogger<MigrationService> logger, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
             _locationService = locationService ?? throw new ArgumentNullException(nameof(locationService));
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task MigrateAsync(MigrationOptions options)
+
+        public async Task MigrateAzureToCPAsync()
         {
             try
             {
@@ -47,11 +48,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 var newUsers = users.Result
                     .Where(user => user.CPUserId == null || user.CPUserId == 0)
                     .Select(user =>
-                        {
-                            var newUser = user.Adapt<User>();
-                            newUser.Role = roles.FirstOrDefault(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
-                            return newUser;
-                        });
+                    {
+                        var newUser = user.Adapt<User>();
+                        newUser.Role = roles.FirstOrDefault(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
+                        return newUser;
+                    });
 
                 foreach (var newUser in newUsers)
                 {
@@ -94,7 +95,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 user.Role = roles.FirstOrDefault(role => int.TryParse(user.Role, out int RoleId) && role.RoleId == RoleId)?.RoleName ?? "Anonymous";
                 await _userService.UpdateUserByIdAsync(user.ObjectId, user.Adapt<BaseProfile>());
 
-                Console.WriteLine($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
+                _logger.LogInformation($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
             }
         }
 
@@ -120,7 +121,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         await _azureClient.PostUser(user.Adapt<AzureUser>());
                         HandleUserProperties(usersState, usersCity, user);
 
-                        Console.WriteLine($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                        _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                     }
                     catch (Exception ex)
                     {
@@ -132,7 +133,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                             await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
                             HandleUserProperties(usersState, usersCity, user);
 
-                            Console.WriteLine($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                            _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                         }
                     }
 
@@ -153,7 +154,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             foreach (var user in users)
             {
                 await _azureClient.PatchUser(user.ObjectId, new AzureUser { Role = "Anonyumous" });
-                Console.WriteLine($"Role filled, {user.DisplayName}");
+                _logger.LogInformation($"Role filled, {user.DisplayName}");
             }
         }
         public async Task SetAllEmailsToLowerCase(MigrationOptions options)
@@ -165,15 +166,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 if (user.Email != null)
                 {
                     await _azureClient.PatchUser(user.ObjectId, new AzureUser { SignInNames = new List<SignInName> { new SignInName { Type = "emailAddress", Value = user.Email.ToLower() } } });
-                    Console.WriteLine($"Sign in name reset, {user.Email.ToLower()}");
+                    _logger.LogInformation($"Sign in name reset, {user.Email.ToLower()}");
                 }
                 else
                 {
-                    Console.WriteLine("NULL EMAIL!!!");
+                    _logger.LogError("NULL EMAIL!!!");
                 }
             }
         }
-
         public async Task SyncEnabledUsers(MigrationOptions options)
         {
             try
@@ -193,7 +193,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         await _userService.UpdateUserByIdAsync(existUser.ObjectId, new Identity.Services.Models.User.BaseProfile { AccountEnabled = user.IsActive ?? false });
                     }
 
-                    Console.WriteLine($"Enable updated, {user.Name} {user.LastName}");
+                    _logger.LogInformation($"Enable updated, {user.Name} {user.LastName}");
 
                 }
             }
@@ -203,6 +203,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
         }
 
+        #region Helpers
         private void HandleUserProperties(List<State> usersState, List<City> usersCity, User user)
         {
             if (usersState.FirstOrDefault(x => x?.Name?.ToLower() == user?.State?.ToLower()) == null && !string.IsNullOrEmpty(user?.State))
@@ -215,7 +216,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
             }
         }
-
         private void PrepeareUserProperties(User user, List<Role> roles)
         {
             user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName ?? "Anonymous";
@@ -230,5 +230,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
         }
 
+        public async Task PeriodicTask()
+        {
+            _logger.LogInformation("Periodic task");
+        }
+        #endregion
     }
 }
