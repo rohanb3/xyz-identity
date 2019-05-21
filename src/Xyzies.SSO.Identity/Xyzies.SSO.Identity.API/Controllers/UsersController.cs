@@ -78,7 +78,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [Route("{token}/trusted")]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> GetAllUsersForTrustedService(string token)
+        public async Task<IActionResult> GetAllUsersForTrustedService(string token, [FromBody] UserFilteringParams filters)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 {
                     Role = Consts.Roles.OperationsAdmin
                 };
-                var users = await _userService.GetAllUsersAsync(currentUser);
+                var users = await _userService.GetAllUsersAsync(currentUser, filters);
 
                 return Ok(users);
             }
