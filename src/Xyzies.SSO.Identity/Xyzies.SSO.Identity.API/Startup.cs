@@ -25,7 +25,6 @@ using Xyzies.SSO.Identity.Services.Middleware;
 using Xyzies.SSO.Identity.Services.Service.Roles;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Helpers;
-
 using Xyzies.SSO.Identity.UserMigration;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +33,9 @@ using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 using Ardas.AspNetCore.Logging;
+using Microsoft.Extensions.Hosting;
+using Hangfire;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -115,6 +117,9 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
+
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("db")));
+            services.AddHangfireServer();
 
             #region DI configuration
 
@@ -208,6 +213,8 @@ namespace Xyzies.SSO.Identity.API
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
                 userService.SetUsersCache().Wait();
             }
+
+            app.UseHangfireDashboard();
 
             app.UseAuthentication()
                 .UseProcessClaims()

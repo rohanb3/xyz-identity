@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
-using Xyzies.SSO.Identity.UserMigration.Services;
+using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
 
 namespace Xyzies.SSO.Identity.UserMigration
 {
