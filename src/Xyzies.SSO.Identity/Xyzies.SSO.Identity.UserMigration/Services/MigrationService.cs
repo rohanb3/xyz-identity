@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,15 +22,16 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         private readonly IUserService _userService;
         private readonly IRoleRepository _roleRepository;
         private readonly ILocaltionService _locationService;
+        private readonly ILogger _logger;
 
-
-        public MigrationService(ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
+        public MigrationService(ILogger<MigrationService> logger, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
             _locationService = locationService ?? throw new ArgumentNullException(nameof(locationService));
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
 
@@ -73,10 +75,23 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                         }
                     }
                 }
+                var emails = newUsers.Select(user => user.Email?.ToLower()).Where(email => !string.IsNullOrEmpty(email)).ToArray();
+
+                if (emails.Length > 0)
+                {
+                    await MigrateCPToAzureAsync(new MigrationOptions()
+                    {
+                        Emails = emails
+                    });
+                }
             }
             catch (ApplicationException ex)
             {
                 throw;
+            }
+            finally
+            {
+                await _userService.SetUsersCache();
             }
         }
 
@@ -93,7 +108,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 user.Role = roles.FirstOrDefault(role => int.TryParse(user.Role, out int RoleId) && role.RoleId == RoleId)?.RoleName ?? "Anonymous";
                 await _userService.UpdateUserByIdAsync(user.ObjectId, user.Adapt<BaseProfile>());
 
-                Console.WriteLine($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
+                _logger.LogInformation($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
             }
         }
 
@@ -103,10 +118,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             {
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
-                var users = await _cpUsersRepository.GetAsync(x => x.IsDeleted != true);
+                var users = await _cpUsersRepository.GetAsync(user => user.IsDeleted != true);
                 if (options.Emails.Length > 0)
                 {
-                    users = users.Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
+                    users = users.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
                 var roles = (await _roleRepository.GetAsync()).ToList();
@@ -119,19 +134,19 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                         await _azureClient.PostUser(user.Adapt<AzureUser>());
                         HandleUserProperties(usersState, usersCity, user);
 
-                        Console.WriteLine($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                        _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                     }
                     catch (Exception ex)
                     {
                         if (ex.Message == "User already exist")
                         {
-                            var existUser = (await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value == user.Email));
+                            var existUser = (await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == user.Email.ToLower()));
                             var adaptedUser = user.Adapt<AzureUser>();
 
                             await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
                             HandleUserProperties(usersState, usersCity, user);
 
-                            Console.WriteLine($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                            _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                         }
                     }
 
@@ -143,6 +158,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             {
                 throw;
             }
+            finally
+            {
+                await _userService.SetUsersCache();
+            }
         }
 
         public async Task FillNullRolesWithAnonymous()
@@ -152,7 +171,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             foreach (var user in users)
             {
                 await _azureClient.PatchUser(user.ObjectId, new AzureUser { Role = "Anonyumous" });
-                Console.WriteLine($"Role filled, {user.DisplayName}");
+                _logger.LogInformation($"Role filled, {user.DisplayName}");
             }
         }
         public async Task SetAllEmailsToLowerCase(MigrationOptions options)
@@ -164,11 +183,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 if (user.Email != null)
                 {
                     await _azureClient.PatchUser(user.ObjectId, new AzureUser { SignInNames = new List<SignInName> { new SignInName { Type = "emailAddress", Value = user.Email.ToLower() } } });
-                    Console.WriteLine($"Sign in name reset, {user.Email.ToLower()}");
+                    _logger.LogInformation($"Sign in name reset, {user.Email.ToLower()}");
                 }
                 else
                 {
-                    Console.WriteLine("NULL EMAIL!!!");
+                    _logger.LogError("NULL EMAIL!!!");
                 }
             }
         }
@@ -191,7 +210,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                         await _userService.UpdateUserByIdAsync(existUser.ObjectId, new Identity.Services.Models.User.BaseProfile { AccountEnabled = user.IsActive ?? false });
                     }
 
-                    Console.WriteLine($"Enable updated, {user.Name} {user.LastName}");
+                    _logger.LogInformation($"Enable updated, {user.Name} {user.LastName}");
 
                 }
             }
