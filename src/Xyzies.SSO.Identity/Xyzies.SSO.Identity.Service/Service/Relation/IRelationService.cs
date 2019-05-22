@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Services.Models.Branch;
@@ -19,6 +18,14 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <param name="token"></param>
         /// <returns></returns>
         Task<CompanyModel> GetCompanyById(int id, string token = null);
+
+        /// <summary>
+        /// Get company by passed filters
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        Task<List<CompanyModel>> GetCompanies(string token,CompanyFilters filters= null);
 
         /// <summary>
         /// Get branch by id

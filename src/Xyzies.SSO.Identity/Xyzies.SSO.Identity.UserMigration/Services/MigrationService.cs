@@ -9,6 +9,7 @@ using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
+using Xyzies.SSO.Identity.Services.Models.Company;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Service.Relation;
@@ -244,7 +245,12 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             }
             superAdmins = superAdmins.Skip(options?.Offset ?? 0).Take(options?.Limit ?? superAdmins.Count());
 
-            var companyIds = superAdmins.Select(sa => sa.CompanyId).Distinct();
+            var testCompanyResult = await _relationService.GetCompanies(token, new CompanyFilters() { Name = "Test company" });
+            var testCompanyId = testCompanyResult.FirstOrDefault()?.Id;
+
+            var companyIds = superAdmins.Select(sa => sa.CompanyId).Distinct().ToList();
+            companyIds.Add(testCompanyId);
+
             var branches = await _relationService.GetBranchesAsync(token);
             var filteredBranches = branches.Where(branch => companyIds.Contains(branch.CompanyId));
 
@@ -253,6 +259,15 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 superAdmin.BranchId = filteredBranches.FirstOrDefault(branch => branch.CompanyId == superAdmin.CompanyId)?.Id;
                 await _userService.UpdateUserByIdAsync(superAdmin.ObjectId, superAdmin.Adapt<BaseProfile>());
                 _logger.LogInformation("Successfully updated branch for {UserName}, {BranchId}", superAdmin.DisplayName, superAdmin.BranchId);
+            }
+
+            var adminsWithoutCompany = superAdmins.Where(sa => !sa.CompanyId.HasValue);
+            foreach (var adminWithoutCompany in adminsWithoutCompany)
+            {
+                adminWithoutCompany.CompanyId = testCompanyId;
+                adminWithoutCompany.BranchId = filteredBranches.FirstOrDefault(branch => branch.CompanyId == adminWithoutCompany.CompanyId)?.Id;
+                await _userService.UpdateUserByIdAsync(adminWithoutCompany.ObjectId, adminWithoutCompany.Adapt<BaseProfile>());
+                _logger.LogInformation("Successfully updated branch for {UserName}, {BranchId}", adminWithoutCompany.DisplayName, adminWithoutCompany.BranchId);
             }
         }
 

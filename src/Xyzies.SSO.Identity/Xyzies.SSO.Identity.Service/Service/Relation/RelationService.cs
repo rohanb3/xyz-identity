@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,6 +44,15 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             var responseString = await SendGetRequest(uri, token);
 
             return GetPublicApiResponse<BranchModel>(responseString);
+        }
+
+        /// <inheritdoc />
+        public async Task<List<CompanyModel>> GetCompanies(string token, CompanyFilters filters = null)
+        {
+            var uri = new Uri($"{_publicApiUrl}/company?{PrepareCompanyQueryFilters(filters)}");
+            var responseString = await SendGetRequest(uri, token);
+
+            return GetPublicApiResponse<List<CompanyModel>>(responseString);
         }
 
         /// <inheritdoc />
@@ -93,6 +101,17 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
 
                 return responseString;
             }
+        }
+
+        private string PrepareCompanyQueryFilters(CompanyFilters filters)
+        {
+            string query = "";
+
+            if (!string.IsNullOrEmpty(filters.Name))
+            {
+                query += "companyNameFilter=" + filters.Name + "&";
+            }
+            return query;
         }
         #endregion
     }
