@@ -11,6 +11,7 @@ using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
+using Xyzies.SSO.Identity.Services.Service.Relation;
 using Xyzies.SSO.Identity.UserMigration.Models;
 
 namespace Xyzies.SSO.Identity.UserMigration.Services
@@ -22,9 +23,17 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
         private readonly IUserService _userService;
         private readonly IRoleRepository _roleRepository;
         private readonly ILocaltionService _locationService;
+        private readonly IRelationService _relationService;
         private readonly ILogger _logger;
 
-        public MigrationService(ILogger<MigrationService> logger, ICpUsersRepository cpUsersRepository, IAzureAdClient azureClient, IRoleRepository roleRepository, IUserService userService, ILocaltionService locationService)
+        public MigrationService(
+            ILogger<MigrationService> logger,
+            IAzureAdClient azureClient,
+            IRoleRepository roleRepository,
+            ICpUsersRepository cpUsersRepository,
+            IUserService userService,
+            IRelationService relationService,
+            ILocaltionService locationService)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _azureClient = azureClient ?? throw new ArgumentNullException(nameof(azureClient));
@@ -32,6 +41,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
         }
 
 
@@ -217,6 +227,32 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             catch (ApplicationException ex)
             {
                 throw;
+            }
+        }
+
+
+        public async Task FillSuperAdminsWithDefaultBranches(string token, MigrationOptions options = null)
+        {
+            var identity = new UserIdentityParams() { Role = Consts.Roles.OperationsAdmin };
+            var filters = new UserFilteringParams() { Role = new List<string>() { Consts.Roles.SuperAdmin } };
+            var users = await _userService.GetAllUsersAsync(identity, filters);
+            var superAdmins = users.Result;
+
+            if (options.Emails.Length > 0)
+            {
+                superAdmins = superAdmins.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
+            }
+            superAdmins = superAdmins.Skip(options?.Offset ?? 0).Take(options?.Limit ?? superAdmins.Count());
+
+            var companyIds = superAdmins.Select(sa => sa.CompanyId).Distinct();
+            var branches = await _relationService.GetBranchesAsync(token);
+            var filteredBranches = branches.Where(branch => companyIds.Contains(branch.CompanyId));
+
+            foreach (var superAdmin in superAdmins)
+            {
+                superAdmin.BranchId = filteredBranches.FirstOrDefault(branch => branch.CompanyId == superAdmin.CompanyId)?.Id;
+                await _userService.UpdateUserByIdAsync(superAdmin.ObjectId, superAdmin.Adapt<BaseProfile>());
+                _logger.LogInformation("Successfully updated branch for {UserName}, {BranchId}", superAdmin.DisplayName, superAdmin.BranchId);
             }
         }
 

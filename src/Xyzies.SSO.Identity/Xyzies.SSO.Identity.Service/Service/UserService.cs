@@ -29,7 +29,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
-        private readonly IHttpService _httpService = null;
+        private readonly IRelationService _httpService = null;
         private readonly IRoleRepository _roleRepository = null;
         private readonly IPermissionService _permissionService = null;
         private readonly string _projectUrl;
@@ -46,7 +46,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         public UserService(IAzureAdClient azureClient, 
             IMemoryCache cache, 
             ILocaltionService localtionService,
-            IHttpService httpService,
+            IRelationService httpService,
             IRoleRepository roleRepository,
             IPermissionService permissionService,
             IOptionsMonitor<ProjectSettingsOption> options)

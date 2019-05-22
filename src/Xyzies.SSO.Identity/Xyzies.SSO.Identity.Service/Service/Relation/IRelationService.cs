@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
@@ -8,7 +10,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
     /// <summary>
     /// Http clien for communication with microservices
     /// </summary>
-    public interface IHttpService
+    public interface IRelationService
     {
         /// <summary>
         /// Get company by id
@@ -25,5 +27,12 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <param name="token"></param>
         /// <returns></returns>
         Task<BranchModel> GetBranchById(Guid id, string token = null);
+
+        /// <summary>
+        /// Get branches
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<List<BranchModel>> GetBranchesAsync(string token = null);
     }
 }

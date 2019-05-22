@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -13,15 +15,15 @@ using Xyzies.SSO.Identity.Services.Models.Company;
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
     /// <inheritdoc />
-    public class HttpService : IHttpService
+    public class RelationService : IRelationService
     {
         private readonly string _publicApiUrl = null;
 
-       /// <summary>
-       /// 
-       /// </summary>
-       /// <param name="options"></param>
-        public HttpService(IOptionsMonitor<ServiceOption> options)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        public RelationService(IOptionsMonitor<ServiceOption> options)
         {
             _publicApiUrl = options.CurrentValue?.PublicApiUrl ??
                 throw new InvalidOperationException("Missing URL to public-api");
@@ -45,9 +47,19 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             return GetPublicApiResponse<BranchModel>(responseString);
         }
 
+        /// <inheritdoc />
+        public async Task<List<BranchModel>> GetBranchesAsync(string token = null)
+        {
+            var uri = new Uri($"{_publicApiUrl}/branch");
+            var responseString = await SendGetRequest(uri, token);
+
+            return GetPublicApiResponse<List<BranchModel>>(responseString);
+        }
+
+        #region Helpers
         private T GetPublicApiResponse<T>(string responseString)
         {
-            if(string.IsNullOrWhiteSpace(responseString))
+            if (string.IsNullOrWhiteSpace(responseString))
             {
                 return default(T);
             }
@@ -64,7 +76,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = uri;
-                if(!string.IsNullOrWhiteSpace(token))
+                if (!string.IsNullOrWhiteSpace(token))
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
@@ -82,5 +94,6 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
                 return responseString;
             }
         }
+        #endregion
     }
 }
