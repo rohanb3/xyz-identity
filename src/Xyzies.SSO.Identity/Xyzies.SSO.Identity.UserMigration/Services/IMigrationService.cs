@@ -5,6 +5,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 {
     public interface IMigrationService
     {
+        Task FillSuperAdminsWithDefaultBranches(string token, MigrationOptions options = null);
         Task ReplaceRoleIdWithRoleName();
         Task MigrateCPToAzureAsync(MigrationOptions options);
         Task SyncEnabledUsers(MigrationOptions options);
