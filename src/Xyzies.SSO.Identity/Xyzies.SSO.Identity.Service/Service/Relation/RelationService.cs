@@ -49,7 +49,8 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <inheritdoc />
         public async Task<List<CompanyModel>> GetCompanies(string token, CompanyFilters filters = null)
         {
-            var uri = new Uri($"{_publicApiUrl}/company?{PrepareCompanyQueryFilters(filters)}");
+            var queryFilter = filters == null ? "" : PrepareCompanyQueryFilters(filters);
+            var uri = new Uri($"{_publicApiUrl}/company?{queryFilter}");
             var responseString = await SendGetRequest(uri, token);
 
             return GetPublicApiResponse<List<CompanyModel>>(responseString);

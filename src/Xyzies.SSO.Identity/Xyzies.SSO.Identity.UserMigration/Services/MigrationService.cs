@@ -237,16 +237,17 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             var identity = new UserIdentityParams() { Role = Consts.Roles.OperationsAdmin };
             var filters = new UserFilteringParams() { Role = new List<string>() { Consts.Roles.SuperAdmin } };
             var users = await _userService.GetAllUsersAsync(identity, filters);
-            var superAdmins = users.Result;
+            var companies = await _relationService.GetCompanies(token);
 
+            var superAdmins = users.Result;
             if (options.Emails.Length > 0)
             {
                 superAdmins = superAdmins.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
             }
             superAdmins = superAdmins.Skip(options?.Offset ?? 0).Take(options?.Limit ?? superAdmins.Count());
 
-            var testCompanyResult = await _relationService.GetCompanies(token, new CompanyFilters() { Name = "Test company" });
-            var testCompanyId = testCompanyResult.FirstOrDefault()?.Id;
+            var testCompanyResult = companies.Where(company => !string.IsNullOrWhiteSpace(company.Name)).FirstOrDefault(company => company.Name.ToLower().Contains("test company"));
+            var testCompanyId = testCompanyResult?.Id;
 
             var companyIds = superAdmins.Select(sa => sa.CompanyId).Distinct().ToList();
             companyIds.Add(testCompanyId);
@@ -261,7 +262,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 _logger.LogInformation("Successfully updated branch for {UserName}, {BranchId}", superAdmin.DisplayName, superAdmin.BranchId);
             }
 
-            var adminsWithoutCompany = superAdmins.Where(sa => !sa.CompanyId.HasValue);
+            var adminsWithoutCompany = superAdmins.Where(sa => !sa.CompanyId.HasValue || !companies.Any(company => company.Id == sa.CompanyId));
             foreach (var adminWithoutCompany in adminsWithoutCompany)
             {
                 adminWithoutCompany.CompanyId = testCompanyId;
