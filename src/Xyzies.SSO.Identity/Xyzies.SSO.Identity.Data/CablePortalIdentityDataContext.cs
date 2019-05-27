@@ -11,6 +11,16 @@ namespace Xyzies.SSO.Identity.Data
 
         }
 
+        #region Entities
         public DbSet<User> Users { get; set; }
+        public DbSet<RequestStatus> RequestStatuses { get; set; }
+        #endregion
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<RequestStatus>().HasKey(entity => new { entity.Id, entity.WfKey });
+
+            base.OnModelCreating(builder);
+        }
     }
 }
