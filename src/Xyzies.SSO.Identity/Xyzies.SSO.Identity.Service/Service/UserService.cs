@@ -282,7 +282,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                     return result?.Adapt<Profile>();
                 }
 
-                if (user.Role.ToLower() == Consts.Roles.SuperAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.Operator && !string.IsNullOrEmpty(user.CompanyId))
+                if (user.Role.ToLower() == Consts.Roles.SuperAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.SupportAdmin && !string.IsNullOrEmpty(user.CompanyId))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found"); 
                     if (result == null && result?.CompanyId != user.CompanyId)
@@ -492,7 +492,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task ValidationUserByRole(ProfileCreatable model, string token)
         {
-            if (model.Role.ToLower() == Consts.Roles.SuperAdmin || model.Role.ToLower() == Consts.Roles.Operator)
+            if (model.Role.ToLower() == Consts.Roles.SuperAdmin || model.Role.ToLower() == Consts.Roles.SupportAdmin)
             {
                 await ValidationByCompany(model.CompanyId, token);
             }
