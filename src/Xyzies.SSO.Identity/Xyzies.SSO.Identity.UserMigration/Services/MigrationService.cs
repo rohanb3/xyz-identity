@@ -20,6 +20,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
     {
         private readonly ICpUsersRepository _cpUsersRepository;
         private readonly IRequestStatusRepository _requestStatusesRepository;
+        private readonly ICpRoleRepository _cpRoleRepository;
         private readonly IAzureAdClient _azureClient;
         private readonly IUserService _userService;
         private readonly IRoleRepository _roleRepository;
@@ -35,7 +36,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             IRequestStatusRepository requestStatusesRepository,
             IUserService userService,
             IRelationService relationService,
-            ILocaltionService locationService)
+            ILocaltionService locationService,
+            ICpRoleRepository cpRoleRepository)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _requestStatusesRepository = requestStatusesRepository ?? throw new ArgumentNullException(nameof(requestStatusesRepository));
@@ -45,6 +47,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
+            _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
         }
 
         public async Task MigrateAzureToCPAsync()
@@ -279,6 +282,55 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 adminWithoutCompany.BranchId = filteredBranches.FirstOrDefault(branch => branch.CompanyId == adminWithoutCompany.CompanyId)?.Id;
                 await _userService.UpdateUserByIdAsync(adminWithoutCompany.ObjectId, adminWithoutCompany.Adapt<BaseProfile>());
                 _logger.LogInformation("Successfully updated branch for {UserName}, {BranchId}", adminWithoutCompany.DisplayName, adminWithoutCompany.BranchId);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task ChangeRoleName()
+        {
+            _logger.LogInformation($"Begin updating users role from operator to support admin");
+
+            var identity = new UserIdentityParams() { Role = Consts.Roles.OperationsAdmin };
+            var filter = new UserFilteringParams { Role = new List<string> { Consts.Roles.Operator } };
+            var users = await _userService.GetAllUsersAsync(identity, filter);
+            _logger.LogInformation($"Count of users in Azure - {users.Total}");
+            var operatorRole = await _cpRoleRepository.GetByAsync(x => x.RoleName == Consts.Roles.Operator);
+            var supAdminRoleId = (await _cpRoleRepository.GetByAsync(x => x.RoleName == Consts.Roles.SupportAdmin)).RoleId;
+            try
+            {
+                var cpUsers = (await _cpUsersRepository.GetAsync(x => x.Role == operatorRole.RoleId.ToString())).ToList();
+                _logger.LogInformation($"Count of users in CP - {cpUsers.Count}");
+                if (cpUsers.Any())
+                {
+                    foreach (var cpUser in cpUsers)
+                    {
+                        cpUser.RoleId = supAdminRoleId;
+                        await _cpUsersRepository.UpdateAsync(cpUser);
+                    }
+                }
+            }
+            catch
+            {
+                _logger.LogInformation($"Users in CP were migrated");
+            }
+            if (users.Result.Any())
+            {
+                foreach (var user in users.Result)
+                {
+                    var newUser = new BaseProfile { Role = Consts.Roles.SupportAdmin };
+                    await _userService.UpdateUserByIdAsync(user.ObjectId, newUser);
+                }
+            }
+            _logger.LogInformation($"Finish updating users role from operator to support admin");
+            try
+            {
+                _logger.LogInformation($"Begin removing role operator from CP");
+                await _cpRoleRepository.RemoveAsync(operatorRole);
+                _logger.LogInformation($"End removing role operator from CP");
+            }
+            catch
+            {
+                _logger.LogWarning($"Operator has already deleted from CP");
             }
         }
 
