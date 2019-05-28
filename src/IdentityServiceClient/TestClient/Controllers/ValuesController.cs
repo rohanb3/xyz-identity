@@ -26,6 +26,7 @@ namespace TestClient.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [AccessFilter("xyzies.devicemanagment.create")]
         public ActionResult<string> Get(int id)
         {
             return "value";
