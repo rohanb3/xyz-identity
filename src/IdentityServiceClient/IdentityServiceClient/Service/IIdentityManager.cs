@@ -25,7 +25,7 @@ namespace IdentityServiceClient.Service
 
         #region Permission
         Task<bool> HasPermission(string role, string[] scopes);
-        Task<bool> HasPermission(string[] scopes);
+        Task<bool> HasAccess(string token, string[] scopes);
         #endregion
     }
 }

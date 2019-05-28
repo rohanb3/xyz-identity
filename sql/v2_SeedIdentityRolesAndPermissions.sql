@@ -26,15 +26,15 @@ values
     ('c25d7b14-5718-416d-811c-14b92a19965a', 'xyzies.reconciliation.web.ressubmissiontable', 1),--18
 ---------------------------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
-	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', 'xyzies.devicemanagment.create', 1),--19
-	('291aebb0-729f-4c51-abce-c141ddffe40d', 'xyzies.devicemanagment.update', 1),--20
-	('c3ff0c81-0790-4d44-8307-92507bf98621', 'xyzies.devicemanagment.read', 1),--21
-	('087f272d-ea01-4670-9e3e-2c6a5498f80c', 'xyzies.devicemanagment.delete', 1),--22
+	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', 'xyzies.devicemanagment.device.create', 1),--19
+	('291aebb0-729f-4c51-abce-c141ddffe40d', 'xyzies.devicemanagment.device.update', 1),--20
+	('c3ff0c81-0790-4d44-8307-92507bf98621', 'xyzies.devicemanagment.device.read', 1),--21
+	('087f272d-ea01-4670-9e3e-2c6a5498f80c', 'xyzies.devicemanagment.device.delete', 1),--22
 
-	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'xyzies.devicemanagment.create.admin', 1),--23
-	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.update.admin', 1),--24
-	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.read.admin', 1),--25
-	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.delete.admin', 1);--26
+	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'xyzies.devicemanagment.device.create.admin', 1),--23
+	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.device.update.admin', 1),--24
+	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.device.read.admin', 1),--25
+	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1);--26
 ---------------------------------------------------------------------------------------
 
 
