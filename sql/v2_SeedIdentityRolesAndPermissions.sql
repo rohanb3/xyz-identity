@@ -14,7 +14,7 @@ values
     ('66dfa9f7-8c86-48e0-9ec5-7e382729985c', 'xyzies.reviews.reviews.delete', 1),--7
     ('63e781cc-7637-4d07-bed0-5629d5da92ec', 'xyzies.authorization.reviews.admin', 1),--8
     ('3a8a3a6c-4b9f-4425-81f1-476cddd436da', 'xyzies.authorization.reviews.mobile', 1),--9
-    ('96bf3985-0536-4bea-9bb1-8c71a86da6fc', 'xyzies.authorization.vsp.operator', 1),--10
+    ('96bf3985-0536-4bea-9bb1-8c71a86da6fc', 'xyzies.authorization.vsp.web', 1),--10
     ('cace7e20-c5f9-4e98-984d-76fd8c35c4d5', 'xyzies.authorization.vsp.mobile', 1),--11
 ---------------------- Reconciliation ---------------------------------
     ('cfd0b910-4310-4d68-8796-1707307e26f5', 'xyzies.authorization.reconciliation.web', 1),--12
@@ -44,7 +44,7 @@ values
     ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', 'ReviewsFull'),--1
     ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'ReviewsAdminLogin'),--2
     ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'ReviewsMobileLogin'),--3
-    ('b695018c-c264-4246-9e33-9dce90f338c2', 'VspOperatorLogin'),--4
+    ('b695018c-c264-4246-9e33-9dce90f338c2', 'VspSupportAdminLogin'),--4
     ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'VspMobileLogin'),--5
 ---------------------- Reconciliation ---------------------------------
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'ReconciliationLogin'),--6
@@ -74,7 +74,6 @@ values
     ('d47fd2ad-46ce-4173-8689-88573aa9ffac', 14, 'Role #14', NULL, getdate(), 0),--14
     ('1e0b4f66-d15e-4366-994a-5bba45db1540', 15, 'Role #15', NULL, getdate(), 0),--15
     ('b2669957-2b49-460b-9074-3a68aa075c12', 16, 'Role #16', NULL, getdate(), 0),--16
-    ('384c5edb-9db2-4cc5-bada-6b265a61ae6c', 17, 'Operator', NULL, getdate(), 0),--17
     ('92b1d474-8764-4363-bf7c-05d8f0520bce', 18, 'SAM', NULL, getdate(), 0),--18
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0
 
@@ -90,7 +89,7 @@ values
     ('66dfa9f7-8c86-48e0-9ec5-7e382729985c', '6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2'),--reviews permissions to Reviews Full Policy
     ('63e781cc-7637-4d07-bed0-5629d5da92ec', '91d3b70e-3c7e-4faf-97c0-718809bf3a2a'),--authorization.reviews.admin permissions to Reviews Admin Login
     ('3a8a3a6c-4b9f-4425-81f1-476cddd436da', '71f11476-42ff-4d4e-a05e-9a4e3fd45274'),--xyzies.authorization.reviews.mobile to Reviews Mobile Login
-    ('96bf3985-0536-4bea-9bb1-8c71a86da6fc', 'b695018c-c264-4246-9e33-9dce90f338c2'),--xyzies.authorization.vsp.operator permissions to Vsp Operator Login Policy
+    ('96bf3985-0536-4bea-9bb1-8c71a86da6fc', 'b695018c-c264-4246-9e33-9dce90f338c2'),--xyzies.authorization.vsp.supportadmin permissions to Vsp Support Admin Login Policy
     ('cace7e20-c5f9-4e98-984d-76fd8c35c4d5', '9ffce075-3299-4227-aae3-859f3c6e9eb6'),--authorization.vsp.mobile permissions to Vsp Mobile Login Policy
     ---------------------- Reconciliation ---------------------------------
     ('cfd0b910-4310-4d68-8796-1707307e26f5', '221315e1-b212-41f4-bf3a-ce6b5bbb9f7a'),--xyzies.authorization.reconciliation.web permissions to ReconciliationLogin
@@ -135,12 +134,6 @@ values
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--RecontiliationLogin policy for account admin
     ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--RecontiliationWebAdmin policy for account admin
 
-    ('415b2993-7e32-4859-8b59-2b527bcdeea1', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--TemplatesFull policy for supportadmin
-    ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--ReviewsFull policy for support admin
-    ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--ReviewsAdminLogin policy for support admin
-    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--RecontiliationLogin policy for support admin
-    ('7b0ad5ee-429d-4577-ad70-7d3323069804', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--RecontiliationWebAdmin policy for support admin
-
     ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'),--ReviewsAdminLogin policy for super admin
     ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'),--ReviewsMobileLogin policy for super admin
     ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'cb308b73-acf0-4f23-89b0-509b6bc0e7e6'),--VspMobileLogin policy for super admin
@@ -148,8 +141,8 @@ values
     ('71f11476-42ff-4d4e-a05e-9a4e3fd45274', 'a89d3c96-5f4d-475f-8588-08e1523feffb'),--ReviewsMobileLogin policies for SalesRep
     ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'a89d3c96-5f4d-475f-8588-08e1523feffb'),--ReviewsAdminLogin policies for SalesRep
 
-    ('b695018c-c264-4246-9e33-9dce90f338c2', '384c5edb-9db2-4cc5-bada-6b265a61ae6c'),--VspOperatorLogin policies for Operator
-    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--VspOperatorLogin policies for Operator
+    ('b695018c-c264-4246-9e33-9dce90f338c2', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--VspOperatorLogin policies for supportadmin
+    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--VspOperatorLogin policies for SAM
 
     ('cda0444f-2414-4498-8d01-0422f1aa08c2', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--RecontiliationWebManager policies for SAM
 
