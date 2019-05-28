@@ -29,7 +29,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IAzureAdClient _azureClient;
         private readonly IMemoryCache _cache;
         private readonly ILocaltionService _localtionService;
-        private readonly IHttpService _httpService = null;
+        private readonly IRelationService _httpService = null;
         private readonly IRoleRepository _roleRepository = null;
         private readonly IPermissionService _permissionService = null;
         private readonly string _projectUrl;
@@ -46,7 +46,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         public UserService(IAzureAdClient azureClient, 
             IMemoryCache cache, 
             ILocaltionService localtionService,
-            IHttpService httpService,
+            IRelationService httpService,
             IRoleRepository roleRepository,
             IPermissionService permissionService,
             IOptionsMonitor<ProjectSettingsOption> options)
@@ -88,8 +88,6 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
-                ////////TODO: Remove then need /////////
-                filter.Role = null;
 
                 return await GetUsers(filter, sorting);
             }
@@ -282,7 +280,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                     return result?.Adapt<Profile>();
                 }
 
-                if (user.Role.ToLower() == Consts.Roles.SuperAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.Operator && !string.IsNullOrEmpty(user.CompanyId))
+                if (user.Role.ToLower() == Consts.Roles.SuperAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.SupportAdmin && !string.IsNullOrEmpty(user.CompanyId))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found"); 
                     if (result == null && result?.CompanyId != user.CompanyId)
@@ -492,7 +490,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task ValidationUserByRole(ProfileCreatable model, string token)
         {
-            if (model.Role.ToLower() == Consts.Roles.SuperAdmin || model.Role.ToLower() == Consts.Roles.Operator)
+            if (model.Role.ToLower() == Consts.Roles.SuperAdmin || model.Role.ToLower() == Consts.Roles.SupportAdmin)
             {
                 await ValidationByCompany(model.CompanyId, token);
             }

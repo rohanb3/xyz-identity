@@ -112,11 +112,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// </summary>
         /// <returns>Collection of users</returns>
         /// <response code="200">If users fetched successfully</response>
-        /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         [Route("{token}/trusted")]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(IEnumerable<Profile>))]
         public async Task<IActionResult> GetAllUsersForTrustedService(string token)
         {
             try
@@ -145,6 +145,45 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 return new ContentResult { StatusCode = 403 };
             }
         }
+
+        /// <summary>
+        /// Returns collection of users for trusted service by passed filters. POST method required to pass large collections inside filters
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        [HttpPost]
+        [Route("{token}/trusted/filtered")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetFilteredUsersForTrustedService(string token, [FromBody] UserFilteringParams filters)
+        {
+            try
+            {
+                if (token != Consts.Security.StaticToken)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+
+                var currentUser = new UserIdentityParams
+                {
+                    Role = Consts.Roles.OperationsAdmin
+                };
+                var users = await _userService.GetAllUsersAsync(currentUser, filters);
+
+                return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
+                    })));
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
+        }
+
 
         /// <summary>
         /// Returns total count of users

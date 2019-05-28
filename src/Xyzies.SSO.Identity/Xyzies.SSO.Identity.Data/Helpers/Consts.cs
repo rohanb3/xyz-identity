@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Xyzies.SSO.Identity.Data.Helpers
 {
@@ -54,16 +55,17 @@ namespace Xyzies.SSO.Identity.Data.Helpers
         public class Roles
         {
             public const string SalesRep = "salesrep";
-            public const string Operator = "operator";
+            public const string SupportAdmin = "supportadmin";
             public const string SuperAdmin = "superadmin";
+
+            [Obsolete("Only for migration, delete in next version")]
+            public const string Operator = "operator";
 
             public const string OperationsAdmin = "operationadmin";
             public const string SystemAdmin = "systemadmin";
             public const string AccountAdmin = "accountadmin";
-            public const string SupportAdmin = "supportadmin";
             public static readonly List<string> GlobalAdmins = new List<string> {
                 SystemAdmin,
-                SupportAdmin,
                 AccountAdmin,
                 OperationsAdmin
             };

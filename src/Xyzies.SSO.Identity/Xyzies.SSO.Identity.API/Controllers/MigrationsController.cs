@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -56,7 +57,23 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet("fill-roles")]
         public async Task<IActionResult> FillRoles()
         {
-            await _migrationService.ReplaceRoleIdWithRoleName();
+            await _migrationService.ChangeRoleName();
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Fill SuperAdmins with default company branches
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <param name="offset"></param>
+        /// <param name="emails"></param>
+        /// <returns></returns>
+        [HttpGet("fill-sa-branches")]
+        public async Task<IActionResult> FillBranches([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
+        {
+            string token = HttpContext.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault();
+            await _migrationService.FillSuperAdminsWithDefaultBranches(token, new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
 
             return Ok();
         }
