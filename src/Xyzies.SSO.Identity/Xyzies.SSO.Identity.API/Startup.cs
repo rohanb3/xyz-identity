@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -127,6 +127,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICpUsersRepository, CpUsersRepository>();
+            services.AddScoped<IRequestStatusRepository, RequestStatusRepository>();
             services.AddScoped<ICpRoleRepository, CpRoleRepository>();
             services.AddScoped<IPasswordResetRequestRepository, PasswordResetRequestRepository>();
             services.AddScoped<ICityRepository, CityRepository>();

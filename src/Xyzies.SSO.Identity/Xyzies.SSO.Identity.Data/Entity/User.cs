@@ -78,5 +78,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
         public bool? IsEmailVerified { get; set; }
 
         public int? StatusId { get; set; }
+
+        public Guid? UserStatusKey { get; set; }
     }
 }

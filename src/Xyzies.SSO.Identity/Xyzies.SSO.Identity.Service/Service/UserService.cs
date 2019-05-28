@@ -88,8 +88,6 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
-                ////////TODO: Remove then need /////////
-                filter.Role = null;
 
                 return await GetUsers(filter, sorting);
             }
