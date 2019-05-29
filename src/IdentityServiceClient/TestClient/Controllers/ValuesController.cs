@@ -3,6 +3,7 @@ using IdentityServiceClient.Service;
 using IdentityServiceClient.Filters;
 using Microsoft.AspNetCore.Mvc;
 using IdentityServiceClient.Constants;
+using IdentityServiceClient;
 
 namespace TestClient.Controllers
 {
@@ -26,7 +27,7 @@ namespace TestClient.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [AccessFilter("xyzies.devicemanagment.create")]
+        [AccessFilter(Const.Permissions.Device.AdminPermissionForCreate)]
         public ActionResult<string> Get(int id)
         {
             return "value";
