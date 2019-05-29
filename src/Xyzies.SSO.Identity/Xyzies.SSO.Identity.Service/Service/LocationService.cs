@@ -65,7 +65,12 @@ namespace Xyzies.SSO.Identity.Services.Service
             {
                 try
                 {
-                    city.State.Id = (states.FirstOrDefault(x => x.Name == city.State.Name)).Id;
+                    var state = states.FirstOrDefault(x => x.Name == city.State.Name);
+                    if(state == null)
+                    {
+                        continue;
+                    }
+                    city.State.Id = state.Id;
                     var cityInDb = await _cityRepo.GetByAsync(x => x.Name.ToLower() == city.Name.ToLower());
                     if (cityInDb == null)
                     {
