@@ -6,10 +6,10 @@
     <Company>Ardas</Company>
     <Description>This is the library that contains the client to use Identity Service</Description>
     <PackageTags>Core;IdentityService;VSP</PackageTags>
-    <Version>1.1.1</Version>
-    <PackageReleaseNotes>Update scopes for Device Managment, add HasAccess method, that checks permissions for role from passed token</PackageReleaseNotes>
-    <AssemblyVersion>1.1.1.0</AssemblyVersion>
-    <FileVersion>1.1.1.0</FileVersion>
+    <Version>1.1.2</Version>
+    <PackageReleaseNotes>Change scope type to const</PackageReleaseNotes>
+    <AssemblyVersion>1.1.2.0</AssemblyVersion>
+    <FileVersion>1.1.2.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,14 +46,14 @@ namespace Xyzies.SSO.Identity.Services.Service
                 var state = await _stateRepo.GetByAsync(x => x.Name == stateName || x.ShortName == stateName);
                 if (state == null)
                 {
-                    var newState = new State { Name = stateName, ShortName = stateName };
+                    var newState = new State { Name = RemoveDigits(stateName), ShortName = RemoveDigits(stateName) };
                     var stateId = await _stateRepo.AddAsync(newState);
                     newState.Id = stateId;
-                    await _cityRepo.AddAsync(new City { Name = city, State = state });
+                    await _cityRepo.AddAsync(new City { Name = RemoveDigits(city), State = newState });
                 }
                 else
                 {
-                    await _cityRepo.AddAsync(new City { Name = city, State = state });
+                    await _cityRepo.AddAsync(new City { Name = RemoveDigits(city), State = state });
                 }
             }
         }
@@ -63,11 +64,24 @@ namespace Xyzies.SSO.Identity.Services.Service
             var statesList = states.ToList();
             foreach (var city in cities)
             {
-                city.State.Id = (statesList.FirstOrDefault(x => x.Name == city.State.Name)).Id;
-                var cityInDb = await _cityRepo.GetByAsync(x => x.Name.ToLower() == city.Name.ToLower());
-                if(cityInDb == null)
+                try
                 {
-                    await _cityRepo.AddAsync(city);
+                    var state = states.FirstOrDefault(x => x.Name == city.State.Name);
+                    if(state == null)
+                    {
+                        continue;
+                    }
+                    city.State.Id = state.Id;
+                    var cityInDb = await _cityRepo.GetByAsync(x => x.Name.ToLower() == city.Name.ToLower());
+                    if (cityInDb == null)
+                    {
+                        city.Name = RemoveDigits(city.Name);
+                        await _cityRepo.AddAsync(city);
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
                 }
             }
         }
@@ -77,6 +91,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             var isStateExists = (await _stateRepo.GetByAsync(s => s.Name == stateName || s.ShortName == stateName)) != null;
             if (!isStateExists)
             {
+                stateName = RemoveDigits(stateName);
                 await _stateRepo.AddAsync(new State { Name = stateName, ShortName = stateName });
             }
         }
@@ -85,12 +100,31 @@ namespace Xyzies.SSO.Identity.Services.Service
         {
             foreach (var state in states)
             {
-                var stateInDb = await _stateRepo.GetByAsync(x => x.Name.ToLower() == state.Name.ToLower());
-                if(stateInDb == null)
+                try
                 {
-                    await _stateRepo.AddAsync(state);
+                    var stateInDb = await _stateRepo.GetByAsync(x => x.Name.ToLower() == state.Name.ToLower());
+                    if (stateInDb == null)
+                    {
+                        state.Name = RemoveDigits(state.Name);
+                        state.ShortName = RemoveDigits(state.ShortName);
+                        await _stateRepo.AddAsync(state);
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
                 }
             }
+        }
+
+        private string RemoveDigits(string str)
+        {
+            var replaced = str.Replace("[^a-zA-Z]", "");
+            if (string.IsNullOrWhiteSpace(replaced))
+            {
+                throw new ArgumentException("Check location parameters");
+            }
+            return str.Replace("[^a-zA-Z]", "");
         }
     }
 }
