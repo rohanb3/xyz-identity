@@ -23,7 +23,18 @@ values
     ('870d6172-a3fa-4348-96be-8cb9a01edf54', 'xyzies.reconciliation.web.disputestatistic', 1),--15
     ('dbd354be-7588-4684-9ed2-f8bd96af332b', 'xyzies.reconciliation.web.teamstatistic', 1), --16
     ('5bf6ad33-6e29-460b-a871-66f5d56185ba', 'xyzies.reconciliation.web.disputedashboard', 1),--17
-    ('c25d7b14-5718-416d-811c-14b92a19965a', 'xyzies.reconciliation.web.ressubmissiontable', 1);--18
+    ('c25d7b14-5718-416d-811c-14b92a19965a', 'xyzies.reconciliation.web.ressubmissiontable', 1),--18
+---------------------------------------------------------------------------------------
+---------------------- Devices  -------------------------------------------------------
+	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', 'xyzies.devicemanagment.device.create', 1),--19
+	('291aebb0-729f-4c51-abce-c141ddffe40d', 'xyzies.devicemanagment.device.update', 1),--20
+	('c3ff0c81-0790-4d44-8307-92507bf98621', 'xyzies.devicemanagment.device.read', 1),--21
+	('087f272d-ea01-4670-9e3e-2c6a5498f80c', 'xyzies.devicemanagment.device.delete', 1),--22
+
+	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'xyzies.devicemanagment.device.create.admin', 1),--23
+	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.device.update.admin', 1),--24
+	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.device.read.admin', 1),--25
+	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1);--26
 ---------------------------------------------------------------------------------------
 
 
@@ -38,8 +49,12 @@ values
 ---------------------- Reconciliation ---------------------------------
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'ReconciliationLogin'),--6
     ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'ReconciliationWebAdmin'),--7
-    ('cda0444f-2414-4498-8d01-0422f1aa08c2', 'ReconciliationWebManager');--8
+    ('cda0444f-2414-4498-8d01-0422f1aa08c2', 'ReconciliationWebManager'),--8
 -----------------------------------------------------------------------
+---------------------- Devices  -------------------------------------------------------
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'DeviceBase'),--9
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin');--10
+---------------------------------------------------------------------------------------
 
 insert into [TWC_Role]
 values
@@ -84,8 +99,20 @@ values
     ('dbd354be-7588-4684-9ed2-f8bd96af332b', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.teamstatistic permissions to ReconciliationWebAdmin
     ('5bf6ad33-6e29-460b-a871-66f5d56185ba', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputedashboard permissions to ReconciliationWebAdmin
     ('c25d7b14-5718-416d-811c-14b92a19965a', 'cda0444f-2414-4498-8d01-0422f1aa08c2'),--xyzies.reconciliation.web.ressubmissiontable permissions to ReconciliationWebManager
-    ('3fba9eca-ff52-4040-b26d-4f31d4f8b5ea', 'cda0444f-2414-4498-8d01-0422f1aa08c2');--xyzies.reconciliation.web.orderlist permissions to ReconciliationWebManager
+    ('3fba9eca-ff52-4040-b26d-4f31d4f8b5ea', 'cda0444f-2414-4498-8d01-0422f1aa08c2'),--xyzies.reconciliation.web.orderlist permissions to ReconciliationWebManager
 -----------------------------------------------------------------------
+---------------------- Devices  -------------------------------------------------------
+	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', '128cdc31-c597-4ca6-bdbc-55d66e31f698'), --xyzies.devicemanagment.create to DeviceBase
+	('291aebb0-729f-4c51-abce-c141ddffe40d', '128cdc31-c597-4ca6-bdbc-55d66e31f698'), --xyzies.devicemanagment.update to DeviceBase
+	('c3ff0c81-0790-4d44-8307-92507bf98621', '128cdc31-c597-4ca6-bdbc-55d66e31f698'), --xyzies.devicemanagment.read to DeviceBase
+	('087f272d-ea01-4670-9e3e-2c6a5498f80c', '128cdc31-c597-4ca6-bdbc-55d66e31f698'), --xyzies.devicemanagment.delete to DeviceBase
+
+	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.create.admin to DeviceAdmin
+	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.update.admin to DeviceAdmin
+	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.read.admin to DeviceAdmin
+	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'); --xyzies.devicemanagment.delete.admin to DeviceAdmin
+---------------------------------------------------------------------------------------
+
 
 insert into [PolicyToRole]
 values
@@ -117,4 +144,17 @@ values
     ('b695018c-c264-4246-9e33-9dce90f338c2', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--VspOperatorLogin policies for supportadmin
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--VspOperatorLogin policies for SAM
 
-    ('cda0444f-2414-4498-8d01-0422f1aa08c2', '92b1d474-8764-4363-bf7c-05d8f0520bce');--RecontiliationWebManager policies for SAM
+    ('cda0444f-2414-4498-8d01-0422f1aa08c2', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--RecontiliationWebManager policies for SAM
+
+	---------------------- Devices  -------------------------------------------------------
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DeviceAdmin for AccountAdmin
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceAdmin for OperationAdmin
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceAdmin for SystemAdmin
+
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DeviceBase for AccountAdmin
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceBase for OperationAdmin
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceBase for SystemAdmin
+	
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--DeviceBase for Supervisor
+
+---------------------------------------------------------------------------------------

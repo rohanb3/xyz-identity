@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -251,6 +252,18 @@ namespace IdentityServiceClient.Service
                 var response = await client.SendAsync(request);
                 return response.StatusCode == HttpStatusCode.OK;
             }
+        }
+
+        public async Task<bool> HasAccess(string token, string[] scopes)
+        {
+            if(string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var role = jwtToken.Claims.FirstOrDefault(claim => claim.Type == Const.Permissions.RoleClaimType)?.Value;
+            return await HasPermission(role, scopes);
         }
 
         private string GenerateQueryString(List<string> values, string parameter)
