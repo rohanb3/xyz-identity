@@ -34,9 +34,8 @@ using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 using Ardas.AspNetCore.Logging;
 using Microsoft.Extensions.Hosting;
-using Hangfire;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -118,10 +117,7 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
-
-            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("db")));
-            services.AddHangfireServer();
-
+            
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -143,6 +139,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddHostedService<MigrationScheduler>();
             services.AddUserMigrationService();
             #endregion
 
@@ -216,12 +213,6 @@ namespace Xyzies.SSO.Identity.API
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
                 userService.SetUsersCache().Wait();
             }
-
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
-
-            RecurringJob.AddOrUpdate<IMigrationService>(service => service.PeriodicTask(), Cron.Minutely);
-
             
             app.UseAuthentication()
                 .UseProcessClaims()

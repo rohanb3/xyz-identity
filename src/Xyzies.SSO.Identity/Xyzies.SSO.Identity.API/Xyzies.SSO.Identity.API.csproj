@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Ardas.AspNetCore.Logger" Version="1.0.0" />
-    <PackageReference Include="Hangfire" Version="1.7.2" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.3.0" />
     <PackageReference Include="Mapster" Version="3.3.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />

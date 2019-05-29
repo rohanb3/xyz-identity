@@ -18,6 +18,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 {
     public class MigrationService : IMigrationService
     {
+        private object _lock = new object();
         private readonly ICpUsersRepository _cpUsersRepository;
         private readonly IRequestStatusRepository _requestStatusesRepository;
         private readonly ICpRoleRepository _cpRoleRepository;
@@ -133,25 +134,38 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             {
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
+
                 var users = await _cpUsersRepository.GetAsync(user => user.IsDeleted != true);
+                var roles = await _roleRepository.GetAsync();
+                var statuses = await _requestStatusesRepository.GetAsync();
+
+                IList<User> usersList;
+                IList<Role> rolesList;
+                IList<RequestStatus> statusesList;
+
                 if (options.Emails.Length > 0)
                 {
                     users = users.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
-                var roles = (await _roleRepository.GetAsync()).ToList();
-                var statuses = await _requestStatusesRepository.GetAsync();
 
-                foreach (var user in users.ToList())
+                lock (_lock)
+                {
+                    usersList = users.ToList();
+                    rolesList = roles.ToList();
+                    statusesList = statuses.ToList();
+                }
+
+                foreach (var user in usersList)
                 {
                     try
                     {
-                        PrepeareUserProperties(user, roles, statuses);
+                        PrepeareUserProperties(user, rolesList, statusesList);
 
                         await _azureClient.PostUser(user.Adapt<AzureUser>());
                         HandleUserProperties(usersState, usersCity, user);
 
-                        _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                        _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
                     }
                     catch (Exception ex)
                     {
@@ -163,15 +177,22 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                             await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
                             HandleUserProperties(usersState, usersCity, user);
 
-                            _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
+                            _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
                         }
                     }
 
                 }
-                await _locationService.SetState(usersState);
-                await _locationService.SetCity(usersCity);
+                lock (_lock)
+                {
+                    _locationService.SetState(usersState).Wait();
+                    _locationService.SetCity(usersCity).Wait();
+                }
             }
-            catch (ApplicationException ex)
+            catch (InvalidOperationException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
             {
                 throw;
             }

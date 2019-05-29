@@ -59,10 +59,11 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task SetCity(List<City> cities)
         {
-            var states = (await _stateRepo.GetAsync()).ToList();
+            var states = await _stateRepo.GetAsync();
+            var statesList = states.ToList();
             foreach (var city in cities)
             {
-                city.State.Id = (states.FirstOrDefault(x => x.Name == city.State.Name)).Id;
+                city.State.Id = (statesList.FirstOrDefault(x => x.Name == city.State.Name)).Id;
                 var cityInDb = await _cityRepo.GetByAsync(x => x.Name.ToLower() == city.Name.ToLower());
                 if(cityInDb == null)
                 {
