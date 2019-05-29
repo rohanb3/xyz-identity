@@ -422,6 +422,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
