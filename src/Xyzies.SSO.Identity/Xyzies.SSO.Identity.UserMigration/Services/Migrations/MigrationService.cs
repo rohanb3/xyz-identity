@@ -143,7 +143,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 IList<Role> rolesList;
                 IList<RequestStatus> statusesList;
 
-                if (options.Emails.Length > 0)
+                if (options.Emails?.Length > 0)
                 {
                     users = users.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
@@ -382,11 +382,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
 
             user.IsActive = IsUserActive(user, statuses);
-        }
-
-        public async Task PeriodicTask()
-        {
-            _logger.LogInformation("Periodic task");
         }
 
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>
