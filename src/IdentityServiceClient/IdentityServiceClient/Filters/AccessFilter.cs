@@ -44,8 +44,6 @@ namespace IdentityServiceClient.Filters
             {
                 context.Result = new ContentResult { StatusCode = 403 };
             }
-
-            await next();
         }
     }
 }

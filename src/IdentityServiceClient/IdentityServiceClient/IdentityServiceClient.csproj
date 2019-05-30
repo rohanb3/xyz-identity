@@ -6,10 +6,10 @@
     <Company>Ardas</Company>
     <Description>This is the library that contains the client to use Identity Service</Description>
     <PackageTags>Core;IdentityService;VSP</PackageTags>
-    <Version>1.1.2</Version>
-    <PackageReleaseNotes>Change scope type to const</PackageReleaseNotes>
-    <AssemblyVersion>1.1.2.0</AssemblyVersion>
-    <FileVersion>1.1.2.0</FileVersion>
+    <Version>1.1.3</Version>
+    <PackageReleaseNotes>fix Forbid Result</PackageReleaseNotes>
+    <AssemblyVersion>1.1.3.0</AssemblyVersion>
+    <FileVersion>1.1.3.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
