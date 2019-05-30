@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Xyzies.SSO.Identity.UserMigration.Models;
 
-namespace Xyzies.SSO.Identity.UserMigration.Services
+namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 {
     public interface IMigrationService
     {

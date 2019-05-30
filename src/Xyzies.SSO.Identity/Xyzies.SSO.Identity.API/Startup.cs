@@ -25,7 +25,6 @@ using Xyzies.SSO.Identity.Services.Middleware;
 using Xyzies.SSO.Identity.Services.Service.Roles;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Helpers;
-
 using Xyzies.SSO.Identity.UserMigration;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +33,9 @@ using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 using Ardas.AspNetCore.Logging;
+using Microsoft.Extensions.Hosting;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -115,7 +117,7 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
-
+            
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -137,6 +139,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddHostedService<MigrationScheduler>();
             services.AddUserMigrationService();
             #endregion
 
@@ -210,7 +213,7 @@ namespace Xyzies.SSO.Identity.API
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
                 userService.SetUsersCache().Wait();
             }
-
+            
             app.UseAuthentication()
                 .UseProcessClaims()
                 .UseHealthChecks("/healthz")

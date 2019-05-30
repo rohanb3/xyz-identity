@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Xyzies.SSO.Identity.UserMigration.Services;
+using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {

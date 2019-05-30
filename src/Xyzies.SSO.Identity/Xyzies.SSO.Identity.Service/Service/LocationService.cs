@@ -60,7 +60,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         public async Task SetCity(List<City> cities)
         {
-            var states = (await _stateRepo.GetAsync()).ToList();
+            var states = await _stateRepo.GetAsync();
+            var statesList = states.ToList();
             foreach (var city in cities)
             {
                 try
