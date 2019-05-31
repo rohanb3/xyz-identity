@@ -51,6 +51,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
         }
 
+        [Obsolete("Will be deleted")]
         public async Task MigrateAzureToCPAsync()
         {
             try
@@ -95,10 +96,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 
                 if (emails.Length > 0)
                 {
-                    //await MigrateCPToAzureAsync(new MigrationOptions()
-                    //{
-                    //    Emails = emails
-                    //});
+                    await MigrateCPToAzureAsync(new MigrationOptions()
+                    {
+                        Emails = emails
+                    });
                 }
             }
             catch (ApplicationException ex)
@@ -128,7 +129,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             }
         }
 
-        public async Task MigrateCPToAzureAsync(MigrationOptions options, string token)
+        public async Task MigrateCPToAzureAsync(MigrationOptions options)
         {
             try
             {
@@ -142,7 +143,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
                 var roles = (await _roleRepository.GetAsync()).ToList();
                 var statuses = await _requestStatusesRepository.GetAsync();
-                var branches = await _relationService.GetBranchesAsync(token);
+                var branches = await _relationService.GetBranchesTrustedAsync();
                 var branchesByCompany = branches.GroupBy(branch => branch.CompanyId);
 
                 foreach (var user in users.ToList())
@@ -231,7 +232,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                     if (existUser == null)
                     {
                         _logger.LogWarning($"User does not exist in Azure, {user.Name} {user.LastName}");
-                        //await MigrateCPToAzureAsync(new MigrationOptions() { Emails = new[] { user.Email } });
+                        await MigrateCPToAzureAsync(new MigrationOptions() { Emails = new[] { user.Email } });
                     }
                     else
                     {
