@@ -47,6 +47,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <param name="emails">Specify users by their mail</param>
         /// <returns></returns>
         [HttpGet("users/cp-to-azure")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
         {
