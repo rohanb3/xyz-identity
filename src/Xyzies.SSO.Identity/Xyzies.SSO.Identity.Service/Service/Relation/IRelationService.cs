@@ -41,5 +41,12 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <param name="token"></param>
         /// <returns></returns>
         Task<List<BranchModel>> GetBranchesAsync(string token = null);
+
+        /// <summary>
+        /// Get branches by trusted token
+        /// </summary>
+        /// <returns></returns>
+        Task<List<BranchModel>> GetBranchesTrustedAsync();
+
     }
 }

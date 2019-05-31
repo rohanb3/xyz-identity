@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
@@ -65,6 +66,13 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             return GetPublicApiResponse<List<BranchModel>>(responseString);
         }
 
+        public async Task<List<BranchModel>> GetBranchesTrustedAsync()
+        {
+            var uri = new Uri($"{_publicApiUrl}/branch/{Consts.Security.StaticToken}/trusted");
+            var responseString = await SendGetRequest(uri);
+
+            return GetPublicApiResponse<List<BranchModel>>(responseString);
+        }
         #region Helpers
         private T GetPublicApiResponse<T>(string responseString)
         {
