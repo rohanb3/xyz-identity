@@ -142,8 +142,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 }
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
                 var roles = (await _roleRepository.GetAsync()).ToList();
-                var statuses = await _requestStatusesRepository.GetAsync();
-                var branches = await _relationService.GetBranchesTrustedAsync();
+                var statuses = (await _requestStatusesRepository.GetAsync()).ToList();
+                var branches = (await _relationService.GetBranchesTrustedAsync()).ToList();
                 var branchesByCompany = branches.GroupBy(branch => branch.CompanyId);
 
                 foreach (var user in users.ToList())
