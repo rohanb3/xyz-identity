@@ -47,10 +47,12 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <param name="emails">Specify users by their mail</param>
         /// <returns></returns>
         [HttpGet("users/cp-to-azure")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
         {
-            await _migrationService.MigrateCPToAzureAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
+            string token = HttpContext.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault();
+            await _migrationService.MigrateCPToAzureAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails }, token);
             return Ok();
         }
 
