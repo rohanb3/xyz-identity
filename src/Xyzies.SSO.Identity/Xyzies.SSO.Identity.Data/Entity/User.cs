@@ -32,7 +32,8 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public Guid? BranchId { get; set; }
 
-        public int? RoleId => !int.TryParse(Role, out int roleId) ? 0 : new int?(roleId);
+        [NotMapped]
+        public int? RoleId { get => !int.TryParse(Role, out int roleId) ? 0 : new int?(roleId); set => RoleId = value; }
 
         public DateTime? CreatedDate { get; set; }
 
@@ -77,5 +78,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
         public bool? IsEmailVerified { get; set; }
 
         public int? StatusId { get; set; }
+
+        public Guid? UserStatusKey { get; set; }
     }
 }
