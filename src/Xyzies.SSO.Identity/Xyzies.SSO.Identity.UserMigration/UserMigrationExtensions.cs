@@ -9,7 +9,7 @@ namespace Xyzies.SSO.Identity.UserMigration
     {
         public static void AddUserMigrationService(this IServiceCollection services)
         {
-            services.AddScoped<ICpUsersRepository,CpUsersRepository>();
+            services.AddScoped<ICpUsersRepository, CpUsersRepository>();
             services.AddScoped<IAzureAdClient, AzureAdClient>();
             services.AddScoped<IRoleRepository, RoleRepository>();
 
