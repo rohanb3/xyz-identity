@@ -18,6 +18,12 @@
                 public const string AdminPermissionForRead = "xyzies.devicemanagment.device.read.admin";
                 public const string AdminPermissionForDelete = "xyzies.devicemanagment.device.delete.admin";
             }
+
+            public class Comment
+            {
+                public const string PermissionForCreate = "xyzies.devicemanagment.comment.create";
+                public const string PermissionForRead = "xyzies.devicemanagment.comment.read";
+            }
         }
         public class IndentityApi
         {
