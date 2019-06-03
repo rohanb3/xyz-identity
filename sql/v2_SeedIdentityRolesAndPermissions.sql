@@ -174,10 +174,10 @@ values
 
 ---------------------------------------------------------------------------------------
 	---------------------- Comments  -------------------------------------------------------
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--DeviceBase for AccountAdmin
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceBase for OperationAdmin
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceBase for SystemAdmin
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--CommentBase for AccountAdmin
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--CommentBase for OperationAdmin
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--CommentBase for SystemAdmin
 	
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--DeviceBase for Supervisor
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--CommentBase for Supervisor
 
 ---------------------------------------------------------------------------------------
