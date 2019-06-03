@@ -34,7 +34,11 @@ values
 	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'xyzies.devicemanagment.device.create.admin', 1),--23
 	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.device.update.admin', 1),--24
 	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.device.read.admin', 1),--25
-	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1);--26
+	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1),--26
+---------------------------------------------------------------------------------------
+---------------------- Comments  -------------------------------------------------------
+	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--27
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1);--28
 ---------------------------------------------------------------------------------------
 
 
@@ -53,7 +57,10 @@ values
 -----------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'DeviceBase'),--9
-	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin');--10
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin'),--10
+---------------------------------------------------------------------------------------
+---------------------- Comments  -------------------------------------------------------
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase');--11
 ---------------------------------------------------------------------------------------
 
 insert into [TWC_Role]
@@ -110,7 +117,11 @@ values
 	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.create.admin to DeviceAdmin
 	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.update.admin to DeviceAdmin
 	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.read.admin to DeviceAdmin
-	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'); --xyzies.devicemanagment.delete.admin to DeviceAdmin
+	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.delete.admin to DeviceAdmin
+---------------------------------------------------------------------------------------
+---------------------- Comments  -------------------------------------------------------
+	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'ea3431be-811d-449f-b51b-5deda83cdc8d'), --xyzies.devicemanagment.create to CommentBase
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'ea3431be-811d-449f-b51b-5deda83cdc8d'); --xyzies.devicemanagment.read to CommentBase
 ---------------------------------------------------------------------------------------
 
 
@@ -159,6 +170,14 @@ values
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceBase for OperationAdmin
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceBase for SystemAdmin
 	
-	('128cdc31-c597-4ca6-bdbc-55d66e31f698', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--DeviceBase for Supervisor
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--DeviceBase for Supervisor
+
+---------------------------------------------------------------------------------------
+	---------------------- Comments  -------------------------------------------------------
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--DeviceBase for AccountAdmin
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceBase for OperationAdmin
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceBase for SystemAdmin
+	
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--DeviceBase for Supervisor
 
 ---------------------------------------------------------------------------------------
