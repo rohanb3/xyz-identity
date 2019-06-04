@@ -38,7 +38,11 @@ values
 ---------------------------------------------------------------------------------------
 ---------------------- Comments  -------------------------------------------------------
 	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--27
-	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1);--28
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--28
+---------------------------------------------------------------------------------------
+---------------------- History  -------------------------------------------------------
+	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--29
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1);--30
 ---------------------------------------------------------------------------------------
 
 
@@ -60,7 +64,11 @@ values
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin'),--10
 ---------------------------------------------------------------------------------------
 ---------------------- Comments  -------------------------------------------------------
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase');--11
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase'),--11
+---------------------------------------------------------------------------------------
+---------------------- History  -------------------------------------------------------
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'HistoryBase'),--12
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin');--13
 ---------------------------------------------------------------------------------------
 
 insert into [TWC_Role]
@@ -121,7 +129,11 @@ values
 ---------------------------------------------------------------------------------------
 ---------------------- Comments  -------------------------------------------------------
 	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'ea3431be-811d-449f-b51b-5deda83cdc8d'), --xyzies.devicemanagment.create to CommentBase
-	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'ea3431be-811d-449f-b51b-5deda83cdc8d'); --xyzies.devicemanagment.read to CommentBase
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'ea3431be-811d-449f-b51b-5deda83cdc8d'), --xyzies.devicemanagment.read to CommentBase
+---------------------------------------------------------------------------------------
+---------------------- History  -------------------------------------------------------
+	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'a104bad3-cdad-4722-9c16-2f735f58ffc0'), --xyzies.devicemanagment.history.read to HistoryBase 
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'f1a2b40a-781e-416b-aeed-21961b01c86a'); --xyzies.devicemanagment.history.read.admin to HistoryAdmin 
 ---------------------------------------------------------------------------------------
 
 
@@ -178,6 +190,18 @@ values
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--CommentBase for OperationAdmin
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--CommentBase for SystemAdmin
 	
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--CommentBase for Supervisor
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--CommentBase for Supervisor
+
+---------------------------------------------------------------------------------------
+------------------------- History  -------------------------------------------------------
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--HistoryBase for AccountAdmin
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryBase for OperationAdmin
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryBase for SystemAdmin
+	
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--HistoryAdmin for AccountAdmin
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryAdmin for OperationAdmin
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryAdmin for SystemAdmin
+
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--HistoryBase for Supervisor
 
 ---------------------------------------------------------------------------------------

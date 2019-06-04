@@ -24,6 +24,12 @@
                 public const string PermissionForCreate = "xyzies.devicemanagment.comment.create";
                 public const string PermissionForRead = "xyzies.devicemanagment.comment.read";
             }
+
+            public class History
+            {
+                public const string PermissionForRead = "xyzies.devicemanagment.history.read";
+                public const string AdminPermissionForRead = "xyzies.devicemanagment.history.read.admin";
+            }
         }
         public class IndentityApi
         {
