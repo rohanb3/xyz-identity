@@ -62,7 +62,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 if (ex.Message.Contains(Consts.ErrorReponses.AzureLoginError))
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                            new KeyValuePair<string, string[]>("Password", new string[] { "Password incorrect. Please, check it correctness and try again." })
+                            new KeyValuePair<string, string[]>("Password", new string[] { "Password Incorrect" })
                         })));
                 }
 
