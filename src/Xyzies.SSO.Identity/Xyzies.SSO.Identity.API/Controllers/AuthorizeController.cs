@@ -43,7 +43,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                _logger.LogError("Test logs. Login by {username},{scope}", credentials.Username, credentials.Scope);
+                _logger.LogInformation("Login requested by {username}, {scope}", credentials.Username, credentials.Scope);
                 return Ok(await _authorizationService.AuthorizeAsync(credentials));
             }
             catch (ArgumentException ex)

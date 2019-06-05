@@ -17,5 +17,7 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         [StringLength(64)]
         public string CompanyName { get; set; }
+
+        public int? CPUserId { get; set; }
     }
 }

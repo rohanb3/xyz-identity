@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Xyzies.SSO.Identity.Data.Entity
@@ -8,11 +7,11 @@ namespace Xyzies.SSO.Identity.Data.Entity
     public class User : BaseEntity<int>
     {
         [Column("UserId")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public override int Id { get; set; }
 
         public int? CompanyId { get; set; }
 
-        [Required, EmailAddress]
         public string Email { get; set; }
 
         public string Password { get; set; }
@@ -33,7 +32,8 @@ namespace Xyzies.SSO.Identity.Data.Entity
 
         public Guid? BranchId { get; set; }
 
-        public int? RoleId => !int.TryParse(Role, out int roleId) ? null : new int?(roleId);
+        [NotMapped]
+        public int? RoleId { get => !int.TryParse(Role, out int roleId) ? 0 : new int?(roleId); set => RoleId = value; }
 
         public DateTime? CreatedDate { get; set; }
 
@@ -78,5 +78,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
         public bool? IsEmailVerified { get; set; }
 
         public int? StatusId { get; set; }
+
+        public Guid? UserStatusKey { get; set; }
     }
 }

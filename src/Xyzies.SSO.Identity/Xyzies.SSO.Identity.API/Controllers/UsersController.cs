@@ -13,7 +13,6 @@ using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Xyzies.SSO.Identity.UserMigration.Services;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -26,19 +25,15 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IMigrationService _migrationService;
 
         /// <summary>
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
-        /// <param name="migrationService"></param>
-        public UsersController(IUserService userService, IMigrationService migrationService)
+        public UsersController(IUserService userService)
         {
             _userService = userService ??
                 throw new ArgumentNullException(nameof(userService));
-            _migrationService = migrationService ??
-                throw new ArgumentNullException(nameof(migrationService));
         }
 
         /// <summary>
@@ -74,15 +69,54 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Returns collection of users for trusted service
+        /// Returns user for trusted service
         /// </summary>
         /// <returns>Collection of users</returns>
         /// <response code="200">If users fetched successfully</response>
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
+        [Route("{token}/trusted/{objectId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetAllUsersForTrustedService(string token, string objectId)
+        {
+            try
+            {
+                if (token != Consts.Security.StaticToken)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+
+                var currentUser = new UserIdentityParams
+                {
+                    Role = Consts.Roles.OperationsAdmin
+                };
+
+                var user = await _userService.GetUserByIdAsync(objectId, currentUser);
+                return Ok(user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
+                    })));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound("User with current id not found");
+            }
+        }
+
+        /// <summary>
+        /// Returns collection of users for trusted service
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        [HttpGet]
         [Route("{token}/trusted")]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(IEnumerable<Profile>))]
         public async Task<IActionResult> GetAllUsersForTrustedService(string token)
         {
             try
@@ -111,6 +145,45 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 return new ContentResult { StatusCode = 403 };
             }
         }
+
+        /// <summary>
+        /// Returns collection of users for trusted service by passed filters. POST method required to pass large collections inside filters
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        [HttpPost]
+        [Route("{token}/trusted/filtered")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
+        public async Task<IActionResult> GetFilteredUsersForTrustedService(string token, [FromBody] UserFilteringParams filters)
+        {
+            try
+            {
+                if (token != Consts.Security.StaticToken)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+
+                var currentUser = new UserIdentityParams
+                {
+                    Role = Consts.Roles.OperationsAdmin
+                };
+                var users = await _userService.GetAllUsersAsync(currentUser, filters);
+
+                return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
+                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
+                    })));
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
+        }
+
 
         /// <summary>
         /// Returns total count of users
@@ -166,19 +239,44 @@ namespace Xyzies.SSO.Identity.API.Controllers
         }
 
         /// <summary>
-        /// Migrate users from CP base to Azure
+        /// Get user by his Cable Portal id
         /// </summary>
-        /// <param name="limit">Limit of users from CP base</param>
-        /// <param name="offset">Offset for users from CP base</param>
-        /// <param name="emails">Specify users by their mail</param>
-        /// <returns></returns>
-        [HttpGet("migrate")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
+        /// <param name="id">Cable Portal id</param>
+        /// <param name="token">Static token</param>
+        /// <returns>User with passed identifier, or not found response</returns>
+        /// <response code="200">If user fetched successfully</response>
+        /// <response code="403">If authorization token is invalid</response>
+        /// <response code="404">If user was not found</response>
+        [AllowAnonymous]
+        [HttpGet("{token}/cp/{id}", Name = "UserByCPId")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+        public async Task<IActionResult> Get(string token, int id)
         {
-            await _migrationService.MigrateAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
-            return Ok();
+            try
+            {
+                if (token != Consts.Security.StaticToken)
+                {
+                    return new ContentResult { StatusCode = 403 };
+                }
+
+                var user = await _userService.GetUserBy(u => u.CPUserId == id);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
         }
+
+
 
         /// <summary>
         /// Get user by his id, objectId or userPrincipalName
@@ -321,6 +419,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 return NoContent();
             }
             catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
             }

@@ -5,9 +5,17 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 {
     public interface IMigrationService
     {
-        Task MigrateAsync(MigrationOptions options);
-        Task SyncEnabledUsers(MigrationOptions options);
+        Task FillSuperAdminsWithDefaultBranches(string token, MigrationOptions options = null);
+        Task ReplaceRoleIdWithRoleName();
+        Task MigrateCPToAzureAsync(MigrationOptions options);
+        Task UpdateUserActivityStatus(MigrationOptions options = null);
         Task FillNullRolesWithAnonymous();
         Task SetAllEmailsToLowerCase(MigrationOptions options);
+        Task MigrateAzureToCPAsync();
+        /// <summary>
+        /// Change role from operator to support admin
+        /// </summary>
+        /// <returns></returns>
+        Task ChangeRoleName();
     }
 }

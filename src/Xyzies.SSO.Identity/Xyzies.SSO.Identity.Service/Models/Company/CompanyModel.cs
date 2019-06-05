@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Xyzies.SSO.Identity.Data.Entity;
 
 namespace Xyzies.SSO.Identity.Services.Models.Company
 {
@@ -20,5 +18,10 @@ namespace Xyzies.SSO.Identity.Services.Models.Company
         /// </summary>
         [JsonProperty("companyName")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// Status key from CP
+        /// </summary>
+        public RequestStatus RequestStatus { get; set; }
     }
 }
