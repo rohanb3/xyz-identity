@@ -60,6 +60,12 @@ namespace Xyzies.SSO.Identity.Services.Service
         private static List<AzureUser> GetFiltered(this List<AzureUser> users, UserFilteringParams filters)
         {
             UserFilters condition = null;
+
+            if (!string.IsNullOrEmpty(filters.Status))
+            {
+                condition += (AzureUser user) => FilterUserByStatus(user, filters.Status);
+            }
+
             if (filters.Role != null && filters.Role.Any())
             {
                 condition += (AzureUser user) => filters.Role.Select(role => role.ToLower()).Contains(user.Role?.ToLower());
@@ -112,6 +118,20 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
             }
             return true;
+        }
+
+        private static bool FilterUserByStatus(AzureUser user, string status)
+        {
+            switch (status)
+            {
+                case Consts.UserStatuses.Active:
+                    return user.AccountEnabled ?? false;
+
+                case Consts.UserStatuses.Disabled:
+                    return !user.AccountEnabled ?? false;
+                default:
+                    throw new ArgumentException("Unknown status", nameof(status));
+            }
         }
     }
 }

@@ -95,6 +95,15 @@ namespace Xyzies.SSO.Identity.Data.Helpers
             public const string Descending = "desc";
             public const string Ascending = "asc";
         }
+
+        public class UserStatuses
+        {
+            public const string Active = "active";
+            public const string Disabled = "disabled";
+
+            public static string[] Statuses = { Active, Disabled };
+        }
+
         public class GrantTypes
         {
             public const string Password = "password";
