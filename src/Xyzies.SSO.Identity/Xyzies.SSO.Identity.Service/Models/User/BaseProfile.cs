@@ -38,7 +38,7 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         public bool? AccountEnabled { get; set; }
 
-        [StringLength(32)]
+        [StringLength(36)]
         public string MailNickname { get; set; }
 
         [StringLength(32)]

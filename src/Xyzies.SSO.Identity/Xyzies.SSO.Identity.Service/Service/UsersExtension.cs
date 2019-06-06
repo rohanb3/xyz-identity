@@ -73,12 +73,12 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (filters.State != null && filters.State.Any())
             {
-                condition += (AzureUser user) => filters.State.Select(role => role.ToLower()).Contains(user.State?.ToLower());
+                condition += (AzureUser user) => filters.State.Select(state => state.ToLower()).Contains(user.State?.ToLower());
             }
 
             if (filters.City != null && filters.City.Any())
             {
-                condition += (AzureUser user) => filters.City.Select(role => role.ToLower()).Contains(user.City?.ToLower());
+                condition += (AzureUser user) => filters.City.Select(city => city.ToLower()).Contains(user.City?.ToLower());
             }
 
             if (filters.UserName != null)
@@ -98,7 +98,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (filters.BranchesId != null && filters.BranchesId.Any())
             {
-                condition += (AzureUser user) => user.BranchId.HasValue ? filters.BranchesId.Contains(user.BranchId.Value) : true;
+                condition += (AzureUser user) => user.BranchId.HasValue ? filters.BranchesId.Contains(user.BranchId.Value) : false;
             }
 
             if (condition != null)
