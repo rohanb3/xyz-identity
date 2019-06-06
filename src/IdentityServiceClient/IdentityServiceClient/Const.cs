@@ -19,6 +19,19 @@
                 public const string AdminPermissionForDelete = "xyzies.devicemanagment.device.delete.admin";
             }
 
+            public class Dispute
+            {
+                public const string PermissionForCreate = "xyzies.reconciliation.dispute.create";
+                public const string PermissionForRead = "xyzies.reconciliation.dispute.read";
+                public const string PermissionForUpdate = "xyzies.reconciliation.dispute.update";
+                public const string PermissionForDelete = "xyzies.reconciliation.dispute.delete";
+            }
+
+            public class Order
+            {
+                public const string PermissionForRead = "xyzies.reconciliation.order.read";
+            }
+
             public class Comment
             {
                 public const string PermissionForCreate = "xyzies.devicemanagment.comment.create";
