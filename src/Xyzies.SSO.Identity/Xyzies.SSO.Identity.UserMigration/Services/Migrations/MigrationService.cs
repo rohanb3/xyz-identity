@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Xyzies.SSO.Identity.CPUserMigration.Models;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
@@ -22,6 +23,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private object _lock = new object();
         private readonly ICpUsersRepository _cpUsersRepository;
         private readonly IRequestStatusRepository _requestStatusesRepository;
+        private readonly IUserMigrationHistoryRepository _userMigrationHistoryRepository;
         private readonly ICpRoleRepository _cpRoleRepository;
         private readonly IAzureAdClient _azureClient;
         private readonly IUserService _userService;
@@ -39,7 +41,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             IUserService userService,
             IRelationService relationService,
             ILocaltionService locationService,
-            ICpRoleRepository cpRoleRepository)
+            ICpRoleRepository cpRoleRepository,
+            IUserMigrationHistoryRepository userMigrationHistoryRepository)
         {
             _cpUsersRepository = cpUsersRepository ?? throw new ArgumentNullException(nameof(cpUsersRepository));
             _requestStatusesRepository = requestStatusesRepository ?? throw new ArgumentNullException(nameof(requestStatusesRepository));
@@ -50,8 +53,9 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
+            _userMigrationHistoryRepository = userMigrationHistoryRepository ?? throw new ArgumentNullException(nameof(userMigrationHistoryRepository));
         }
-        
+
         [Obsolete("Will be deleted")]
         public async Task MigrateAzureToCPAsync()
         {
@@ -145,7 +149,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 IList<User> usersList;
                 IList<Role> rolesList;
                 IList<BranchModel> branchesList;
-                IEnumerable<IGrouping<int?,BranchModel>> branchesByCompanies;
+                IEnumerable<IGrouping<int?, BranchModel>> branchesByCompanies;
                 IList<RequestStatus> statusesList;
 
                 if (options.Emails?.Length > 0)
@@ -272,6 +276,17 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             {
                 throw;
             }
+        }
+
+
+        public async Task<LastSyncTime> GetLastUsersFullSyncTime()
+        {
+            var syncHistory = (await _userMigrationHistoryRepository.GetAsync()).LastOrDefault();
+            if (syncHistory == null)
+            {
+                throw new KeyNotFoundException("Sync time yet");
+            }
+            return new LastSyncTime() { Time = syncHistory.CreatedOn };
         }
 
         public async Task FillSuperAdminsWithDefaultBranches(string token, MigrationOptions options = null)

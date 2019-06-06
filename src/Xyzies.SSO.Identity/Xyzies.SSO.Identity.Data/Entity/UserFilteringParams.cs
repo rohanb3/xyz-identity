@@ -4,7 +4,7 @@ using Xyzies.SSO.Identity.Data.Core;
 
 namespace Xyzies.SSO.Identity.Data.Entity
 {
-    public class UserFilteringParams: LazyLoadParameters
+    public class UserFilteringParams : LazyLoadParameters
     {
         /// <summary>
         /// User role
@@ -22,5 +22,7 @@ namespace Xyzies.SSO.Identity.Data.Entity
         public List<string> State { get; set; }
 
         public string UserName { get; set; }
+
+        public string Status { get; set; }
     }
 }

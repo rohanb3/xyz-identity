@@ -36,6 +36,7 @@ using Ardas.AspNetCore.Logging;
 using Microsoft.Extensions.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
+using Xyzies.SSO.Identity.CPUserMigration.Models;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -147,6 +148,7 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
             services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
+            services.Configure<MigrationSchedulerOptions>(Configuration.GetSection("MigrationsScheduler"));
 
             services.AddSwaggerGen(options =>
             {
