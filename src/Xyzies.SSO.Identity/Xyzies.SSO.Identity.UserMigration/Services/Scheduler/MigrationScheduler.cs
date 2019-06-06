@@ -58,15 +58,15 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
 
                     _logger.LogInformation($"Total users cout from CP: {totalUsers}");
 
-                    //do
-                    //{
-                    //    tasks.Add(migrationService.MigrateCPToAzureAsync(new MigrationOptions() { Limit = _usersLimit, Offset = offset }));
-                    //    _logger.LogInformation($"Fetch started with params: limit - {_usersLimit}, offset - {offset}");
+                    do
+                    {
+                        tasks.Add(migrationService.MigrateCPToAzureAsync(new MigrationOptions() { Limit = _usersLimit, Offset = offset }));
+                        _logger.LogInformation($"Fetch started with params: limit - {_usersLimit}, offset - {offset}");
 
-                    //    offset += _usersLimit;
-                    //} while (offset < totalUsers);
+                        offset += _usersLimit;
+                    } while (offset < totalUsers);
 
-                    //Task.WaitAll(tasks.ToArray());
+                    Task.WaitAll(tasks.ToArray());
 
                     _logger.LogInformation("All fetches ended");
 
