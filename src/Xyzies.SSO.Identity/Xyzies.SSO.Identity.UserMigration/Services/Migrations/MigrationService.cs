@@ -141,21 +141,36 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
 
-                var users = await _cpUsersRepository.GetAsync(user => user.IsDeleted != true);
+                var users = await _cpUsersRepository.GetAsync();
                 var roles = await _roleRepository.GetAsync();
                 var statuses = await _requestStatusesRepository.GetAsync();
                 var branches = await _relationService.GetBranchesTrustedAsync();
+                var userMigrationHistories = await _userMigrationHistoryRepository.GetAsync();
 
                 IList<User> usersList;
                 IList<Role> rolesList;
                 IList<BranchModel> branchesList;
                 IEnumerable<IGrouping<int?, BranchModel>> branchesByCompanies;
                 IList<RequestStatus> statusesList;
+                UserMigrationHistory lastUserMigration;
+
+                lock (_lock)
+                {
+                    lastUserMigration = userMigrationHistories.LastOrDefault();
+                }
 
                 if (options.Emails?.Length > 0)
                 {
-                    users = users.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
+                    users = users
+                        .Where(user => !string.IsNullOrEmpty(user.Email))
+                        .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
+                else if(lastUserMigration != null)
+                {
+                    users = users
+                        .Where(user => user.CreatedDate > lastUserMigration.CreatedOn || user.CreatedDate > lastUserMigration.CreatedOn);
+                }
+
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
 
                 lock (_lock)
@@ -410,7 +425,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         }
 
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>
-            user.IsActive == true && (statuses.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Name.ToLower().Contains("approved") ?? false);
+            user.IsActive == true && user.IsDeleted != true && (statuses.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Name.ToLower().Contains("approved") ?? false);
         private Guid? GetUserBranch(User user, IEnumerable<BranchModel> companyBranches) =>
             user.BranchId.HasValue ? user.BranchId : companyBranches.FirstOrDefault()?.Id;
         #endregion
