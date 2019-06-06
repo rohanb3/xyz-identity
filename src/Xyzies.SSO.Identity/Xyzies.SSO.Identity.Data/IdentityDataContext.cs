@@ -33,6 +33,7 @@ namespace Xyzies.SSO.Identity.Data
         public DbSet<PasswordResetRequest> PasswordResetRequest { get; set; }
 
         public DbSet<Configuration> Configuration { get; set; }
+        public DbSet<UserMigrationHistory> UserMigrationHistory { get; set; }
 
         #endregion
 
