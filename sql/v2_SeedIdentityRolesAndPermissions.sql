@@ -118,8 +118,6 @@ values
     ('cace7e20-c5f9-4e98-984d-76fd8c35c4d5', '9ffce075-3299-4227-aae3-859f3c6e9eb6'),--authorization.vsp.mobile permissions to Vsp Mobile Login Policy
 ----------------------------------------------------------------- Reconciliation ---------------------------------
     ('cfd0b910-4310-4d68-8796-1707307e26f5', '221315e1-b212-41f4-bf3a-ce6b5bbb9f7a'),--xyzies.authorization.reconciliation.web permissions to ReconciliationLogin
-     --('3fba9eca-ff52-4040-b26d-4f31d4f8b5ea', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.orderlist permissions to ReconciliationWebAdmin
-     -- ('c594bb9e-de39-4917-a3d3-b9905b29451c', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputelist permissions to ReconciliationWebAdmin
     ('870d6172-a3fa-4348-96be-8cb9a01edf54', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputestatistic permissions to ReconciliationWebAdmin
     ('dbd354be-7588-4684-9ed2-f8bd96af332b', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.teamstatistic permissions to ReconciliationWebAdmin
     ('5bf6ad33-6e29-460b-a871-66f5d56185ba', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputedashboard permissions to ReconciliationWebAdmin
