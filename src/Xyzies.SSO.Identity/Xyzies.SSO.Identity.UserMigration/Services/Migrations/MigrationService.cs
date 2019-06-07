@@ -156,7 +156,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
                 lock (_lock)
                 {
-                    lastUserMigration = userMigrationHistories.LastOrDefault();
+                    lastUserMigration = userMigrationHistories.OrderByDescending(history => history.CreatedOn).FirstOrDefault();
                 }
 
                 if (options.Emails?.Length > 0)
@@ -296,7 +296,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
         public async Task<LastSyncTime> GetLastUsersFullSyncTime()
         {
-            var syncHistory = (await _userMigrationHistoryRepository.GetAsync()).OrderByDescending(history => history.CreatedOn).LastOrDefault();
+            var syncHistory = (await _userMigrationHistoryRepository.GetAsync()).OrderByDescending(history => history.CreatedOn).FirstOrDefault();
             if (syncHistory == null)
             {
                 throw new KeyNotFoundException("Sync time yet");
