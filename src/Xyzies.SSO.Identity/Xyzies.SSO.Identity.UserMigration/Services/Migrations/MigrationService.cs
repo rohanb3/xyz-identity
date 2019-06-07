@@ -168,7 +168,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 else if(lastUserMigration != null)
                 {
                     users = users
-                        .Where(user => user.CreatedDate > lastUserMigration.CreatedOn || user.CreatedDate > lastUserMigration.CreatedOn);
+                        .Where(user => user.CreatedDate > lastUserMigration.CreatedOn || user.ModifiedDate > lastUserMigration.CreatedOn);
                 }
 
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
