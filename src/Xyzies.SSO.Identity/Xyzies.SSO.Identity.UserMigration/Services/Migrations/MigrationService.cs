@@ -296,7 +296,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
         public async Task<LastSyncTime> GetLastUsersFullSyncTime()
         {
-            var syncHistory = (await _userMigrationHistoryRepository.GetAsync()).LastOrDefault();
+            var syncHistory = (await _userMigrationHistoryRepository.GetAsync()).OrderByDescending(history => history.CreatedOn).LastOrDefault();
             if (syncHistory == null)
             {
                 throw new KeyNotFoundException("Sync time yet");
