@@ -30,6 +30,18 @@
                 public const string PermissionForRead = "xyzies.devicemanagment.history.read";
                 public const string AdminPermissionForRead = "xyzies.devicemanagment.history.read.admin";
             }
+
+            public class Dispute
+            {
+                public const string PermissionForCreate = "xyzies.reconciliation.create.dispute";
+                public const string PermissionForRead = "xyzies.reconciliation.read.disputelist";
+                public const string PermissionForUpdate = "xyzies.reconciliation.update.dispute";
+            }
+
+            public class Order
+            {
+                public const string PermissionForRead = "xyzies.reconciliation.web.orderlist";
+            }
         }
         public class IndentityApi
         {
