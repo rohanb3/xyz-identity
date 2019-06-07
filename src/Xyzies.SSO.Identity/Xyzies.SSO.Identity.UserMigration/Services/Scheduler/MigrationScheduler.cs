@@ -21,6 +21,7 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
         private readonly IServiceProvider _serviceProvider;
         private CancellationToken _token;
         private Timer _timer;
+        private object _lock = new object();
 
         private MigrationSchedulerOptions _options;
 
@@ -72,7 +73,10 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
 
                     Task.WaitAll(tasks.ToArray());
 
-                    await userMigrationHistoryRepository.AddAsync(new UserMigrationHistory() { CreatedOn = DateTime.UtcNow });
+                    lock (_lock)
+                    {
+                        userMigrationHistoryRepository.AddAsync(new UserMigrationHistory() { CreatedOn = DateTime.UtcNow }).Wait();
+                    }
 
                     _logger.LogInformation("All fetches ended");
 
