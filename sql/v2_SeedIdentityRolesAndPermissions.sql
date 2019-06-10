@@ -26,11 +26,11 @@ values
     ('0a3787cf-2293-4dbe-8095-c9658f0eefb3', 'xyzies.reconciliation.web.order.read.systemadmin', 1), --33 read orders WITH column "Expected Comission"
 
 ------------------------------------Dispute-------------------------------------------------------------
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.ressubmissiontable', 1), -- 18
-    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.read.disputelist', 1), --14
-    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.update.dispute', 1), -- 34
-    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.create.dispute', 1), --35
-    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'xyzies.reconciliation.patch.dispute', 1), --36
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.ressubmissiontable.read', 1), -- 18
+    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.dispute.read', 1), --14
+    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.dispute.update', 1), -- 34
+    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.dispute.create', 1), --35
+    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'xyzies.reconciliation.dispute.patch', 1), --36
 
 ---------------------------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
@@ -132,12 +132,12 @@ values
     ('dbd354be-7588-4684-9ed2-f8bd96af332b', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.teamstatistic permissions to ReconciliationWebAdmin
     ('5bf6ad33-6e29-460b-a871-66f5d56185ba', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputedashboard permissions to ReconciliationWebAdmin
 -----------------------------Dispute-------------------------------------------------------------------------------   
-    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.read.disputelist to DisputeManager
+    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.dispute.read to DisputeManager
 
-    ('00c8f930-b254-41fd-898d-b2e97a6918a3', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.update.dispute to DisputeAdmin
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.ressubmissiontable to OutDisputeAdmin
-    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.create.dispute to DisputeAdmin
-    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'bea8223a-dd34-477a-ae9b-ff6537a84d6f'), --xyzies.reconciliation.patch.dispute to DisputeSam
+    ('00c8f930-b254-41fd-898d-b2e97a6918a3', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.update to DisputeAdmin
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.ressubmissiontable.read to OutDisputeAdmin
+    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --'xyzies.reconciliation.dispute.create to DisputeAdmin
+    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'bea8223a-dd34-477a-ae9b-ff6537a84d6f'), --xyzies.reconciliation.dispute.patch to DisputeSam
 -----------------------------Order----------------------------------------------------------------------------------
     ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', '489b2156-6cb3-4d76-b5a4-c13776b82421'), --xyzies.reconciliation.web.order.read to OrderManager
 

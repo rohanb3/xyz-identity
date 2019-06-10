@@ -33,11 +33,11 @@
 
             public class Dispute
             {
-                public const string PermissionForCreate = "xyzies.reconciliation.create.dispute";
-                public const string PermissionForRead = "xyzies.reconciliation.read.disputelist";
-                public const string PermissionForUpdate = "xyzies.reconciliation.update.dispute";
-                public const string PermissionForPatch = "xyzies.reconciliation.patch.dispute";
-                public const string RessubmissiontablePermissionForRead = "xyzies.reconciliation.web.ressubmissiontable";
+                public const string PermissionForCreate = "xyzies.reconciliation.dispute.create";
+                public const string PermissionForRead = "xyzies.reconciliation.dispute.read";
+                public const string PermissionForUpdate = "xyzies.reconciliation.dispute.update";
+                public const string PermissionForPatch = "xyzies.reconciliation.dispute.patch";
+                public const string RessubmissiontablePermissionForRead = "xyzies.reconciliation.web.ressubmissiontable.read";
             }
 
             public class Order
