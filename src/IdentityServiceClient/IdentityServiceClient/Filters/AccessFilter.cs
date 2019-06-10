@@ -39,13 +39,15 @@ namespace IdentityServiceClient.Filters
                 {
                     context.Result = new ContentResult { StatusCode = 403 };
                 }
+                else
+                {
+                    await next();
+                }
             }
             else
             {
                 context.Result = new ContentResult { StatusCode = 403 };
             }
-
-            await next();
         }
     }
 }

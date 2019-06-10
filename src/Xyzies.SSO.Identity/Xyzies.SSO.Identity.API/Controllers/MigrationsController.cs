@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Xyzies.SSO.Identity.UserMigration.Services;
+using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -61,6 +62,21 @@ namespace Xyzies.SSO.Identity.API.Controllers
             await _migrationService.ChangeRoleName();
 
             return Ok();
+        }
+
+        [HttpGet("last-sync-time")]
+        public async Task<IActionResult> GetLastSyncTime()
+        {
+            try
+            {
+                var lastSyncTime = await _migrationService.GetLastUsersFullSyncTime();
+
+                return Ok(lastSyncTime);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         /// <summary>

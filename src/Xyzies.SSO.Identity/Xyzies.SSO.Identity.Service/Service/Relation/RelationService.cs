@@ -66,8 +66,6 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             return GetPublicApiResponse<List<BranchModel>>(responseString);
         }
 
-
-
         public async Task<List<BranchModel>> GetBranchesTrustedAsync()
         {
             var uri = new Uri($"{_publicApiUrl}/branch/{Consts.Security.StaticToken}/trusted");
@@ -75,7 +73,6 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
 
             return GetPublicApiResponse<List<BranchModel>>(responseString);
         }
-
         #region Helpers
         private T GetPublicApiResponse<T>(string responseString)
         {

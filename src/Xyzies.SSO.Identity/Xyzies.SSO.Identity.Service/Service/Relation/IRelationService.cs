@@ -47,5 +47,6 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// </summary>
         /// <returns></returns>
         Task<List<BranchModel>> GetBranchesTrustedAsync();
+
     }
 }
