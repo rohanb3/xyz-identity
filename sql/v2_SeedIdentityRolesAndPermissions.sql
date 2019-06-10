@@ -49,7 +49,10 @@ values
 ---------------------------------------------------------------------------------------
 ---------------------- History  -------------------------------------------------------
 	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--29
-	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1);--30
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--30
+---------------------------------------------------------------------------------------
+---------------------- Notification  -------------------------------------------------------
+	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1);--31
 ---------------------------------------------------------------------------------------
 
 
@@ -78,7 +81,10 @@ values
 ---------------------------------------------------------------------------------------
 ---------------------- History  -------------------------------------------------------
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'HistoryBase'),--12
-	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin');--13
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin'),--13
+---------------------------------------------------------------------------------------
+---------------------- Notification  -------------------------------------------------------
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'NotificationBase'),--14
 ---------------------------------------------------------------------------------------
 
 insert into [TWC_Role]
@@ -150,7 +156,10 @@ values
 ---------------------------------------------------------------------------------------
 ---------------------- History  -------------------------------------------------------
 	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'a104bad3-cdad-4722-9c16-2f735f58ffc0'), --xyzies.devicemanagment.history.read to HistoryBase 
-	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'f1a2b40a-781e-416b-aeed-21961b01c86a'); --xyzies.devicemanagment.history.read.admin to HistoryAdmin 
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'f1a2b40a-781e-416b-aeed-21961b01c86a'), --xyzies.devicemanagment.history.read.admin to HistoryAdmin 
+---------------------------------------------------------------------------------------
+---------------------- Notification  -------------------------------------------------------
+	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', '9702e098-d66b-4d7b-a758-0f204a7b8321'); --xyzies.notification.email.create to NotificationBase
 ---------------------------------------------------------------------------------------
 
 
@@ -226,6 +235,14 @@ values
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryAdmin for OperationAdmin
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryAdmin for SystemAdmin
 
-	('a104bad3-cdad-4722-9c16-2f735f58ffc0', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--HistoryBase for Supervisor
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--HistoryBase for Supervisor
+
+---------------------------------------------------------------------------------------
+----------------------- Notification  -------------------------------------------------------
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--NotificationBase for AccountAdmin
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--NotificationBase for OperationAdmin
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--NotificationBase for SystemAdmin
+	
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--NotificationBase for Supervisor
 
 ---------------------------------------------------------------------------------------
