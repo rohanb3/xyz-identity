@@ -15,7 +15,7 @@ namespace Xyzies.SSO.Identity.Data
         public DbSet<User> Users { get; set; }
         public DbSet<RequestStatus> RequestStatuses { get; set; }
         public DbSet<CPRole> Roles { get; set; }
-
+        
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)

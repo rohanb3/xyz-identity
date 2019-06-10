@@ -9,7 +9,6 @@ using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
-using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.Services.Service.Relation;
@@ -19,7 +18,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
 {
     public class MigrationService : IMigrationService
     {
-        private object _lock = new object();
         private readonly ICpUsersRepository _cpUsersRepository;
         private readonly IRequestStatusRepository _requestStatusesRepository;
         private readonly ICpRoleRepository _cpRoleRepository;
@@ -52,7 +50,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
         }
 
-        [Obsolete("Will be deleted")]
         public async Task MigrateAzureToCPAsync()
         {
             try
@@ -66,11 +63,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 var newUsers = users.Result
                     .Where(user => user.CPUserId == null || user.CPUserId == 0)
                     .Select(user =>
-                    {
-                        var newUser = user.Adapt<User>();
-                        newUser.Role = roles.FirstOrDefault(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
-                        return newUser;
-                    });
+                        {
+                            var newUser = user.Adapt<User>();
+                            newUser.Role = roles.FirstOrDefault(role => role.RoleName == user.Role)?.RoleId.ToString() ?? null;
+                            return newUser;
+                        });
 
                 foreach (var newUser in newUsers)
                 {
@@ -136,44 +133,25 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             {
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
-
                 var users = await _cpUsersRepository.GetAsync(user => user.IsDeleted != true);
-                var roles = await _roleRepository.GetAsync();
-                var statuses = await _requestStatusesRepository.GetAsync();
-                var branches = await _relationService.GetBranchesTrustedAsync();
-
-                IList<User> usersList;
-                IList<Role> rolesList;
-                IList<BranchModel> branchesList;
-                IEnumerable<IGrouping<int?, BranchModel>> branchesByCompanies;
-                IList<RequestStatus> statusesList;
-
-                if (options.Emails?.Length > 0)
+                if (options.Emails.Length > 0)
                 {
                     users = users.Where(user => !string.IsNullOrEmpty(user.Email)).Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
                 users = users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
+                var roles = (await _roleRepository.GetAsync()).ToList();
+                var statuses = await _requestStatusesRepository.GetAsync();
 
-                lock (_lock)
-                {
-                    branchesList = branches.ToList();
-                    branchesByCompanies = branches.GroupBy(branch => branch.CompanyId);
-                    usersList = users.ToList();
-                    rolesList = roles.ToList();
-                    statusesList = statuses.ToList();
-                }
-
-                foreach (var user in usersList)
+                foreach (var user in users.ToList())
                 {
                     try
                     {
-                        var companyBranches = branchesByCompanies.FirstOrDefault(branchGroup => branchGroup.Key == user.CompanyId);
-                        PrepeareUserProperties(user, rolesList, statusesList, companyBranches);
+                        PrepeareUserProperties(user, roles, statuses);
 
                         await _azureClient.PostUser(user.Adapt<AzureUser>());
                         HandleUserProperties(usersState, usersCity, user);
 
-                        _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
+                        _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                     }
                     catch (Exception ex)
                     {
@@ -185,22 +163,15 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                             await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
                             HandleUserProperties(usersState, usersCity, user);
 
-                            _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
+                            _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"}");
                         }
                     }
 
                 }
-                lock (_lock)
-                {
-                    _locationService.SetState(usersState).Wait();
-                    _locationService.SetCity(usersCity).Wait();
-                }
+                await _locationService.SetState(usersState);
+                await _locationService.SetCity(usersCity);
             }
-            catch (InvalidOperationException ex)
-            {
-                throw;
-            }
-            catch (Exception ex)
+            catch (ApplicationException ex)
             {
                 throw;
             }
@@ -376,7 +347,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
                 usersCity.Add(new City { Name = user?.City, State = new State { Name = user?.State } });
             }
         }
-        private void PrepeareUserProperties(User user, IEnumerable<Role> roles, IEnumerable<RequestStatus> statuses, IEnumerable<BranchModel> companyBranches)
+        private void PrepeareUserProperties(User user, IEnumerable<Role> roles, IEnumerable<RequestStatus> statuses)
         {
             user.Role = roles.FirstOrDefault(role => role.RoleId == user.RoleId)?.RoleName ?? "Anonymous";
             if (user.City == "")
@@ -390,14 +361,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services
             }
 
             user.IsActive = IsUserActive(user, statuses);
-
-            user.BranchId = GetUserBranch(user, companyBranches);
         }
 
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>
             user.IsActive == true && (statuses.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Name.ToLower().Contains("approved") ?? false);
-        private Guid? GetUserBranch(User user, IEnumerable<BranchModel> companyBranches) =>
-            user.BranchId.HasValue ? user.BranchId : companyBranches.FirstOrDefault()?.Id;
+
         #endregion
     }
 }

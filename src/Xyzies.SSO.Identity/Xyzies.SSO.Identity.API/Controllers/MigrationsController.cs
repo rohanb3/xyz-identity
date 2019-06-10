@@ -58,7 +58,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet("fill-roles")]
         public async Task<IActionResult> FillRoles()
         {
-            await _migrationService.ReplaceRoleIdWithRoleName();
+            await _migrationService.ChangeRoleName();
 
             return Ok();
         }

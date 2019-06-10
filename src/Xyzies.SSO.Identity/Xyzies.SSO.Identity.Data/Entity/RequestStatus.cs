@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Xyzies.SSO.Identity.Data.Entity
 {
     [Table("RequestStatus")]
-    public class RequestStatus : BaseEntity<Guid>
+    public class RequestStatus: BaseEntity<Guid>
     {
         [Column("StatusKey")]
         public override Guid Id { get; set; }
