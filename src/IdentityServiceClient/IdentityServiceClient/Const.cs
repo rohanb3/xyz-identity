@@ -36,11 +36,14 @@
                 public const string PermissionForCreate = "xyzies.reconciliation.create.dispute";
                 public const string PermissionForRead = "xyzies.reconciliation.read.disputelist";
                 public const string PermissionForUpdate = "xyzies.reconciliation.update.dispute";
+                public const string PermissionForPatch = "xyzies.reconciliation.patch.dispute";
+                public const string RessubmissiontablePermissionForRead = "xyzies.reconciliation.web.ressubmissiontable";
             }
 
             public class Order
             {
-                public const string PermissionForRead = "xyzies.reconciliation.web.orderlist";
+                public const string PermissionForRead = "xyzies.reconciliation.web.order.read";
+                public const string AdminPermissionForRead = "xyzies.reconciliation.web.order.read.systemadmin";
             }
 
             public class NotificationEmail
