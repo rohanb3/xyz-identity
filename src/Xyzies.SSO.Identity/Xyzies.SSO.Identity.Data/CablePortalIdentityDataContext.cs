@@ -14,7 +14,7 @@ namespace Xyzies.SSO.Identity.Data
         #region Entities
         public DbSet<User> Users { get; set; }
         public DbSet<RequestStatus> RequestStatuses { get; set; }
-        public DbSet<CPRole> Roles { get; set; }
+        public DbSet<CpRoles> Roles { get; set; }
         
         #endregion
 
