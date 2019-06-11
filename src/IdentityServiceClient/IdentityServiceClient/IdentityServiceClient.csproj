@@ -6,10 +6,10 @@
     <Company>Ardas</Company>
     <Description>This is the library that contains the client to use Identity Service</Description>
     <PackageTags>Core;IdentityService;VSP</PackageTags>
-    <Version>1.1.8</Version>
-    <PackageReleaseNotes>Add scopes for Notification service</PackageReleaseNotes>
-    <AssemblyVersion>1.1.8.0</AssemblyVersion>
-    <FileVersion>1.1.8.0</FileVersion>
+    <Version>1.1.9</Version>
+    <PackageReleaseNotes>Add scopes for Dispute micro service</PackageReleaseNotes>
+    <AssemblyVersion>1.1.9.0</AssemblyVersion>
+    <FileVersion>1.1.9.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
