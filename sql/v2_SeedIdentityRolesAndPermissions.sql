@@ -22,14 +22,15 @@ values
     ('dbd354be-7588-4684-9ed2-f8bd96af332b', 'xyzies.reconciliation.web.teamstatistic', 1), --16
     ('5bf6ad33-6e29-460b-a871-66f5d56185ba', 'xyzies.reconciliation.web.disputedashboard', 1),--17
 ------------------------------------Order-------------------------------------------------------------
-    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', 'xyzies.reconciliation.web.orderlist', 1),
-------------------------------------Dispute-------------------------------------------------------------
-    ('6018249e-9778-4b0f-8848-122d528fc7a5', 'xyzies.reconciliation.web.disputelist', 1), -- 13
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.ressubmissiontable', 1), -- 18
-    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.read.disputelist', 1), --14
-    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.update.dispute', 1),
-    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.create.dispute', 1)
+    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', 'xyzies.reconciliation.web.order.read', 1), --32 read orders WITHOUT column "Expected Comission"
+    ('0a3787cf-2293-4dbe-8095-c9658f0eefb3', 'xyzies.reconciliation.web.order.read.systemadmin', 1), --33 read orders WITH column "Expected Comission"
 
+------------------------------------Dispute-------------------------------------------------------------
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.ressubmissiontable.read', 1), -- 18
+    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.dispute.read', 1), --14
+    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.dispute.update', 1), -- 34
+    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.dispute.create', 1), --35
+    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'xyzies.reconciliation.dispute.patch', 1), --36
 
 ---------------------------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
@@ -66,25 +67,27 @@ values
     ('9ffce075-3299-4227-aae3-859f3c6e9eb6', 'VspMobileLogin'),--5
 ---------------------- Reconciliation ---------------------------------
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'ReconciliationLogin'),--6
-    ('c096dfa8-2cd3-422d-afd4-c20970e0c01c', 'DisputeManager'),
-    ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'DisputeAdmin'),
-    ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'OutDisputeAdmin'),
-    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'OrderManager')
-
+    ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'ReconciliationWebAdmin'),--7
+    ('c096dfa8-2cd3-422d-afd4-c20970e0c01c', 'DisputeManager'), --8
+    ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'DisputeAdmin'), --9
+    ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'OutDisputeAdmin'), --10
+    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'OrderManager'), --11
+    ('f778d726-e016-47ec-b6ea-8d016937ae73', 'OrderAdmin'), --12
+    ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', 'DisputeSam'), --13
 -----------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
-	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'DeviceBase'),--9
-	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin'),--10
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'DeviceBase'),--14
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin'),--15
 ---------------------------------------------------------------------------------------
 ---------------------- Comments  -------------------------------------------------------
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase'),--11
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase'),--16
 ---------------------------------------------------------------------------------------
 ---------------------- History  -------------------------------------------------------
-	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'HistoryBase'),--12
-	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin'),--13
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'HistoryBase'),--17
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin'),--18
 ---------------------------------------------------------------------------------------
 ---------------------- Notification  -------------------------------------------------------
-	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'NotificationBase'),--14
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'NotificationBase');--19
 ---------------------------------------------------------------------------------------
 
 insert into [TWC_Role]
@@ -108,6 +111,7 @@ values
     ('92b1d474-8764-4363-bf7c-05d8f0520bce', 18, 'SAM', NULL, getdate(), 0),--18
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0
 
+
 insert into [PermissionToPolicy]
 values
     ('814615e0-7785-4396-9f0d-b3715a135b9b', '415b2993-7e32-4859-8b59-2b527bcdeea1'),--templates permissions to Templates Full Policy
@@ -122,22 +126,23 @@ values
     ('3a8a3a6c-4b9f-4425-81f1-476cddd436da', '71f11476-42ff-4d4e-a05e-9a4e3fd45274'),--xyzies.authorization.reviews.mobile to Reviews Mobile Login
     ('96bf3985-0536-4bea-9bb1-8c71a86da6fc', 'b695018c-c264-4246-9e33-9dce90f338c2'),--xyzies.authorization.vsp.web permissions to Vsp Support Admin Login Policy
     ('cace7e20-c5f9-4e98-984d-76fd8c35c4d5', '9ffce075-3299-4227-aae3-859f3c6e9eb6'),--authorization.vsp.mobile permissions to Vsp Mobile Login Policy
------------------------------------------------------------------ Reconciliation ---------------------------------
+--------------------------------------------------------------- Reconciliation ---------------------------------
     ('cfd0b910-4310-4d68-8796-1707307e26f5', '221315e1-b212-41f4-bf3a-ce6b5bbb9f7a'),--xyzies.authorization.reconciliation.web permissions to ReconciliationLogin
     ('870d6172-a3fa-4348-96be-8cb9a01edf54', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputestatistic permissions to ReconciliationWebAdmin
     ('dbd354be-7588-4684-9ed2-f8bd96af332b', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.teamstatistic permissions to ReconciliationWebAdmin
     ('5bf6ad33-6e29-460b-a871-66f5d56185ba', '7b0ad5ee-429d-4577-ad70-7d3323069804'),--xyzies.reconciliation.web.disputedashboard permissions to ReconciliationWebAdmin
 -----------------------------Dispute-------------------------------------------------------------------------------   
-    ('6018249e-9778-4b0f-8848-122d528fc7a5', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.web.disputelist to DisputeManager
-    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.read.disputelist to DisputeManager
+    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.dispute.read to DisputeManager
 
-    ('00c8f930-b254-41fd-898d-b2e97a6918a3', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.update.dispute to DisputeAdmin
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.ressubmissiontable to OutDisputeAdmin
-    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.update.dispute to OutDisputeAdmin
-    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.create.dispute to DisputeAdmin
+    ('00c8f930-b254-41fd-898d-b2e97a6918a3', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.update to DisputeAdmin
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.ressubmissiontable.read to OutDisputeAdmin
+    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --'xyzies.reconciliation.dispute.create to DisputeAdmin
+    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'bea8223a-dd34-477a-ae9b-ff6537a84d6f'), --xyzies.reconciliation.dispute.patch to DisputeSam
 -----------------------------Order----------------------------------------------------------------------------------
-    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', '489b2156-6cb3-4d76-b5a4-c13776b82421'), --xyzies.reconciliation.web.orderlist to OrderManager
-    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13') --xyzies.reconciliation.web.orderlist to DisputeAdmin
+    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', '489b2156-6cb3-4d76-b5a4-c13776b82421'), --xyzies.reconciliation.web.order.read to OrderManager
+
+    ('0a3787cf-2293-4dbe-8095-c9658f0eefb3', 'f778d726-e016-47ec-b6ea-8d016937ae73'), --xyzies.reconciliation.web.order.read.systemadmin to OrderAdmin
+
 -----------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
 	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', '128cdc31-c597-4ca6-bdbc-55d66e31f698'), --xyzies.devicemanagment.create to DeviceBase
@@ -170,11 +175,19 @@ values
     ('c096dfa8-2cd3-422d-afd4-c20970e0c01c', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DisputeManager for account admin
     ('c096dfa8-2cd3-422d-afd4-c20970e0c01c', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --DisputeManager for system admin
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --DisputeAdmin for system admin
-    ('c096dfa8-2cd3-422d-afd4-c20970e0c01c', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --DisputeManager for SAM
+    ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --DisputeAdmin for operation admin
+    ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DisputeAdmin for account admin
+
+    ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --DisputeSam for SAM
     ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --OutDisputeAdmin for SAM
+	('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --OutDisputeAdmin for system admin
 
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'da671d01-1133-4cc9-94a6-b77587f21fad'),  --OrderManager for operation admin
-    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9')  --OrderManager for account admin
+    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),  --OrderManager for account admin
+
+    ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for system admin
+
+	('489b2156-6cb3-4d76-b5a4-c13776b82421', '92b1d474-8764-4363-bf7c-05d8f0520bce'),  --OrderManager for SAM
 
 ---------------------------------------------------------------------------------------------------------------------------------------
     ('415b2993-7e32-4859-8b59-2b527bcdeea1', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--TemplatesFull policy for operation admin
