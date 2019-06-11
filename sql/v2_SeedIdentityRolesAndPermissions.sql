@@ -184,6 +184,7 @@ values
 
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'da671d01-1133-4cc9-94a6-b77587f21fad'),  --OrderManager for operation admin
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),  --OrderManager for account admin
+	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderManager for system admin
 
     ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for system admin
 
