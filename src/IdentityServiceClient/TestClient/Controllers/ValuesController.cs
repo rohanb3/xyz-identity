@@ -27,7 +27,7 @@ namespace TestClient.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [AccessFilter(Const.Permissions.Device.AdminPermissionForCreate)]
+        [AccessFilter(Const.Permissions.Device.AdminPermissionForCreate, Const.Permissions.Dispute.SamPermissionForPatch)]
         public ActionResult<string> Get(int id)
         {
             return "value";

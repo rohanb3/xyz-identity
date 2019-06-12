@@ -7,17 +7,22 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace IdentityServiceClient.Filters
 {
     public class AccessFilter : Attribute, IAsyncActionFilter
     {
-        public string Scopes { get; set; }
+        public string[] Scopes { get; set; }
         public IIdentityManager _manager;
-        public AccessFilter(string scopes)
+        
+        public AccessFilter(params string[] scopes)
         {
-            Scopes = scopes;
+            var scopeList = new List<string>();
+            scopeList.AddRange(scopes.Select(x => x));
+            Scopes = scopeList.ToArray();
         }
+
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
@@ -27,15 +32,19 @@ namespace IdentityServiceClient.Filters
         {
             _manager = context.HttpContext.RequestServices.GetService<IIdentityManager>();
             var bearerToken = (context.HttpContext.Request.Headers[Const.Auth.AuthHeader]).ToString();
+            var hasPermissionResultList = new List<bool>();
             if (!string.IsNullOrEmpty(bearerToken))
             {
                 bearerToken = bearerToken.Substring(Const.Auth.BearerToken.Length);
                 var handler = new JwtSecurityTokenHandler();
                 var tokenS = handler.ReadJwtToken(bearerToken);
                 var role = tokenS.Claims.FirstOrDefault(claim => claim.Type == Const.Permissions.RoleClaimType)?.Value;
-                var scopes = Scopes.Split(',');
-                var hashPermission = await _manager.HasPermission(role, scopes);
-                if (!hashPermission)
+                foreach (var scope in Scopes)
+                {
+                    var scopesForOneRole = scope.Split(',');
+                    hasPermissionResultList.Add(await _manager.HasPermission(role, scopesForOneRole));
+                }
+                if (hasPermissionResultList.All(x => !x)) 
                 {
                     context.Result = new ContentResult { StatusCode = 403 };
                 }
