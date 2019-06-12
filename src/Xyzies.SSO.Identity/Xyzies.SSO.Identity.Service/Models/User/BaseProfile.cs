@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Xyzies.SSO.Identity.Data.Entity;
 
 namespace Xyzies.SSO.Identity.Services.Models.User
 {
@@ -27,6 +28,8 @@ namespace Xyzies.SSO.Identity.Services.Models.User
         public string Phone { get; set; }
 
         public string Status { get; set; }
+
+        public RequestStatus RequestStatus { get; set; }
 
         public string Role { get; set; }
 

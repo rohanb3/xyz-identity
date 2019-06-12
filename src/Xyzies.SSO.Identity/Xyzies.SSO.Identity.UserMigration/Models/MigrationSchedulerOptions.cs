@@ -9,6 +9,6 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Models
         [DefaultValue(500)]
         public int UsersLimit { get; set; }
         [DefaultValue(true)]
-        public bool IsEnabled { get; set; }
+        public bool Enabled { get; set; }
     }
 }

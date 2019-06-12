@@ -79,13 +79,6 @@ namespace Xyzies.SSO.Identity.Data.Helpers
             public const string UsersKey = "Users";
         }
 
-        public class Scopes
-        {
-            public const string Full = "xyzies.sso.identity.full";
-            public const string Edit = "xyzies.sso.identity.edit";
-            public const string Read = "xyzies.sso.identity.read";
-        }
-
         public class UsersSorting
         {
             public const string Id = "userid";
@@ -101,6 +94,8 @@ namespace Xyzies.SSO.Identity.Data.Helpers
         {
             public const string Active = "active";
             public const string Disabled = "disabled";
+
+            public const string CPActiveUserStatus = "approved";
 
             public static string[] Statuses = { Active, Disabled };
         }
