@@ -13,6 +13,7 @@ using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -25,15 +26,18 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ILogger<UsersController> logger)
         {
             _userService = userService ??
                 throw new ArgumentNullException(nameof(userService));
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
-
+                _logger.LogInformation("Get all users requested by user with object id {id}, users: {users}", currentUser.Id, string.Join(",", users.Result.Select(user => $"{user.GivenName ?? ""} {user.Surname ?? ""}")));
                 return Ok(users);
             }
             catch (ArgumentException ex)
@@ -299,6 +303,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var user = await _userService.GetUserByIdAsync(id, currentUser);
+                _logger.LogInformation("Get user by id requested by user with object id {id},requested user name: {users}, id: {id}", currentUser.Id, $"{user.GivenName ?? ""} {user.Surname ?? ""}", user.ObjectId);
                 return Ok(user);
             }
             catch (KeyNotFoundException ex)
@@ -329,8 +334,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value;
-
-                return Ok(await _userService.GetOwnProfile(userId));
+                var profile = await _userService.GetOwnProfile(userId);
+                _logger.LogInformation("Own profile requested, user name: {user}, id: {id}", profile.ObjectId, $"{profile.GivenName ?? ""} {profile.Surname ?? ""}", profile.ObjectId);
+                return Ok(profile);
             }
             catch (KeyNotFoundException ex)
             {
