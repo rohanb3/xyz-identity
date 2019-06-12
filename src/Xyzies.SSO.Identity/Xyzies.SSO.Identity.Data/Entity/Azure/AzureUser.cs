@@ -52,6 +52,9 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         [JsonProperty(Consts.CPUserIdPropertyName)]
         public int? CPUserId { get; set; }
 
+        [JsonProperty(Consts.StatudIdPropertyName)]
+        public Guid? StatusId { get; set; }
+
         public string CompanyName { get; set; }
 
         public string MailNickname { get; set; }

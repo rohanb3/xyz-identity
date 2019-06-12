@@ -34,6 +34,8 @@ namespace Xyzies.SSO.Identity.Services.Models.User
 
         public Guid? BranchId { get; set; }
 
+        public Guid? StatusId { get; set; }
+
         public Guid? DepartmentId { get; set; }
 
         public bool? AccountEnabled { get; set; }
