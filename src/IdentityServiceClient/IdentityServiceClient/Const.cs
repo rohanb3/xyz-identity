@@ -34,6 +34,7 @@
             public class Dispute
             {
                 public const string PermissionForCreate = "xyzies.reconciliation.dispute.create";
+                public const string PermissionForDelete = "xyzies.reconciliation.dispute.delete";
                 public const string PermissionForRead = "xyzies.reconciliation.dispute.read";
                 public const string PermissionForUpdate = "xyzies.reconciliation.dispute.update";
                 public const string PermissionForPatch = "xyzies.reconciliation.dispute.patch";
