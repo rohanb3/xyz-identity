@@ -43,9 +43,14 @@ namespace Xyzies.SSO.Identity.API
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public class Startup
     {
+        private readonly string _identityEnvironmentName = "IdentityEnvironment";
+        private readonly string _identityEnvironment = null;
+        private readonly string _identityTestEnvironment = "test";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _identityEnvironment = Environment.GetEnvironmentVariable(_identityEnvironmentName);
         }
 
         public IConfiguration Configuration { get; }
@@ -94,7 +99,10 @@ namespace Xyzies.SSO.Identity.API
                 options.Providers.Add<GzipCompressionProvider>();
             });
 
-            services.AddTcpStreamLogging(options => Configuration.Bind("Logstash", options));
+            if (_identityEnvironment?.ToLower() != _identityTestEnvironment.ToLower())
+            {
+                services.AddTcpStreamLogging(options => Configuration.Bind("Logstash", options));
+            }
 
             services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
             services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
