@@ -18,9 +18,7 @@ namespace IdentityServiceClient.Filters
         
         public AccessFilter(params string[] scopes)
         {
-            var scopeList = new List<string>();
-            scopeList.AddRange(scopes.Select(x => x));
-            Scopes = scopeList.ToArray();
+            Scopes = scopes;
         }
 
 
