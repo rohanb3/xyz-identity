@@ -26,7 +26,7 @@ values
     ('0a3787cf-2293-4dbe-8095-c9658f0eefb3', 'xyzies.reconciliation.web.order.read.systemadmin', 1), --33 read orders WITH column "Expected Comission"
 
 ------------------------------------Dispute-------------------------------------------------------------
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.ressubmissiontable.read', 1), -- 18
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.resubmissiontable.read', 1), -- 18
     ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.dispute.read', 1), --14
     ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.dispute.update', 1), -- 34
     ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.dispute.create', 1), --35
@@ -136,7 +136,7 @@ values
     ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.dispute.read to DisputeManager
 
     ('00c8f930-b254-41fd-898d-b2e97a6918a3', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.update to DisputeAdmin
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.ressubmissiontable.read to OutDisputeAdmin
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.resubmissiontable.read to OutDisputeAdmin
     ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --'xyzies.reconciliation.dispute.create to DisputeAdmin
     ('133eb68b-2a32-40e5-957c-79b9719bb2fc', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.patch to DisputeAdmin
     ('4dc5139b-dbbb-4b7d-a32d-78d5ab48268d', 'bea8223a-dd34-477a-ae9b-ff6537a84d6f'), --xyzies.reconciliation.dispute.patch.sam to DisputeSam

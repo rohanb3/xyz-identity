@@ -38,7 +38,7 @@
                 public const string PermissionForUpdate = "xyzies.reconciliation.dispute.update";
                 public const string PermissionForPatch = "xyzies.reconciliation.dispute.patch";
                 public const string SamPermissionForPatch = "xyzies.reconciliation.dispute.patch.sam";
-                public const string RessubmissiontablePermissionForRead = "xyzies.reconciliation.web.ressubmissiontable.read";
+                public const string RessubmissiontablePermissionForRead = "xyzies.reconciliation.web.resubmissiontable.read";
             }
 
             public class Order
