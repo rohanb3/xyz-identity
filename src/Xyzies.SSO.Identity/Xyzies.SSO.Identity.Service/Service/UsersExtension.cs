@@ -125,9 +125,9 @@ namespace Xyzies.SSO.Identity.Services.Service
             switch (status)
             {
                 case Consts.UserStatuses.Active:
-                    return user.RequestStatus.Name.ToLower() == Consts.UserStatuses.CPActiveUserStatus && user.AccountEnabled == true;
+                    return user.RequestStatus?.Name?.ToLower() == Consts.UserStatuses.CPActiveUserStatus && user.AccountEnabled == true;
                 case Consts.UserStatuses.Disabled:
-                    return user.RequestStatus.Name.ToLower() != Consts.UserStatuses.CPActiveUserStatus || user.AccountEnabled == false;
+                    return user.RequestStatus?.Name?.ToLower() != Consts.UserStatuses.CPActiveUserStatus || user.AccountEnabled == false;
                 default:
                     throw new ArgumentException("Unknown status", nameof(status));
             }
