@@ -6,14 +6,18 @@
     <Company>Ardas</Company>
     <Description>This is the library that contains the client to use Identity Service</Description>
     <PackageTags>Core;IdentityService;VSP</PackageTags>
-    <Version>1.1.5</Version>
-    <PackageReleaseNotes>Add scopes for Comments Entity</PackageReleaseNotes>
-    <AssemblyVersion>1.1.5.0</AssemblyVersion>
-    <FileVersion>1.1.5.0</FileVersion>
+    <Version>1.2.0</Version>
+    <PackageReleaseNotes>Rename constants in PermissionClass and support AccessFilter to use many areas through the OR operator</PackageReleaseNotes>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

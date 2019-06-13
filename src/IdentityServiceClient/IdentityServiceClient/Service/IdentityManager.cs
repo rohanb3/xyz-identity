@@ -242,11 +242,11 @@ namespace IdentityServiceClient.Service
             }
         }
 
-        public async Task<bool> HasPermission(string role, string[] scopes)
+        public async Task<bool> HasPermission(string role, string[] scopes, string token = null)
         {
             using (HttpClient client = new HttpClient())
             {
-                SetAuthHeader(client);
+                SetAuthHeader(client, token);
                 var request = new HttpRequestMessage(HttpMethod.Head,
                     $"{_options.ServiceUrl}/{Const.IndentityApi.RoleEntity}?{GenerateQueryString(scopes.ToList(), "scope")}&role={role}");
                 var response = await client.SendAsync(request);
@@ -256,7 +256,7 @@ namespace IdentityServiceClient.Service
 
         public async Task<bool> HasAccess(string token, string[] scopes)
         {
-            if(string.IsNullOrWhiteSpace(token))
+            if (string.IsNullOrWhiteSpace(token))
             {
                 throw new ArgumentNullException(nameof(token));
             }
@@ -276,9 +276,16 @@ namespace IdentityServiceClient.Service
             return query;
         }
 
-        private void SetAuthHeader(HttpClient client)
+        private void SetAuthHeader(HttpClient client, string token = null)
         {
-            client.DefaultRequestHeaders.Add("Authorization", $"{Context.Request.Headers["Authorization"]}");
+            if (token != null)
+            {
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", token);
+            }
+            else
+            {
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"{Context.Request.Headers["Authorization"]}");
+            }
         }
     }
 }
