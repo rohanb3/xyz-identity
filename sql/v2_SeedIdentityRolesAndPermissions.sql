@@ -18,42 +18,44 @@ values
     ('cace7e20-c5f9-4e98-984d-76fd8c35c4d5', 'xyzies.authorization.vsp.mobile', 1),--11
 ---------------------- Reconciliation ---------------------------------
     ('cfd0b910-4310-4d68-8796-1707307e26f5', 'xyzies.authorization.reconciliation.web', 1),--12
-    ('870d6172-a3fa-4348-96be-8cb9a01edf54', 'xyzies.reconciliation.web.disputestatistic', 1),--15
-    ('dbd354be-7588-4684-9ed2-f8bd96af332b', 'xyzies.reconciliation.web.teamstatistic', 1), --16
-    ('5bf6ad33-6e29-460b-a871-66f5d56185ba', 'xyzies.reconciliation.web.disputedashboard', 1),--17
+    ('870d6172-a3fa-4348-96be-8cb9a01edf54', 'xyzies.reconciliation.web.disputestatistic', 1),--13
+    ('dbd354be-7588-4684-9ed2-f8bd96af332b', 'xyzies.reconciliation.web.teamstatistic', 1), --14
+    ('5bf6ad33-6e29-460b-a871-66f5d56185ba', 'xyzies.reconciliation.web.disputedashboard', 1),--15
 ------------------------------------Order-------------------------------------------------------------
-    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', 'xyzies.reconciliation.web.order.read', 1), --32 read orders WITHOUT column "Expected Comission"
-    ('0a3787cf-2293-4dbe-8095-c9658f0eefb3', 'xyzies.reconciliation.web.order.read.systemadmin', 1), --33 read orders WITH column "Expected Comission"
+    ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', 'xyzies.reconciliation.web.order.read', 1), --16 read orders WITHOUT column "Expected Comission"
+    ('0a3787cf-2293-4dbe-8095-c9658f0eefb3', 'xyzies.reconciliation.web.order.read.systemadmin', 1), --17 read orders WITH column "Expected Comission"
 
 ------------------------------------Dispute-------------------------------------------------------------
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.ressubmissiontable.read', 1), -- 18
-    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.dispute.read', 1), --14
-    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.dispute.update', 1), -- 34
-    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.dispute.create', 1), --35
-    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'xyzies.reconciliation.dispute.patch', 1), --36
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'xyzies.reconciliation.web.resubmissiontable.read', 1), -- 18
+    ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'xyzies.reconciliation.dispute.read', 1), --19
+    ('00c8f930-b254-41fd-898d-b2e97a6918a3', 'xyzies.reconciliation.dispute.update', 1), -- 20
+    ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', 'xyzies.reconciliation.dispute.create', 1), --21
+    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'xyzies.reconciliation.dispute.patch', 1), --22
+    ('4dc5139b-dbbb-4b7d-a32d-78d5ab48268d', 'xyzies.reconciliation.dispute.patch.sam', 1), --23
+    ('95e2d571-5fc5-4deb-8e3b-6c2e02d822c4', 'xyzies.reconciliation.dispute.delete', 1), --24
 
 ---------------------------------------------------------------------------------------
 ---------------------- Devices  -------------------------------------------------------
-	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', 'xyzies.devicemanagment.device.create', 1),--19
-	('291aebb0-729f-4c51-abce-c141ddffe40d', 'xyzies.devicemanagment.device.update', 1),--20
-	('c3ff0c81-0790-4d44-8307-92507bf98621', 'xyzies.devicemanagment.device.read', 1),--21
-	('087f272d-ea01-4670-9e3e-2c6a5498f80c', 'xyzies.devicemanagment.device.delete', 1),--22
+	('1df29ca9-f3b5-410d-b31e-8b85395fc1df', 'xyzies.devicemanagment.device.create', 1),--25
+	('291aebb0-729f-4c51-abce-c141ddffe40d', 'xyzies.devicemanagment.device.update', 1),--26
+	('c3ff0c81-0790-4d44-8307-92507bf98621', 'xyzies.devicemanagment.device.read', 1),--27
+	('087f272d-ea01-4670-9e3e-2c6a5498f80c', 'xyzies.devicemanagment.device.delete', 1),--28
 
-	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'xyzies.devicemanagment.device.create.admin', 1),--23
-	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.device.update.admin', 1),--24
-	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.device.read.admin', 1),--25
-	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1),--26
+	('7f854cef-57a1-4fae-b8b7-be8b8713dfee', 'xyzies.devicemanagment.device.create.admin', 1),--29
+	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.device.update.admin', 1),--30
+	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.device.read.admin', 1),--31
+	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1),--32
 ---------------------------------------------------------------------------------------
 ---------------------- Comments  -------------------------------------------------------
-	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--27
-	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--28
+	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--33
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--34
 ---------------------------------------------------------------------------------------
 ---------------------- History  -------------------------------------------------------
-	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--29
-	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--30
+	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--35
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--36
 ---------------------------------------------------------------------------------------
 ---------------------- Notification  -------------------------------------------------------
-	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1);--31
+	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1);--37
 ---------------------------------------------------------------------------------------
 
 
@@ -135,9 +137,11 @@ values
     ('7e228a8f-773f-4d74-9e50-a56c8fa6a729', 'c096dfa8-2cd3-422d-afd4-c20970e0c01c'), --xyzies.reconciliation.dispute.read to DisputeManager
 
     ('00c8f930-b254-41fd-898d-b2e97a6918a3', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.update to DisputeAdmin
-    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.ressubmissiontable.read to OutDisputeAdmin
+    ('60647a09-f792-4cf3-88a2-41f7291f6181', 'a9ffa03d-8a57-40ba-a75b-3b4a823b0b13'), --xyzies.reconciliation.web.resubmissiontable.read to OutDisputeAdmin
     ('c35e6e69-6476-41ba-99c8-ea512bc4cc5c', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --'xyzies.reconciliation.dispute.create to DisputeAdmin
-    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', 'bea8223a-dd34-477a-ae9b-ff6537a84d6f'), --xyzies.reconciliation.dispute.patch to DisputeSam
+    ('133eb68b-2a32-40e5-957c-79b9719bb2fc', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.patch to DisputeAdmin
+    ('4dc5139b-dbbb-4b7d-a32d-78d5ab48268d', 'bea8223a-dd34-477a-ae9b-ff6537a84d6f'), --xyzies.reconciliation.dispute.patch.sam to DisputeSam
+    ('95e2d571-5fc5-4deb-8e3b-6c2e02d822c4', '601e493f-61b3-4fac-89cb-a8d21e331abc'), --xyzies.reconciliation.dispute.delete to DisputeAdmin
 -----------------------------Order----------------------------------------------------------------------------------
     ('3e2dd00d-7d25-4c43-9c87-fc7ee17604c7', '489b2156-6cb3-4d76-b5a4-c13776b82421'), --xyzies.reconciliation.web.order.read to OrderManager
 
