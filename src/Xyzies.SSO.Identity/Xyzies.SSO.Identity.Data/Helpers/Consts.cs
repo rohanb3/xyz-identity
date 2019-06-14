@@ -129,5 +129,13 @@ namespace Xyzies.SSO.Identity.Data.Helpers
             public const string UserDoesNotExits = "User does not exist";
             public const string AzureLoginError = "The username or password provided in the request are invalid";
         }
+
+        public class UsersReadPermission
+        {
+            public const string ReadAll = "xyzies.identity.user.read.all";
+            public const string ReadInCompany = "xyzies.identity.user.read.incompany";
+            public const string ReadOnlyRequester = "xyzies.identity.user.read.myself";
+
+        }
     }
 }
