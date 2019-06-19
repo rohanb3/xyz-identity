@@ -31,6 +31,7 @@ namespace Xyzies.SSO.Identity.Data.Helpers
         public const string ManagerIdPropertyName = _extensionPropertyTemplate + "ManagerId";
         public const string CPUserIdPropertyName = _extensionPropertyTemplate + "CPUserId";
         public const string PhonePropertyName = _extensionPropertyTemplate + "Phone";
+        public const string StatudIdPropertyName = _extensionPropertyTemplate + "StatusId";
 
         public const string CityPropertyName = "City";
         public const string StatePropertyName = "State";
@@ -78,13 +79,6 @@ namespace Xyzies.SSO.Identity.Data.Helpers
             public const string UsersKey = "Users";
         }
 
-        public class Scopes
-        {
-            public const string Full = "xyzies.sso.identity.full";
-            public const string Edit = "xyzies.sso.identity.edit";
-            public const string Read = "xyzies.sso.identity.read";
-        }
-
         public class UsersSorting
         {
             public const string Id = "userid";
@@ -100,6 +94,8 @@ namespace Xyzies.SSO.Identity.Data.Helpers
         {
             public const string Active = "active";
             public const string Disabled = "disabled";
+
+            public const string CPActiveUserStatus = "approved";
 
             public static string[] Statuses = { Active, Disabled };
         }
@@ -132,6 +128,14 @@ namespace Xyzies.SSO.Identity.Data.Helpers
             public const string CodeIsNotValid = "Code is not valid";
             public const string UserDoesNotExits = "User does not exist";
             public const string AzureLoginError = "The username or password provided in the request are invalid";
+        }
+
+        public class UsersReadPermission
+        {
+            public const string ReadAll = "xyzies.identity.user.read.all";
+            public const string ReadInCompany = "xyzies.identity.user.read.incompany";
+            public const string ReadOnlyRequester = "xyzies.identity.user.read.myself";
+
         }
     }
 }

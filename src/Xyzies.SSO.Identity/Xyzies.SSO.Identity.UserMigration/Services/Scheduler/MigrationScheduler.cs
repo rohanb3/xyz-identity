@@ -37,9 +37,11 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
             _logger.LogInformation("Timed Background User Migration is starting.");
 
             _token = cancellationToken;
-
-            _timer = new Timer(MigrateUsers, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(_options.Period));
+            if (_options.Enabled)
+            {
+                _timer = new Timer(MigrateUsers, null, TimeSpan.Zero,
+                    TimeSpan.FromSeconds(_options.Period));
+            }
 
             return Task.CompletedTask;
         }

@@ -31,6 +31,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly ILocaltionService _localtionService;
         private readonly IRelationService _httpService = null;
         private readonly IRoleRepository _roleRepository = null;
+        private readonly IRequestStatusRepository _requestStatusRepository = null;
         private readonly IPermissionService _permissionService = null;
         private readonly string _projectUrl;
 
@@ -42,13 +43,16 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="localtionService"></param>
         /// <param name="httpService"></param>
         /// <param name="roleRepository"></param>
+        /// <param name="permissionService"></param>
+        /// <param name="requestStatusRepository"></param>
         /// <param name="options"></param>
-        public UserService(IAzureAdClient azureClient, 
-            IMemoryCache cache, 
+        public UserService(IAzureAdClient azureClient,
+            IMemoryCache cache,
             ILocaltionService localtionService,
             IRelationService httpService,
             IRoleRepository roleRepository,
             IPermissionService permissionService,
+            IRequestStatusRepository requestStatusRepository,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ??
@@ -63,6 +67,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(roleRepository));
             _permissionService = permissionService ??
                throw new ArgumentNullException(nameof(permissionService));
+            _requestStatusRepository = requestStatusRepository ??
+               throw new ArgumentNullException(nameof(requestStatusRepository));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
         }
@@ -80,19 +86,19 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <inheritdoc />
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            if (Consts.Roles.GlobalAdmins.Contains(user.Role.ToLower()))
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
             {
                 return await GetUsers(filter, sorting);
             }
 
-            if (user.Role.ToLower() == Consts.Roles.SuperAdmin)
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }))
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
 
                 return await GetUsers(filter, sorting);
             }
 
-            if (user.Role.ToLower() == Consts.Roles.SalesRep)
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }))
             {
                 var salesRep = await GetUserByIdAsync(user.Id.ToString(), user);
                 salesRep.AvatarUrl = FormUrlForDownloadUserAvatar(salesRep.ObjectId);
@@ -106,7 +112,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 };
             }
 
-            throw new ArgumentException("Unknown user role");
+            throw new ArgumentException("Can not check you permission");
         }
 
 
@@ -268,21 +274,24 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
-                if (user.Role.ToLower() == Consts.Roles.SalesRep && id != user.Id)
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester })
+                    && id != user.Id)
                 {
                     throw new AccessException();
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                if (Consts.Roles.GlobalAdmins.Contains(user.Role.ToLower()))
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
                 {
                     var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
                     return result?.Adapt<Profile>();
                 }
 
-                if (user.Role.ToLower() == Consts.Roles.SuperAdmin || user.Role.ToLower() == Consts.Roles.SalesRep || user.Role.ToLower() == Consts.Roles.SupportAdmin && !string.IsNullOrEmpty(user.CompanyId))
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany })
+                    || _permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester })
+                    && !string.IsNullOrEmpty(user.CompanyId))
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found"); 
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
                     if (result == null && result?.CompanyId != user.CompanyId)
                     {
                         throw new AccessException();
@@ -448,7 +457,14 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            var statuses = await _requestStatusRepository.GetAsync();
+            var users = _cache.Get<IEnumerable<AzureUser>>(Consts.Cache.UsersKey)
+                .Join(statuses, user => user.StatusId, status => status.Id, (user, status) =>
+                {
+                    user.RequestStatus = status;
+                    return user;
+                }).ToList();
+
             var searchedUsers = users.GetByParameters(filter, sorting);
             searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
 
