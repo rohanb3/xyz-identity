@@ -42,6 +42,11 @@
             {
                 public const string PermissionForRead = "xyzies.reconciliation.web.orderlist";
             }
+
+            public class NotificationEmail
+            {
+                public const string PermissionForCreate = "xyzies.notification.email.create";
+            }
         }
         public class IndentityApi
         {
