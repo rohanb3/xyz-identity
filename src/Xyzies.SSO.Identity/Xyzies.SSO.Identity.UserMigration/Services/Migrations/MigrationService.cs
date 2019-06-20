@@ -165,7 +165,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         .Where(user => !string.IsNullOrEmpty(user.Email))
                         .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
-                else if(lastUserMigration != null)
+                else if (lastUserMigration != null)
                 {
                     users = users
                         .Where(user => user.CreatedDate > lastUserMigration.CreatedOn || user.ModifiedDate > lastUserMigration.CreatedOn);
@@ -188,8 +188,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                     {
                         var companyBranches = branchesByCompanies.FirstOrDefault(branchGroup => branchGroup.Key == user.CompanyId);
                         PrepeareUserProperties(user, rolesList, statusesList, companyBranches);
+                        var adaptedUser = user.Adapt<AzureUser>();
 
-                        await _azureClient.PostUser(user.Adapt<AzureUser>());
+                        adaptedUser.StatusId = statusesList.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Id;
+
+                        await _azureClient.PostUser(adaptedUser);
                         HandleUserProperties(usersState, usersCity, user);
 
                         _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
@@ -239,6 +242,20 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 _logger.LogInformation($"Role filled, {user.DisplayName}");
             }
         }
+
+        public async Task FillNullStatusWithApproved()
+        {
+            _logger.LogInformation("Filling default statuses started");
+            var users = (await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin })).Result.Where(user => user.StatusId == null);
+            var approvedStatus = await _requestStatusesRepository.GetByAsync(status => status.Name.ToLower().Contains("approved"));
+            foreach (var user in users)
+            {
+                await _azureClient.PatchUser(user.ObjectId, new AzureUser { StatusId = approvedStatus.Id });
+                _logger.LogInformation($"Status filled, {user.DisplayName}");
+            }
+            _logger.LogInformation("Filling default statuses finished");
+        }
+
         public async Task SetAllEmailsToLowerCase(MigrationOptions options)
         {
             var users = await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin });

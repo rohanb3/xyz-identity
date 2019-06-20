@@ -45,12 +45,16 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         public string City { get; set; }
 
         public string State { get; set; }
+        public RequestStatus RequestStatus { get; set; }
 
         [JsonProperty(Consts.CompanyIdPropertyName)]
         public string CompanyId { get; set; }
 
         [JsonProperty(Consts.CPUserIdPropertyName)]
         public int? CPUserId { get; set; }
+
+        [JsonProperty(Consts.StatudIdPropertyName)]
+        public Guid? StatusId { get; set; }
 
         public string CompanyName { get; set; }
 

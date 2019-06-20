@@ -31,6 +31,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly ILocaltionService _localtionService;
         private readonly IRelationService _httpService = null;
         private readonly IRoleRepository _roleRepository = null;
+        private readonly IRequestStatusRepository _requestStatusRepository = null;
         private readonly IPermissionService _permissionService = null;
         private readonly string _projectUrl;
 
@@ -42,6 +43,8 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="localtionService"></param>
         /// <param name="httpService"></param>
         /// <param name="roleRepository"></param>
+        /// <param name="permissionService"></param>
+        /// <param name="requestStatusRepository"></param>
         /// <param name="options"></param>
         public UserService(IAzureAdClient azureClient,
             IMemoryCache cache,
@@ -49,6 +52,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             IRelationService httpService,
             IRoleRepository roleRepository,
             IPermissionService permissionService,
+            IRequestStatusRepository requestStatusRepository,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ??
@@ -63,6 +67,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(roleRepository));
             _permissionService = permissionService ??
                throw new ArgumentNullException(nameof(permissionService));
+            _requestStatusRepository = requestStatusRepository ??
+               throw new ArgumentNullException(nameof(requestStatusRepository));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
         }
@@ -80,6 +86,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <inheritdoc />
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
+            await _permissionService.CheckPermissionExpiration();
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
             {
                 return await GetUsers(filter, sorting);
@@ -451,7 +458,14 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
-            var users = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            var statuses = await _requestStatusRepository.GetAsync();
+            var users = _cache.Get<IEnumerable<AzureUser>>(Consts.Cache.UsersKey)
+                .Join(statuses, user => user.StatusId, status => status.Id, (user, status) =>
+                {
+                    user.RequestStatus = status;
+                    return user;
+                }).ToList();
+
             var searchedUsers = users.GetByParameters(filter, sorting);
             searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
 

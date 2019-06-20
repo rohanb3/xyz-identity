@@ -41,6 +41,7 @@ namespace Xyzies.SSO.Identity.Services.Mapping
 
             TypeAdapterConfig<User, AzureUser>.NewConfig()
                .Map(dest => dest.CPUserId, src => src.Id)
+               .Map(dest => dest.StatusId, src => src.UserStatusKey)
                .Map(dest => dest.DisplayName, src => ReplaceNullOrEmpty($"{src.Name ?? ""} {src.LastName ?? ""}".Trim()))
                .Map(dest => dest.Surname, src => src.LastName)
                .Map(dest => dest.GivenName, src => src.Name)
