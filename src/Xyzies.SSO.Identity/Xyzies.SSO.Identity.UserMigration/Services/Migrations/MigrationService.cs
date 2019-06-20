@@ -32,6 +32,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private readonly IRelationService _relationService;
         private readonly ILogger _logger;
 
+        private readonly string TestPostfix = ".test";
+
         public MigrationService(
             ILogger<MigrationService> logger,
             IAzureAdClient azureClient,
@@ -131,6 +133,29 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 await _userService.UpdateUserByIdAsync(user.ObjectId, user.Adapt<BaseProfile>());
 
                 _logger.LogInformation($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
+            }
+        }
+
+        public async Task RemoveAllUsersFromCP(MigrationOptions options)
+        {
+            var users = await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin });
+
+            var usersList = users.Result.Where(user => user.CPUserId != null).Skip(options.Offset ?? 0).Take(options.Limit ?? users.Result.Count());
+
+            foreach (var user in usersList)
+            {
+                try
+                { 
+                    if (!user.Email.EndsWith(TestPostfix))
+                    {
+                        await _azureClient.DeleteUser(user.ObjectId);
+                        _logger.LogInformation("User deleted {userName}", user.DisplayName);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError("Error {message}", ex.Message);
+                }
             }
         }
 
@@ -439,6 +464,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             user.IsActive = IsUserActive(user, statuses);
 
             user.BranchId = GetUserBranch(user, companyBranches);
+
+            if (!user.Email.EndsWith(TestPostfix))
+            {
+                user.Email += TestPostfix;
+            }
         }
 
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>
