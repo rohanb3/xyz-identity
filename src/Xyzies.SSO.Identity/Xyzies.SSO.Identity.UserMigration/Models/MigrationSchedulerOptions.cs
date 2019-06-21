@@ -10,5 +10,6 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Models
         public int UsersLimit { get; set; }
         [DefaultValue(true)]
         public bool Enabled { get; set; }
+        public string MigrationPostfix { get; set; }
     }
 }

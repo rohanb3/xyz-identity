@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,13 +33,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private readonly IRelationService _relationService;
         private readonly ILogger _logger;
 
-        private readonly string TestPostfix = ".test";
+        private readonly string _migrationPostfix;
 
         public MigrationService(
             ILogger<MigrationService> logger,
             IAzureAdClient azureClient,
             IRoleRepository roleRepository,
             ICpUsersRepository cpUsersRepository,
+            IOptionsMonitor<MigrationSchedulerOptions> optionsMonitor,
             IRequestStatusRepository requestStatusesRepository,
             IUserService userService,
             IRelationService relationService,
@@ -56,6 +58,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
             _userMigrationHistoryRepository = userMigrationHistoryRepository ?? throw new ArgumentNullException(nameof(userMigrationHistoryRepository));
+            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix ?? throw new ArgumentNullException(nameof(_migrationPostfix));
         }
 
         [Obsolete("Will be deleted")]
@@ -145,14 +148,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             foreach (var user in usersList)
             {
                 try
-                { 
-                    if (!user.Email.EndsWith(TestPostfix))
+                {
+                    if (!user.Email.EndsWith(_migrationPostfix))
                     {
                         await _azureClient.DeleteUser(user.ObjectId);
                         _logger.LogInformation("User deleted {userName}", user.DisplayName);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError("Error {message}", ex.Message);
                 }
@@ -465,9 +468,9 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
             user.BranchId = GetUserBranch(user, companyBranches);
 
-            if (!user.Email.EndsWith(TestPostfix))
+            if (!string.IsNullOrEmpty(_migrationPostfix) && !user.Email.EndsWith(_migrationPostfix))
             {
-                user.Email += TestPostfix;
+                user.Email += _migrationPostfix;
             }
         }
 
