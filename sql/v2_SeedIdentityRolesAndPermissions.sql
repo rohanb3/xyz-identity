@@ -118,13 +118,12 @@ values
     ('ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9', 8, 'AccountAdmin', NULL, getdate(), 0),--8 
     ('da671d01-1133-4cc9-94a6-b77587f21fad', 9, 'OperationAdmin', NULL, getdate(), 0),--9 
     ('4d6de41d-bfdb-4a68-8988-017c2a4ce2af', 10, 'Role #10', NULL, getdate(), 0),--10
-    ('af16483d-9c81-4443-84d6-a976e54fbfa9', 11, 'Role #11', NULL, getdate(), 0),--11
+    ('af16483d-9c81-4443-84d6-a976e54fbfa9', 11, 'SAM', NULL, getdate(), 0),--11
     ('1727f429-580a-4d6b-b3fe-bce0ebbbd210', 12, 'Role #12', NULL, getdate(), 0),--12
     ('13e75147-0736-45db-bf34-d3b0aebdeafe', 13, 'Role #13', NULL, getdate(), 0),--13
     ('d47fd2ad-46ce-4173-8689-88573aa9ffac', 14, 'Role #14', NULL, getdate(), 0),--14
     ('1e0b4f66-d15e-4366-994a-5bba45db1540', 15, 'Role #15', NULL, getdate(), 0),--15
     ('b2669957-2b49-460b-9074-3a68aa075c12', 16, 'Role #16', NULL, getdate(), 0),--16
-    ('92b1d474-8764-4363-bf7c-05d8f0520bce', 18, 'SAM', NULL, getdate(), 0),--18 
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0 
 
 
@@ -206,7 +205,7 @@ values
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --ReadAllUsers for AccountAdmin
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --ReadAllUsers for OperationAdmin
 	
-	('415b2993-7e32-4859-8b59-2b527bcdeea2', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --ReadAllUsers for SAM
+	/('415b2993-7e32-4859-8b59-2b527bcdeea2', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --ReadAllUsers for SAM
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'a98dc9cb-7847-4858-8693-5fd11b24b58c'), --ReadAllUsers for Anonymous
 
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -217,8 +216,8 @@ values
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --DisputeAdmin for operation admin
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DisputeAdmin for account admin
 
-    ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --DisputeSam for SAM
-    ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --OutDisputeAdmin for SAM
+    /('bea8223a-dd34-477a-ae9b-ff6537a84d6f', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --DisputeSam for SAM
+    /('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --OutDisputeAdmin for SAM
 	('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --OutDisputeAdmin for system admin
 
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'da671d01-1133-4cc9-94a6-b77587f21fad'),  --OrderManager for operation admin
@@ -227,7 +226,7 @@ values
 
     ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for system admin
 
-	('489b2156-6cb3-4d76-b5a4-c13776b82421', '92b1d474-8764-4363-bf7c-05d8f0520bce'),  --OrderManager for SAM
+	/('489b2156-6cb3-4d76-b5a4-c13776b82421', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),  --OrderManager for SAM
 
 ---------------------------------------------------------------------------------------------------------------------------------------
     ('415b2993-7e32-4859-8b59-2b527bcdeea1', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--TemplatesFull policy for operation admin
@@ -256,7 +255,7 @@ values
     ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'a89d3c96-5f4d-475f-8588-08e1523feffb'),--ReviewsAdminLogin policies for SalesRep
 
     ('b695018c-c264-4246-9e33-9dce90f338c2', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--VspOperatorLogin policies for supportadmin
-    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--RecontiliationLogin policies for SAM
+    /('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),--RecontiliationLogin policies for SAM
     ('b695018c-c264-4246-9e33-9dce90f338c2', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--VspOperatorLogin policies for Superviser
 
 ----------------------- Devices  -------------------------------------------------------
