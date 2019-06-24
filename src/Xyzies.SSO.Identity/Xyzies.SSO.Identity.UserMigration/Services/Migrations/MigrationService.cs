@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,11 +33,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private readonly IRelationService _relationService;
         private readonly ILogger _logger;
 
+        private readonly string _migrationPostfix;
+
         public MigrationService(
             ILogger<MigrationService> logger,
             IAzureAdClient azureClient,
             IRoleRepository roleRepository,
             ICpUsersRepository cpUsersRepository,
+            IOptionsMonitor<MigrationSchedulerOptions> optionsMonitor,
             IRequestStatusRepository requestStatusesRepository,
             IUserService userService,
             IRelationService relationService,
@@ -54,6 +58,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
             _userMigrationHistoryRepository = userMigrationHistoryRepository ?? throw new ArgumentNullException(nameof(userMigrationHistoryRepository));
+            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix ?? throw new ArgumentNullException(nameof(_migrationPostfix));
         }
 
         [Obsolete("Will be deleted")]
@@ -134,6 +139,29 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
         }
 
+        public async Task RemoveAllUsersFromCP(MigrationOptions options)
+        {
+            var users = await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin });
+
+            var usersList = users.Result.Where(user => user.CPUserId != null).Skip(options.Offset ?? 0).Take(options.Limit ?? users.Result.Count());
+
+            foreach (var user in usersList)
+            {
+                try
+                {
+                    if (!user.Email.EndsWith(_migrationPostfix))
+                    {
+                        await _azureClient.DeleteUser(user.ObjectId);
+                        _logger.LogInformation("User deleted {userName}", user.DisplayName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Error {message}", ex.Message);
+                }
+            }
+        }
+
         public async Task MigrateCPToAzureAsync(MigrationOptions options)
         {
             try
@@ -165,7 +193,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         .Where(user => !string.IsNullOrEmpty(user.Email))
                         .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
                 }
-                else if(lastUserMigration != null)
+                else if (lastUserMigration != null)
                 {
                     users = users
                         .Where(user => user.CreatedDate > lastUserMigration.CreatedOn || user.ModifiedDate > lastUserMigration.CreatedOn);
@@ -188,8 +216,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                     {
                         var companyBranches = branchesByCompanies.FirstOrDefault(branchGroup => branchGroup.Key == user.CompanyId);
                         PrepeareUserProperties(user, rolesList, statusesList, companyBranches);
+                        var adaptedUser = user.Adapt<AzureUser>();
 
-                        await _azureClient.PostUser(user.Adapt<AzureUser>());
+                        adaptedUser.StatusId = statusesList.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Id;
+
+                        await _azureClient.PostUser(adaptedUser);
                         HandleUserProperties(usersState, usersCity, user);
 
                         _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
@@ -239,6 +270,20 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 _logger.LogInformation($"Role filled, {user.DisplayName}");
             }
         }
+
+        public async Task FillNullStatusWithApproved()
+        {
+            _logger.LogInformation("Filling default statuses started");
+            var users = (await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin })).Result.Where(user => user.StatusId == null);
+            var approvedStatus = await _requestStatusesRepository.GetByAsync(status => status.Name.ToLower().Contains("approved"));
+            foreach (var user in users)
+            {
+                await _azureClient.PatchUser(user.ObjectId, new AzureUser { StatusId = approvedStatus.Id });
+                _logger.LogInformation($"Status filled, {user.DisplayName}");
+            }
+            _logger.LogInformation("Filling default statuses finished");
+        }
+
         public async Task SetAllEmailsToLowerCase(MigrationOptions options)
         {
             var users = await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin });
@@ -422,6 +467,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             user.IsActive = IsUserActive(user, statuses);
 
             user.BranchId = GetUserBranch(user, companyBranches);
+
+            if (!string.IsNullOrEmpty(_migrationPostfix) && !user.Email.EndsWith(_migrationPostfix))
+            {
+                user.Email += _migrationPostfix;
+            }
         }
 
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>

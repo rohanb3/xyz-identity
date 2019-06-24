@@ -75,6 +75,8 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
 
                     Task.WaitAll(tasks.ToArray());
 
+                    await migrationService.FillNullStatusWithApproved();
+
                     lock (_lock)
                     {
                         userMigrationHistoryRepository.AddAsync(new UserMigrationHistory() { CreatedOn = DateTime.UtcNow }).Wait();

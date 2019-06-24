@@ -86,6 +86,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <inheritdoc />
         public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
         {
+            await _permissionService.CheckPermissionExpiration();
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
             {
                 return await GetUsers(filter, sorting);
