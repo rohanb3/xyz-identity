@@ -45,6 +45,8 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         public string City { get; set; }
 
         public string State { get; set; }
+
+        [JsonIgnore]
         public RequestStatus RequestStatus { get; set; }
 
         [JsonProperty(Consts.CompanyIdPropertyName)]
