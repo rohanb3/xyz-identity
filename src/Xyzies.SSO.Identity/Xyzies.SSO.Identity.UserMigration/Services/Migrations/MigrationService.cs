@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,11 +33,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private readonly IRelationService _relationService;
         private readonly ILogger _logger;
 
+        private readonly string _migrationPostfix;
+
         public MigrationService(
             ILogger<MigrationService> logger,
             IAzureAdClient azureClient,
             IRoleRepository roleRepository,
             ICpUsersRepository cpUsersRepository,
+            IOptionsMonitor<MigrationSchedulerOptions> optionsMonitor,
             IRequestStatusRepository requestStatusesRepository,
             IUserService userService,
             IRelationService relationService,
@@ -54,6 +58,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
             _userMigrationHistoryRepository = userMigrationHistoryRepository ?? throw new ArgumentNullException(nameof(userMigrationHistoryRepository));
+            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix ?? throw new ArgumentNullException(nameof(_migrationPostfix));
         }
 
         [Obsolete("Will be deleted")]
@@ -131,6 +136,29 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 await _userService.UpdateUserByIdAsync(user.ObjectId, user.Adapt<BaseProfile>());
 
                 _logger.LogInformation($"User updated, {user.GivenName} {user.Surname} {user.Role ?? "NULL ROLE!!!"}");
+            }
+        }
+
+        public async Task RemoveAllUsersFromCP(MigrationOptions options)
+        {
+            var users = await _userService.GetAllUsersAsync(new UserIdentityParams { Role = Consts.Roles.OperationsAdmin });
+
+            var usersList = users.Result.Where(user => user.CPUserId != null).Skip(options.Offset ?? 0).Take(options.Limit ?? users.Result.Count());
+
+            foreach (var user in usersList)
+            {
+                try
+                {
+                    if (!user.Email.EndsWith(_migrationPostfix))
+                    {
+                        await _azureClient.DeleteUser(user.ObjectId);
+                        _logger.LogInformation("User deleted {userName}", user.DisplayName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Error {message}", ex.Message);
+                }
             }
         }
 
@@ -439,6 +467,11 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             user.IsActive = IsUserActive(user, statuses);
 
             user.BranchId = GetUserBranch(user, companyBranches);
+
+            if (!string.IsNullOrEmpty(_migrationPostfix) && !user.Email.EndsWith(_migrationPostfix))
+            {
+                user.Email += _migrationPostfix;
+            }
         }
 
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>

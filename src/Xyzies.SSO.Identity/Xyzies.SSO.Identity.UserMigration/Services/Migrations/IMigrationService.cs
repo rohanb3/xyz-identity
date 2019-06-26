@@ -13,6 +13,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         Task UpdateUserActivityStatus(MigrationOptions options = null);
         Task FillNullRolesWithAnonymous();
         Task FillNullStatusWithApproved();
+        Task RemoveAllUsersFromCP(MigrationOptions options);
         Task SetAllEmailsToLowerCase(MigrationOptions options);
         Task MigrateAzureToCPAsync();
         /// <summary>
