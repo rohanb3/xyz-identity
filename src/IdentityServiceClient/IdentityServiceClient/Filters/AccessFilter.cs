@@ -47,7 +47,7 @@ namespace IdentityServiceClient.Filters
                 }
                 if (hasPermissionResultList.All(x => !x))
                 {
-                    context.Result = new ContentResult { StatusCode = 403 };
+                    context.Result = new ContentResult { StatusCode = 403, Content = $"You don't have any permission" };
                 }
                 else
                 {
