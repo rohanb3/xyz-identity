@@ -6,10 +6,10 @@
     <Company>Ardas</Company>
     <Description>This is the library that contains the client to use Identity Service</Description>
     <PackageTags>Core;IdentityService;VSP</PackageTags>
-    <Version>1.2.2</Version>
+    <Version>1.2.2.4</Version>
     <PackageReleaseNotes>Remove all for testing, stable version</PackageReleaseNotes>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
-    <FileVersion>1.2.2.0</FileVersion>
+    <AssemblyVersion>1.2.2.4</AssemblyVersion>
+    <FileVersion>1.2.2.4</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -249,7 +249,16 @@ namespace IdentityServiceClient.Service
                 SetAuthHeader(client, token);
                 var request = new HttpRequestMessage(HttpMethod.Head,
                     $"{_options.ServiceUrl}/{Const.IndentityApi.RoleEntity}?{GenerateQueryString(scopes.ToList(), "scope")}&role={role}");
-                var response = await client.SendAsync(request);
+                HttpResponseMessage response = new HttpResponseMessage();
+                try
+                {
+                    response = await client.SendAsync(request);
+                }
+                catch(Exception ex)
+                {
+                    return false;
+                }
+
                 return response.StatusCode == HttpStatusCode.OK;
             }
         }
