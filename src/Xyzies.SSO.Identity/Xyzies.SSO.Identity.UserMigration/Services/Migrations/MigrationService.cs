@@ -477,7 +477,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private bool IsUserActive(User user, IEnumerable<RequestStatus> statuses) =>
             user.IsActive == true && user.IsDeleted != true && (statuses.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Name.ToLower().Contains("approved") ?? false);
         private Guid? GetUserBranch(User user, IEnumerable<BranchModel> companyBranches) =>
-            user.BranchId.HasValue ? user.BranchId : companyBranches.FirstOrDefault()?.Id;
+            user.BranchId.HasValue ? user.BranchId : companyBranches?.FirstOrDefault()?.Id;
         #endregion
     }
 }
