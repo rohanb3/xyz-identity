@@ -36,7 +36,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Permission
                 {
                     if (roleModel.Policies.FirstOrDefault(policy => policy.Scopes.FirstOrDefault(s => s.ScopeName == scope) != null) == null)
                     {
-                        _logger.LogInformation($"Not fpund scope by policy");
+                        _logger.LogInformation($"Not found scope by policy");
                         return false;
                     };
                 }
