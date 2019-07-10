@@ -55,32 +55,14 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
                 {
                     var migrationService = serviceScope.ServiceProvider.GetService<IMigrationService>();
                     var cpUserRepository = serviceScope.ServiceProvider.GetService<ICpUsersRepository>();
-                    var userMigrationHistoryRepository = serviceScope.ServiceProvider.GetService<IUserMigrationHistoryRepository>();
 
                     var users = await cpUserRepository.GetAsync();
-
-                    var tasks = new List<Task>();
-                    var offset = 0;
                     var totalUsers = users.Count();
 
                     _logger.LogInformation($"Total users cout from CP: {totalUsers}");
-
-                    do
-                    {
-                        tasks.Add(migrationService.MigrateCPToAzureAsync(new MigrationOptions() { Limit = _options.UsersLimit, Offset = offset }));
-                        _logger.LogInformation($"Fetch started with params: limit - {_options.UsersLimit}, offset - {offset}");
-
-                        offset += _options.UsersLimit;
-                    } while (offset < totalUsers);
-
-                    Task.WaitAll(tasks.ToArray());
+                    await migrationService.MigrateCPToAzureAsync();
 
                     await migrationService.FillNullStatusWithApproved();
-
-                    lock (_lock)
-                    {
-                        userMigrationHistoryRepository.AddAsync(new UserMigrationHistory() { CreatedOn = DateTime.UtcNow }).Wait();
-                    }
 
                     _logger.LogInformation("All fetches ended");
 

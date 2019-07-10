@@ -19,10 +19,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
     {
         private readonly string _publicApiUrl = null;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="options"></param>
+        /// <inheritdoc />
         public RelationService(IOptionsMonitor<ServiceOption> options)
         {
             _publicApiUrl = options.CurrentValue?.PublicApiUrl ??
@@ -66,6 +63,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             return GetPublicApiResponse<List<BranchModel>>(responseString);
         }
 
+        /// <inheritdoc />
         public async Task<List<BranchModel>> GetBranchesTrustedAsync()
         {
             var uri = new Uri($"{_publicApiUrl}/branch/{Consts.Security.StaticToken}/trusted");
@@ -73,6 +71,16 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
 
             return GetPublicApiResponse<List<BranchModel>>(responseString);
         }
+
+        /// <inheritdoc />
+        public async Task<List<CompanyModel>> GetCompaniesTrustedAsync()
+        {
+            var uri = new Uri($"{_publicApiUrl}/company/{Consts.Security.StaticToken}/trusted");
+            var responseString = await SendGetRequest(uri);
+
+            return GetPublicApiResponse<List<CompanyModel>>(responseString);
+        }
+
         #region Helpers
         private T GetPublicApiResponse<T>(string responseString)
         {
