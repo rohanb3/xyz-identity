@@ -224,7 +224,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                                 _azureClient.PostUser(adaptedUser).Wait();
                                 HandleUserProperties(usersState, usersCity, user);
 
-                                _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
+                                _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                             }
                             catch (Exception ex)
                             {
@@ -236,7 +236,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                                     _azureClient.PatchUser(existUser.ObjectId, adaptedUser).GetAwaiter().GetResult();
                                     HandleUserProperties(usersState, usersCity, user);
 
-                                    _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options.Offset}");
+                                    _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                 }
                             }
                         }
