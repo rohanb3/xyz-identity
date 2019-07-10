@@ -9,7 +9,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
     {
         Task FillSuperAdminsWithDefaultBranches(string token, MigrationOptions options = null);
         Task ReplaceRoleIdWithRoleName();
-        Task MigrateCPToAzureAsync(MigrationOptions options);
+        Task MigrateCPToAzureAsync(MigrationOptions options = null);
         Task UpdateUserActivityStatus(MigrationOptions options = null);
         Task FillNullRolesWithAnonymous();
         Task FillNullStatusWithApproved();

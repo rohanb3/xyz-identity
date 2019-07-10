@@ -25,7 +25,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <param name="token"></param>
         /// <param name="filters"></param>
         /// <returns></returns>
-        Task<List<CompanyModel>> GetCompanies(string token,CompanyFilters filters= null);
+        Task<List<CompanyModel>> GetCompanies(string token, CompanyFilters filters = null);
 
         /// <summary>
         /// Get branch by id
@@ -48,5 +48,10 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <returns></returns>
         Task<List<BranchModel>> GetBranchesTrustedAsync();
 
+        /// <summary>
+        /// Get companies by trusted token
+        /// </summary>
+        /// <returns></returns>
+        Task<List<CompanyModel>> GetCompaniesTrustedAsync();
     }
 }

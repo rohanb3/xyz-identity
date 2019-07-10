@@ -15,23 +15,26 @@ namespace IdentityServiceClient.Filters
     {
         public string[] Scopes { get; set; }
         public IIdentityManager _manager;
-        
+
         public AccessFilter(params string[] scopes)
         {
             Scopes = scopes;
         }
 
-
         public void OnActionExecuted(ActionExecutedContext context)
         {
         }
-        
+
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             _manager = context.HttpContext.RequestServices.GetService<IIdentityManager>();
             var bearerToken = (context.HttpContext.Request.Headers[Const.Auth.AuthHeader]).ToString();
             var hasPermissionResultList = new List<bool>();
-            if (!string.IsNullOrEmpty(bearerToken))
+            if (string.IsNullOrEmpty(bearerToken))
+            {
+                context.Result = new ContentResult { StatusCode = 401 };
+            }
+            else
             {
                 bearerToken = bearerToken.Substring(Const.Auth.BearerToken.Length);
                 var handler = new JwtSecurityTokenHandler();
@@ -42,18 +45,14 @@ namespace IdentityServiceClient.Filters
                     var scopesForOneRole = scope.Split(',');
                     hasPermissionResultList.Add(await _manager.HasPermission(role, scopesForOneRole));
                 }
-                if (hasPermissionResultList.All(x => !x)) 
+                if (hasPermissionResultList.All(x => !x))
                 {
-                    context.Result = new ContentResult { StatusCode = 403 };
+                    context.Result = new ContentResult { StatusCode = 403, Content = $"You don't have any permission" };
                 }
                 else
                 {
                     await next();
                 }
-            }
-            else
-            {
-                context.Result = new ContentResult { StatusCode = 403 };
             }
         }
     }
