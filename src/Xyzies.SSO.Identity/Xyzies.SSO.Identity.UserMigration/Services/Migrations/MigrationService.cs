@@ -182,19 +182,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 IEnumerable<IGrouping<int?, BranchModel>> branchesByCompanies;
                 IList<RequestStatus> statusesList;
 
-                if (options?.Emails?.Length > 0)
-                {
-                    users = users
-                            .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower()));
-                }
-                else
-                {
-                    users = users
-                           .Where(user => IsUserActive(user, statuses) &&
-                           user.CompanyId.HasValue &&
-                           companiesIds.Contains(user.CompanyId.Value));
-                }
-
                 users = users.Count() == 0 ? users : users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
 
                 lock (_lock)
@@ -204,6 +191,20 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                     rolesList = roles.ToList();
                     statusesList = statuses.ToList();
                 }
+
+                if (options?.Emails?.Length > 0)
+                {
+                    usersList = usersList
+                            .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower())).ToList();
+                }
+                else
+                {
+                    usersList = usersList
+                           .Where(user => IsUserActive(user, statusesList) &&
+                           user.CompanyId.HasValue &&
+                           companiesIds.Contains(user.CompanyId.Value)).ToList();
+                }
+
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
 
                 Parallel.ForEach(chunks, (chunk) =>
