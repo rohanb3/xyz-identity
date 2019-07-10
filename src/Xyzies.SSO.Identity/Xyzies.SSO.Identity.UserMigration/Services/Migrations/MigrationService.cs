@@ -59,7 +59,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
             _userMigrationHistoryRepository = userMigrationHistoryRepository ?? throw new ArgumentNullException(nameof(userMigrationHistoryRepository));
-            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix ?? throw new ArgumentNullException(nameof(_migrationPostfix));
+            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix;
             _migrationChunk = optionsMonitor?.CurrentValue?.UsersLimit ?? throw new ArgumentNullException(nameof(_migrationChunk));
         }
 
