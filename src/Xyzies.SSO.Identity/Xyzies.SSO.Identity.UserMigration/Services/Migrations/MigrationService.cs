@@ -228,15 +228,22 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                             }
                             catch (Exception ex)
                             {
-                                if (ex.Message.ToLower().Contains("user already exist"))
+                                try
                                 {
-                                    var existUser = _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == user.Email.ToLower()).GetAwaiter().GetResult();
-                                    var adaptedUser = user.Adapt<AzureUser>();
+                                    if (ex.Message.ToLower().Contains("user already exist"))
+                                    {
+                                        var existUser = _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == user.Email.ToLower()).GetAwaiter().GetResult();
+                                        var adaptedUser = user.Adapt<AzureUser>();
 
-                                    _azureClient.PatchUser(existUser.ObjectId, adaptedUser).GetAwaiter().GetResult();
-                                    HandleUserProperties(usersState, usersCity, user);
+                                        _azureClient.PatchUser(existUser.ObjectId, adaptedUser).GetAwaiter().GetResult();
+                                        HandleUserProperties(usersState, usersCity, user);
 
-                                    _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
+                                        _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
+                                    }
+                                }
+                                catch (Exception patchEx)
+                                {
+                                    _logger.LogInformation($"{patchEx}");
                                 }
                             }
                         }
