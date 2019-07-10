@@ -52,7 +52,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Migrate([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string[] emails)
         {
-            await _migrationService.MigrateCPToAzureAsync(new UserMigration.Models.MigrationOptions { Limit = limit, Offset = offset, Emails = emails });
+            await _migrationService.MigrateCPToAzureAsync();
             return Ok();
         }
 
