@@ -7,7 +7,7 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
 {
     public class AzureUser
     {
-        public string CreationType { get; set; }
+        public virtual string CreationType { get; set; }
 
         public List<SignInName> SignInNames { get; set; }
 
