@@ -206,11 +206,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 }
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
-                List<User> usersToMigrate = new List<User>();
                 Parallel.ForEach(chunks, (chunk) =>
                 {
                     {
-                        usersToMigrate = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
+                        List<User> usersToMigrate = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
                         _logger.LogInformation($"YEEEE Count of users to migrate-{usersToMigrate.Count}");
                         _logger.LogInformation($"YEEEE Emails of users to migrate-{string.Join(",", usersToMigrate.Select(x => x.Email))}");
 
