@@ -245,6 +245,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                                         _logger.LogInformation($"{patchEx}");
                                     }
                                 }
+                                else
+                                {
+                                    _logger.LogInformation($"CANNOT CREATE, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} exception - {ex.Message}");
+                                }
                             }
                         }
                     };
