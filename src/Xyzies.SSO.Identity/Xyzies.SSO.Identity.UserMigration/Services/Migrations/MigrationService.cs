@@ -204,10 +204,9 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                            user.CompanyId.HasValue &&
                            companiesIds.Contains(user.CompanyId.Value)).ToList();
                 }
-                _logger.LogInformation($"NAMES of Users from cp, {string.Join(", ", usersList.Select(x => x.Name))}");
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
-
+                TestingFunction(chunks, usersList);
                 Parallel.ForEach(chunks, (chunk) =>
                 {
                     {
@@ -279,6 +278,22 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 await _userMigrationHistoryRepository.AddAsync(new UserMigrationHistory { CreatedOn = DateTime.UtcNow });
                 await _userService.SetUsersCache();
             }
+        }
+
+        private void TestingFunction(List<int> chunks, IList<User> users)
+        {
+            var resultedUsers = new List<User>();
+            Parallel.ForEach(chunks, (chunk) =>
+            {
+                users = users.Skip(chunk).Take(_migrationChunk.Value).ToList();
+                foreach (var user in users)
+                {
+                    resultedUsers.Add(user);
+                }
+            });
+            _logger.LogInformation($"TESTING FUNCTION RESULT- result users count - {resultedUsers.Count}... incoming users count = {users.Count}");
+            _logger.LogInformation($"TESTING FUNCTION RESULT- result users names - {string.Join(",", resultedUsers.Select(x => x.Name))}... incoming users names = {string.Join(",", users.Select(x => x.Name))}");
+
         }
 
         public async Task FillNullRolesWithAnonymous()
