@@ -59,8 +59,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
             _cpRoleRepository = cpRoleRepository ?? throw new ArgumentNullException(nameof(cpRoleRepository));
             _userMigrationHistoryRepository = userMigrationHistoryRepository ?? throw new ArgumentNullException(nameof(userMigrationHistoryRepository));
-            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix ?? throw new ArgumentNullException(nameof(_migrationPostfix));
-            _migrationChunk = optionsMonitor?.CurrentValue?.UsersLimit;
+            _migrationPostfix = optionsMonitor?.CurrentValue?.MigrationPostfix;
+            _migrationChunk = optionsMonitor?.CurrentValue?.UsersLimit ?? throw new ArgumentNullException(nameof(_migrationChunk));
         }
 
         [Obsolete("Will be deleted")]
@@ -177,10 +177,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 var branches = await _relationService.GetBranchesTrustedAsync();
                 var companiesIds = (await _relationService.GetCompaniesTrustedAsync()).Select(x => x.Id).ToList();
 
-                IList<User> usersList;
-                IList<Role> rolesList;
+                List<User> usersList;
+                List<Role> rolesList;
                 IEnumerable<IGrouping<int?, BranchModel>> branchesByCompanies;
-                IList<RequestStatus> statusesList;
+                List<RequestStatus> statusesList;
 
                 users = users.Count() == 0 ? users : users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
 
@@ -206,21 +206,19 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 }
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
-
                 Parallel.ForEach(chunks, (chunk) =>
                 {
                     {
-                        usersList = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
-                        foreach (var user in usersList)
+                        List<User> usersToMigrate = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
+
+                        foreach (var user in usersToMigrate)
                         {
                             try
                             {
                                 var companyBranches = branchesByCompanies.FirstOrDefault(branchGroup => branchGroup.Key == user.CompanyId);
                                 PrepeareUserProperties(user, rolesList, statusesList, companyBranches);
                                 var adaptedUser = user.Adapt<AzureUser>();
-
                                 adaptedUser.StatusId = statusesList.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Id;
-
                                 _azureClient.PostUser(adaptedUser).Wait();
                                 HandleUserProperties(usersState, usersCity, user);
 
@@ -228,9 +226,9 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                             }
                             catch (Exception ex)
                             {
-                                try
+                                if (ex.Message.ToLower().Contains("user already exist"))
                                 {
-                                    if (ex.Message.ToLower().Contains("user already exist"))
+                                    try
                                     {
                                         var existUser = _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == user.Email.ToLower()).GetAwaiter().GetResult();
                                         var adaptedUser = user.Adapt<AzureUser>();
@@ -240,10 +238,14 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
                                         _logger.LogInformation($"User updated, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                     }
+                                    catch (Exception patchEx)
+                                    {
+                                        _logger.LogInformation($"{patchEx}");
+                                    }
                                 }
-                                catch (Exception patchEx)
+                                else
                                 {
-                                    _logger.LogInformation($"{patchEx}");
+                                    _logger.LogInformation($"CANNOT CREATE, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} exception - {ex.Message}");
                                 }
                             }
                         }
