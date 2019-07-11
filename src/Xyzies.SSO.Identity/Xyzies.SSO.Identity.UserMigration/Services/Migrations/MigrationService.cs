@@ -204,6 +204,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                            user.CompanyId.HasValue &&
                            companiesIds.Contains(user.CompanyId.Value)).ToList();
                 }
+                _logger.LogInformation($"NAMES of Users from cp, {string.Join(", ", usersList.Select(x => x.Name))}");
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
 
@@ -215,12 +216,15 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         {
                             try
                             {
+
                                 var companyBranches = branchesByCompanies.FirstOrDefault(branchGroup => branchGroup.Key == user.CompanyId);
                                 PrepeareUserProperties(user, rolesList, statusesList, companyBranches);
                                 var adaptedUser = user.Adapt<AzureUser>();
-
                                 adaptedUser.StatusId = statusesList.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Id;
-
+                                if (user.Email.Contains("kek"))
+                                {
+                                    _logger.LogInformation($"ALERTALERTALERT Kekov here");
+                                }
                                 _logger.LogInformation($"TO POST, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                 _azureClient.PostUser(adaptedUser).Wait();
                                 _logger.LogInformation($"POSTED, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
