@@ -206,12 +206,15 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 }
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
-                TestingFunction(chunks, usersList);
+                List<User> usersToMigrate = new List<User>();
                 Parallel.ForEach(chunks, (chunk) =>
                 {
                     {
-                        usersList = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
-                        foreach (var user in usersList)
+                        usersToMigrate = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
+                        _logger.LogInformation($"YEEEE Count of users to migrate-{usersToMigrate.Count}");
+                        _logger.LogInformation($"YEEEE Emails of users to migrate-{string.Join(",", usersToMigrate.Select(x => x.Email))}");
+
+                        foreach (var user in usersToMigrate)
                         {
                             try
                             {
@@ -278,22 +281,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 await _userMigrationHistoryRepository.AddAsync(new UserMigrationHistory { CreatedOn = DateTime.UtcNow });
                 await _userService.SetUsersCache();
             }
-        }
-
-        private void TestingFunction(List<int> chunks, List<User> users)
-        {
-            var resultedUsers = new List<User>();
-            Parallel.ForEach(chunks, (chunk) =>
-            {
-                users = users.Skip(chunk).Take(_migrationChunk.Value).ToList();
-                foreach (var user in users)
-                {
-                    resultedUsers.Add(user);
-                }
-            });
-            _logger.LogInformation($"TESTING FUNCTION RESULT- result users count - {resultedUsers.Count}... incoming users count = {users.Count}");
-            _logger.LogInformation($"TESTING FUNCTION RESULT- result users names - {string.Join(",", resultedUsers.Select(x => x.Name))}... incoming users names = {string.Join(",", users.Select(x => x.Name))}");
-
         }
 
         public async Task FillNullRolesWithAnonymous()
