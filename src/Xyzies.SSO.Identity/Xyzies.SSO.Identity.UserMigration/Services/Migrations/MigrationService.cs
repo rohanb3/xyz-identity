@@ -221,7 +221,9 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
                                 adaptedUser.StatusId = statusesList.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Id;
 
+                                _logger.LogInformation($"TO POST, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                 _azureClient.PostUser(adaptedUser).Wait();
+                                _logger.LogInformation($"POSTED, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                 HandleUserProperties(usersState, usersCity, user);
 
                                 _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
