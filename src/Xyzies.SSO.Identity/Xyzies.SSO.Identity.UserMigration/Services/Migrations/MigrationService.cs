@@ -210,25 +210,16 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 {
                     {
                         List<User> usersToMigrate = usersList.Skip(chunk).Take(_migrationChunk.Value).ToList();
-                        _logger.LogInformation($"YEEEE Count of users to migrate-{usersToMigrate.Count}");
-                        _logger.LogInformation($"YEEEE Emails of users to migrate-{string.Join(",", usersToMigrate.Select(x => x.Email))}");
 
                         foreach (var user in usersToMigrate)
                         {
                             try
                             {
-
                                 var companyBranches = branchesByCompanies.FirstOrDefault(branchGroup => branchGroup.Key == user.CompanyId);
                                 PrepeareUserProperties(user, rolesList, statusesList, companyBranches);
                                 var adaptedUser = user.Adapt<AzureUser>();
                                 adaptedUser.StatusId = statusesList.FirstOrDefault(status => status.Id == user.UserStatusKey)?.Id;
-                                if (user.Email.Contains("kek"))
-                                {
-                                    _logger.LogInformation($"ALERTALERTALERT Kekov here");
-                                }
-                                _logger.LogInformation($"TO POST, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                 _azureClient.PostUser(adaptedUser).Wait();
-                                _logger.LogInformation($"POSTED, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
                                 HandleUserProperties(usersState, usersCity, user);
 
                                 _logger.LogInformation($"New user, {user.Name} {user.LastName} {user.Role ?? "NULL ROLE!!!"} offset {options?.Offset}");
