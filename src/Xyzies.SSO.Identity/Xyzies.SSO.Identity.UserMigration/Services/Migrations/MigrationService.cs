@@ -177,10 +177,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 var branches = await _relationService.GetBranchesTrustedAsync();
                 var companiesIds = (await _relationService.GetCompaniesTrustedAsync()).Select(x => x.Id).ToList();
 
-                IList<User> usersList;
-                IList<Role> rolesList;
+                List<User> usersList;
+                List<Role> rolesList;
                 IEnumerable<IGrouping<int?, BranchModel>> branchesByCompanies;
-                IList<RequestStatus> statusesList;
+                List<RequestStatus> statusesList;
 
                 users = users.Count() == 0 ? users : users.Skip(options?.Offset ?? 0).Take(options?.Limit ?? users.Count());
 
@@ -280,7 +280,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
         }
 
-        private void TestingFunction(List<int> chunks, IList<User> users)
+        private void TestingFunction(List<int> chunks, List<User> users)
         {
             var resultedUsers = new List<User>();
             Parallel.ForEach(chunks, (chunk) =>
