@@ -195,7 +195,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 if (options?.Emails?.Length > 0)
                 {
                     usersList = usersList
-                            .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email.ToLower())).ToList();
+                            .Where(user => options.Emails.Select(email => email.ToLower()).Contains(user.Email?.ToLower())).ToList();
                 }
                 else
                 {
