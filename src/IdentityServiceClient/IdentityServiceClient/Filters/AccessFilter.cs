@@ -7,14 +7,16 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace IdentityServiceClient.Filters
 {
     public class AccessFilter : Attribute, IAsyncActionFilter
     {
-        public string Scopes { get; set; }
+        public string[] Scopes { get; set; }
         public IIdentityManager _manager;
-        public AccessFilter(string scopes)
+
+        public AccessFilter(params string[] scopes)
         {
             Scopes = scopes;
         }
@@ -22,30 +24,36 @@ namespace IdentityServiceClient.Filters
         public void OnActionExecuted(ActionExecutedContext context)
         {
         }
-        
+
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             _manager = context.HttpContext.RequestServices.GetService<IIdentityManager>();
             var bearerToken = (context.HttpContext.Request.Headers[Const.Auth.AuthHeader]).ToString();
-            if (!string.IsNullOrEmpty(bearerToken))
+            var hasPermissionResultList = new List<bool>();
+            if (string.IsNullOrEmpty(bearerToken))
+            {
+                context.Result = new ContentResult { StatusCode = 401 };
+            }
+            else
             {
                 bearerToken = bearerToken.Substring(Const.Auth.BearerToken.Length);
                 var handler = new JwtSecurityTokenHandler();
                 var tokenS = handler.ReadJwtToken(bearerToken);
                 var role = tokenS.Claims.FirstOrDefault(claim => claim.Type == Const.Permissions.RoleClaimType)?.Value;
-                var scopes = Scopes.Split(',');
-                var hashPermission = await _manager.HasPermission(role, scopes);
-                if (!hashPermission)
+                foreach (var scope in Scopes)
                 {
-                    context.Result = new ContentResult { StatusCode = 403 };
+                    var scopesForOneRole = scope.Split(',');
+                    hasPermissionResultList.Add(await _manager.HasPermission(role, scopesForOneRole));
+                }
+                if (hasPermissionResultList.All(x => !x))
+                {
+                    context.Result = new ContentResult { StatusCode = 403, Content = $"You don't have any permission" };
+                }
+                else
+                {
+                    await next();
                 }
             }
-            else
-            {
-                context.Result = new ContentResult { StatusCode = 403 };
-            }
-
-            await next();
         }
     }
 }

@@ -60,6 +60,12 @@ namespace Xyzies.SSO.Identity.Services.Service
         private static List<AzureUser> GetFiltered(this List<AzureUser> users, UserFilteringParams filters)
         {
             UserFilters condition = null;
+
+            if (!string.IsNullOrEmpty(filters.Status))
+            {
+                condition += (AzureUser user) => FilterUserByStatus(user, filters.Status);
+            }
+
             if (filters.Role != null && filters.Role.Any())
             {
                 condition += (AzureUser user) => filters.Role.Select(role => role.ToLower()).Contains(user.Role?.ToLower());
@@ -67,12 +73,12 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (filters.State != null && filters.State.Any())
             {
-                condition += (AzureUser user) => filters.State.Select(role => role.ToLower()).Contains(user.State?.ToLower());
+                condition += (AzureUser user) => filters.State.Select(state => state.ToLower()).Contains(user.State?.ToLower());
             }
 
             if (filters.City != null && filters.City.Any())
             {
-                condition += (AzureUser user) => filters.City.Select(role => role.ToLower()).Contains(user.City?.ToLower());
+                condition += (AzureUser user) => filters.City.Select(city => city.ToLower()).Contains(user.City?.ToLower());
             }
 
             if (filters.UserName != null)
@@ -92,7 +98,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             if (filters.BranchesId != null && filters.BranchesId.Any())
             {
-                condition += (AzureUser user) => user.BranchId.HasValue ? filters.BranchesId.Contains(user.BranchId.Value) : true;
+                condition += (AzureUser user) => user.BranchId.HasValue ? filters.BranchesId.Contains(user.BranchId.Value) : false;
             }
 
             if (condition != null)
@@ -112,6 +118,19 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
             }
             return true;
+        }
+
+        private static bool FilterUserByStatus(AzureUser user, string status)
+        {
+            switch (status)
+            {
+                case Consts.UserStatuses.Active:
+                    return user.RequestStatus?.Name?.ToLower() == Consts.UserStatuses.CPActiveUserStatus && user.AccountEnabled == true;
+                case Consts.UserStatuses.Disabled:
+                    return user.RequestStatus?.Name?.ToLower() != Consts.UserStatuses.CPActiveUserStatus || user.AccountEnabled == false;
+                default:
+                    throw new ArgumentException("Unknown status", nameof(status));
+            }
         }
     }
 }

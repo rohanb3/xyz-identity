@@ -25,7 +25,6 @@ using Xyzies.SSO.Identity.Services.Middleware;
 using Xyzies.SSO.Identity.Services.Service.Roles;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Helpers;
-
 using Xyzies.SSO.Identity.UserMigration;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,15 +33,24 @@ using Xyzies.SSO.Identity.Mailer;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 using Ardas.AspNetCore.Logging;
+using Microsoft.Extensions.Hosting;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
+using Xyzies.SSO.Identity.CPUserMigration.Models;
 
 namespace Xyzies.SSO.Identity.API
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public class Startup
     {
+        private readonly string _identityEnvironmentName = "IdentityEnvironment";
+        private readonly string _identityEnvironment = null;
+        private readonly string _identityTestEnvironment = "test";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _identityEnvironment = Environment.GetEnvironmentVariable(_identityEnvironmentName);
         }
 
         public IConfiguration Configuration { get; }
@@ -91,7 +99,10 @@ namespace Xyzies.SSO.Identity.API
                 options.Providers.Add<GzipCompressionProvider>();
             });
 
-            services.AddTcpStreamLogging(options => Configuration.Bind("Logstash", options));
+            if (_identityEnvironment?.ToLower() != _identityTestEnvironment.ToLower())
+            {
+                services.AddTcpStreamLogging(options => Configuration.Bind("Logstash", options));
+            }
 
             services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
             services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
@@ -115,7 +126,7 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
-
+            
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -137,6 +148,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddHostedService<MigrationScheduler>();
             services.AddUserMigrationService();
             #endregion
 
@@ -144,6 +156,7 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
             services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
+            services.Configure<MigrationSchedulerOptions>(Configuration.GetSection("MigrationsScheduler"));
 
             services.AddSwaggerGen(options =>
             {
@@ -210,7 +223,7 @@ namespace Xyzies.SSO.Identity.API
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
                 userService.SetUsersCache().Wait();
             }
-
+            
             app.UseAuthentication()
                 .UseProcessClaims()
                 .UseHealthChecks("/healthz")
@@ -219,7 +232,7 @@ namespace Xyzies.SSO.Identity.API
                 .UseMvc()
                 .UseSwagger(options =>
                 {
-                    options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = "/api/identity/");
+                    //options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = "/api/identity/");
                     options.RouteTemplate = "/swagger/{documentName}/swagger.json";
                 })
                 .UseSwaggerUI(uiOptions =>

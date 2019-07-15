@@ -17,6 +17,7 @@ using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi;
 using Xyzies.SSO.Identity.Data.Core;
 using static Xyzies.SSO.Identity.Data.Helpers.Consts;
+using Mapster;
 
 namespace Xyzies.SSO.Identity.Data.Repository.Azure
 {
@@ -75,7 +76,8 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
 
         public async Task PatchUser(string id, AzureUser user)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+            var userToUpdate = user.Adapt<AzureUserToPatch>();
+            var content = new StringContent(JsonConvert.SerializeObject(userToUpdate), Encoding.UTF8, "application/json");
             var response = await SendRequest(HttpMethod.Patch, Consts.GraphApi.UserEntity, content, id);
             if (!response.IsSuccessStatusCode)
             {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -241,16 +242,37 @@ namespace IdentityServiceClient.Service
             }
         }
 
-        public async Task<bool> HasPermission(string role, string[] scopes)
+        public async Task<bool> HasPermission(string role, string[] scopes, string token = null)
         {
             using (HttpClient client = new HttpClient())
             {
-                SetAuthHeader(client);
+                SetAuthHeader(client, token);
                 var request = new HttpRequestMessage(HttpMethod.Head,
                     $"{_options.ServiceUrl}/{Const.IndentityApi.RoleEntity}?{GenerateQueryString(scopes.ToList(), "scope")}&role={role}");
-                var response = await client.SendAsync(request);
+                HttpResponseMessage response = new HttpResponseMessage();
+                try
+                {
+                    response = await client.SendAsync(request);
+                }
+                catch(Exception ex)
+                {
+                    return false;
+                }
+
                 return response.StatusCode == HttpStatusCode.OK;
             }
+        }
+
+        public async Task<bool> HasAccess(string token, string[] scopes)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            var role = jwtToken.Claims.FirstOrDefault(claim => claim.Type == Const.Permissions.RoleClaimType)?.Value;
+            return await HasPermission(role, scopes);
         }
 
         private string GenerateQueryString(List<string> values, string parameter)
@@ -263,9 +285,16 @@ namespace IdentityServiceClient.Service
             return query;
         }
 
-        private void SetAuthHeader(HttpClient client)
+        private void SetAuthHeader(HttpClient client, string token = null)
         {
-            client.DefaultRequestHeaders.Add("Authorization", $"{Context.Request.Headers["Authorization"]}");
+            if (token != null)
+            {
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", token);
+            }
+            else
+            {
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"{Context.Request.Headers["Authorization"]}");
+            }
         }
     }
 }

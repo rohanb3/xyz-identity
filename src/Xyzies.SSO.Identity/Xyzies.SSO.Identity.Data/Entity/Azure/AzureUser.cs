@@ -7,7 +7,7 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
 {
     public class AzureUser
     {
-        public string CreationType { get; set; }
+        public virtual string CreationType { get; set; }
 
         public List<SignInName> SignInNames { get; set; }
 
@@ -46,11 +46,17 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
 
         public string State { get; set; }
 
+        [JsonIgnore]
+        public RequestStatus RequestStatus { get; set; }
+
         [JsonProperty(Consts.CompanyIdPropertyName)]
         public string CompanyId { get; set; }
 
         [JsonProperty(Consts.CPUserIdPropertyName)]
         public int? CPUserId { get; set; }
+
+        [JsonProperty(Consts.StatudIdPropertyName)]
+        public Guid? StatusId { get; set; }
 
         public string CompanyName { get; set; }
 

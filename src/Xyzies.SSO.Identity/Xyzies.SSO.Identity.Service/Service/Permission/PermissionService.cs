@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,29 +14,36 @@ namespace Xyzies.SSO.Identity.Services.Service.Permission
     {
         private readonly IMemoryCache _memoryCache;
         private readonly IRoleService _roleService;
+        private readonly ILogger<PermissionService> _logger = null;
 
-        public PermissionService(IMemoryCache memoryCache, IRoleService roleService)
+        public PermissionService(IMemoryCache memoryCache, 
+            IRoleService roleService,
+            ILogger<PermissionService> logger)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _roleService = roleService ?? throw new ArgumentNullException(nameof(roleService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public bool CheckPermission(string role, string[] scopes)
         {
             var roles = _memoryCache.Get<List<RoleModel>>(Consts.Cache.PermissionKey);
             var roleModel = roles.FirstOrDefault(r => r.RoleName.ToLower() == role.ToLower());
-
             if (roleModel != null)
             {
+                _logger.LogInformation($"RoleName{roleModel.RoleName}");
                 foreach (var scope in scopes)
                 {
                     if (roleModel.Policies.FirstOrDefault(policy => policy.Scopes.FirstOrDefault(s => s.ScopeName == scope) != null) == null)
                     {
+                        _logger.LogInformation($"Not found scope by policy");
                         return false;
                     };
                 }
+                _logger.LogInformation($"Has permission");
                 return true;
             }
+            _logger.LogInformation($"Role is null");
             return false;
         }
 
