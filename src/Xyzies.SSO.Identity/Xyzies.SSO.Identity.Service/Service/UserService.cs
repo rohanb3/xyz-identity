@@ -33,6 +33,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IRoleRepository _roleRepository = null;
         private readonly IRequestStatusRepository _requestStatusRepository = null;
         private readonly IPermissionService _permissionService = null;
+        private readonly ICpUsersRepository _cpUsersRep = null;
         private readonly string _projectUrl;
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             IRoleRepository roleRepository,
             IPermissionService permissionService,
             IRequestStatusRepository requestStatusRepository,
+            ICpUsersRepository cpUsersRep,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
             _azureClient = azureClient ??
@@ -63,6 +65,8 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(cache));
             _httpService = httpService ??
                 throw new ArgumentNullException(nameof(httpService));
+            _cpUsersRep = cpUsersRep ??
+                throw new ArgumentNullException(nameof(cpUsersRep));
             _roleRepository = roleRepository ??
                 throw new ArgumentNullException(nameof(roleRepository));
             _permissionService = permissionService ??
@@ -240,6 +244,15 @@ namespace Xyzies.SSO.Identity.Services.Service
                 userToChange.PasswordPolicies = Consts.PasswordPolicy.DisablePasswordExpirationAndStrong;
 
                 await _azureClient.PatchUser(userToChange.ObjectId, userToChange);
+                if (userToChange.CPUserId.HasValue)
+                {
+                    var cpUser = await _cpUsersRep.GetByAsync(x => x.Id == userToChange.CPUserId);
+                    if (cpUser != null)
+                    {
+                        cpUser.Password = password;
+                        await _cpUsersRep.UpdateAsync(cpUser);
+                    }
+                }
 
                 usersInCache.RemoveAll(user => user.ObjectId == userToChange.ObjectId);
                 usersInCache.Add(userToChange);

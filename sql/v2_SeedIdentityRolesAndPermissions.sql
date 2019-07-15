@@ -294,12 +294,12 @@ values
 ------------------------- History  -------------------------------------------------------
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--HistoryBase for AccountAdmin
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryBase for OperationAdmin
-	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--HistoryBase for OperationAdmin
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--HistoryBase for Operation Assistant
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryBase for SystemAdmin
 	
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--HistoryAdmin for AccountAdmin
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryAdmin for OperationAdmin
-	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryAdmin for OperationAdmin
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--HistoryAdmin for Operation Assistant
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryAdmin for SystemAdmin
 
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--HistoryBase for Supervisor
@@ -308,7 +308,7 @@ values
 ----------------------- Notification  -------------------------------------------------------
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--NotificationBase for AccountAdmin
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--NotificationBase for OperationAdmin
-	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--NotificationBase for OperationAdmin
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--NotificationBase for Operation Assistant
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--NotificationBase for SystemAdmin
 	
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--NotificationBase for Supervisor
