@@ -238,7 +238,7 @@ namespace Xyzies.SSO.Identity.API
                 .UseSwaggerUI(uiOptions =>
                 {
                     uiOptions.SwaggerEndpoint("v1/swagger.json", $"v1.0.0");
-                    //uiOptions.RoutePrefix = "/api/identity";
+                    ////uiOptions.RoutePrefix = "/api/identity";
                     uiOptions.DisplayRequestDuration();
                 });
 
