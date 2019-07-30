@@ -36,7 +36,7 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
         {
             try
             {
-                _dependency = new SqlTableDependency<User>(_connectionString, _tableName);
+                _dependency = new SqlTableDependency<User>(_connectionString, _tableName, includeOldValues: true);
                 _dependency.OnChanged += OnChange;
                 _dependency.Start();
                 _logger.LogInformation($"Subscribe to Cable Portal DB");
@@ -49,8 +49,9 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
 
         public async void OnChange(object sender, RecordChangedEventArgs<User> e)
         {
-           _logger.LogInformation($"User - {e.Entity.Email} starting migration by trigger, event - {e.ChangeType.ToString()}");
-            await _migrationService.MigrateByTrigger(e.ChangeType, e.Entity);
+            _logger.LogInformation($"User - {e.Entity.Email} starting migration by trigger, event - {e.ChangeType.ToString()}");
+            var wasPasswordChanged = e.Entity.Password != e.EntityOldValues.Password;
+            await _migrationService.MigrateByTrigger(e.ChangeType, e.Entity, wasPasswordChanged);
         }
     }
 }

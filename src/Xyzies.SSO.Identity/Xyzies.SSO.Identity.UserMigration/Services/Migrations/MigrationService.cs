@@ -279,7 +279,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
         }
 
-        public async Task MigrateByTrigger(ChangeType type, User entity)
+        public async Task MigrateByTrigger(ChangeType type, User entity, bool passwordWasChanged)
         {
             try
             {
@@ -323,25 +323,9 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         return;
                     }
                     var adaptedUser = entity.Adapt<AzureUser>();
-                    var userToUpdate = new AzureUser { ObjectId = existUser.ObjectId };
-                    var adaptedExistsUser = existUser.Adapt<AzureUser>();
-                    var wasPasswordChanged = true;
-                    foreach (var field in entity.GetType().GetProperties())
-                    {
-                        var newValue = adaptedUser.GetType().GetProperty(field.Name)?.GetValue(adaptedUser);
-                        var oldValue = adaptedExistsUser.GetType().GetProperty(field.Name)?.GetValue(adaptedExistsUser);
+                    adaptedUser.PasswordProfile.Password = passwordWasChanged ? entity.Password : null;
 
-                        if (oldValue != newValue && field.Name != nameof(User.Password) && field.Name != nameof(User.Email))
-                        {
-                            userToUpdate.GetType().GetProperty(field.Name)?.SetValue(userToUpdate, newValue);
-                            wasPasswordChanged = false;
-                        }
-                    }
-                    if (wasPasswordChanged)
-                    {
-                        userToUpdate.PasswordProfile.Password = entity.Password;
-                    }
-                    await _azureClient.PatchUser(existUser.ObjectId, userToUpdate);
+                    await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
 
                     if (!string.IsNullOrWhiteSpace(entity.State))
                     {
@@ -353,7 +337,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         await _locationService.SetState(entity.City);
                     }
 
-                    _userService.UpdateUserInCache(userToUpdate);
+                    _userService.UpdateUserInCache(adaptedUser);
                     _logger.LogInformation($"User updated, {entity.Name} {entity.LastName} {entity.Role ?? "NULL ROLE!!!"}");
                 }
 

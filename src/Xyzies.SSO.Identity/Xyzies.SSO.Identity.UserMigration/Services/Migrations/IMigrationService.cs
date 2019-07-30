@@ -18,7 +18,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         Task RemoveAllUsersFromCP(MigrationOptions options);
         Task SetAllEmailsToLowerCase(MigrationOptions options);
         Task MigrateAzureToCPAsync();
-        Task MigrateByTrigger(ChangeType type, User entity);
+        Task MigrateByTrigger(ChangeType type, User entity, bool passwordWasChanged);
         /// <summary>
         /// Change role from operator to support admin
         /// </summary>
