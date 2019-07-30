@@ -16,14 +16,16 @@ namespace Xyzies.SSO.Identity.Services.Service
         Task<Profile> GetUserBy(Func<AzureUser, bool> predicate);
         Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds = null, UserSortingParameters sorting = null, LazyLoadParameters lazyParameters = null);
         Task UpdateUserByIdAsync(string id, BaseProfile model);
-        Task<Profile> CreateUserAsync(ProfileCreatable model, string token);
+        Task<Profile> CreateUserAsync(ProfileCreatable model, string token = null);
         Task DeleteUserByIdAsync(string id);
         Task SetUsersCache();
         Task UploadAvatar(string userId, AvatarModel avatarModel);
         Task DeleteAvatar(string userId);
         Task<FileModel> GetAvatar(string userId);
         Task UpdateUserPasswordAsync(string userMail, string password);
+        void UpdateUserInCache(AzureUser model);
 
+        Task<List<AzureUser>> GetAllUsersFromAzure();
         Task<ProfileSecure> GetOwnProfile(string userId);
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -37,6 +37,7 @@ using Microsoft.Extensions.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -145,7 +146,8 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
-            services.AddScoped<IRelationService, RelationService>();
+            services.AddScoped<ISqlDependencyMigration, SqlDependencyMigration>();
+            services.AddSingleton<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddHostedService<MigrationScheduler>();
@@ -157,6 +159,7 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
             services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
             services.Configure<MigrationSchedulerOptions>(Configuration.GetSection("MigrationsScheduler"));
+            services.Configure<MigrationSettings>(Configuration.GetSection("ConnectionStrings"));
 
             services.AddSwaggerGen(options =>
             {

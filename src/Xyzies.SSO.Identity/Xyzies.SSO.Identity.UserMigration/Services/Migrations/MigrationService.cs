@@ -1,11 +1,14 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TableDependency.SqlClient.Base.Enums;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
@@ -168,6 +171,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         {
             try
             {
+
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
 
@@ -176,6 +180,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 var statuses = await _requestStatusesRepository.GetAsync();
                 var branches = await _relationService.GetBranchesTrustedAsync();
                 var companiesIds = (await _relationService.GetCompaniesTrustedAsync()).Select(x => x.Id).ToList();
+                var azureUsers = await _userService.GetAllUsersFromAzure();
 
                 List<User> usersList;
                 List<Role> rolesList;
@@ -206,6 +211,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 }
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
+                var toPatch = GetUsersToPatch(usersList, azureUsers.ToList()); ;
                 Parallel.ForEach(chunks, (chunk) =>
                 {
                     {
@@ -271,6 +277,134 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 await _userMigrationHistoryRepository.AddAsync(new UserMigrationHistory { CreatedOn = DateTime.UtcNow });
                 await _userService.SetUsersCache();
             }
+        }
+
+        public async Task MigrateByTrigger(ChangeType type, User entity)
+        {
+            try
+            {
+                if (type == ChangeType.Insert)
+                {
+                    entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
+                    if (existUser != null)
+                    {
+                        _logger.LogInformation($"User {entity.Email} was inserted in Cable Portal, but was found in Azure");
+                        return;
+                    }
+                    var roles = (await _roleRepository.GetAsync()).ToList();
+                    var companyBranches = await _relationService.GetBranchesByCompanyTrustedAsync(entity.CompanyId.Value);
+                    var statuses = (await _requestStatusesRepository.GetAsync()).ToList();
+
+                    PrepeareUserProperties(entity, roles, statuses, companyBranches);
+                    await _azureClient.PostUser(entity.Adapt<AzureUser>());
+
+                    if (!string.IsNullOrWhiteSpace(entity.State))
+                    {
+                        await _locationService.SetState(entity.State);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(entity.City))
+                    {
+                        await _locationService.SetState(entity.City);
+                    }
+
+                    _userService.UpdateUserInCache(entity.Adapt<AzureUser>());
+                    _logger.LogInformation($"New user, {entity.Name} {entity.LastName} {entity.Role ?? "NULL ROLE!!!"}");
+                }
+
+                if (type == ChangeType.Update)
+                {
+                    entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
+                    if (existUser == null)
+                    {
+                        _logger.LogInformation($"User {entity.Email} was updated in Cable Portal, but was not found in Azure");
+                        return;
+                    }
+                    var adaptedUser = entity.Adapt<AzureUser>();
+                    var userToUpdate = new AzureUser { ObjectId = existUser.ObjectId };
+                    var adaptedExistsUser = existUser.Adapt<AzureUser>();
+                    var wasPasswordChanged = true;
+                    foreach (var field in entity.GetType().GetProperties())
+                    {
+                        var newValue = adaptedUser.GetType().GetProperty(field.Name)?.GetValue(adaptedUser);
+                        var oldValue = adaptedExistsUser.GetType().GetProperty(field.Name)?.GetValue(adaptedExistsUser);
+
+                        if (oldValue != newValue && field.Name != nameof(User.Password) && field.Name != nameof(User.Email))
+                        {
+                            userToUpdate.GetType().GetProperty(field.Name)?.SetValue(userToUpdate, newValue);
+                            wasPasswordChanged = false;
+                        }
+                    }
+                    if (wasPasswordChanged)
+                    {
+                        userToUpdate.PasswordProfile.Password = entity.Password;
+                    }
+                    await _azureClient.PatchUser(existUser.ObjectId, userToUpdate);
+
+                    if (!string.IsNullOrWhiteSpace(entity.State))
+                    {
+                        await _locationService.SetState(entity.State);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(entity.City))
+                    {
+                        await _locationService.SetState(entity.City);
+                    }
+
+                    _userService.UpdateUserInCache(userToUpdate);
+                    _logger.LogInformation($"User updated, {entity.Name} {entity.LastName} {entity.Role ?? "NULL ROLE!!!"}");
+                }
+
+                if (type == ChangeType.Delete)
+                {
+                    entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
+                    await _userService.DeleteUserByIdAsync(existUser.ObjectId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Cannot {type.ToString()} user {entity.Email} exception - {ex.Message}");
+            }
+        }
+
+        private List<User> GetUsersToAdd(List<User> cpUsers, List<Profile> azureUsers)
+        {
+            return cpUsers.Where(x => !azureUsers.Select(u => u.CPUserId).Contains(x.Id)).ToList();
+        }
+
+        private List<AzureUser> GetUsersToPatch(List<User> cpUsers, List<AzureUser> azureUsers)
+        {
+            var patchUsers = new List<AzureUser>();
+            foreach (var cpUser in cpUsers)
+            {
+                var azureUser = azureUsers.FirstOrDefault(x => x.CPUserId == cpUser.Id);
+                var adaptedCpUser = cpUser.Adapt<AzureUser>();
+                if (azureUser != null)
+                {
+                    var isChanged = false;
+                    var fields = adaptedCpUser.GetType().GetProperties();
+                    var user = new AzureUser();
+                    user.ObjectId = azureUser.ObjectId;
+                    foreach (var field in fields)
+                    {
+                        var cpValue = field.GetValue(adaptedCpUser);
+                        var azureVal = field.GetValue(azureUser);
+                        if (cpValue != azureVal)
+                        {
+                            user.GetType().GetProperty(field.Name).SetValue(user, cpValue);
+                            isChanged = true;
+                        }
+                    }
+                    if (isChanged)
+                    {
+                        patchUsers.Add(user);
+                    }
+                }
+            }
+            return patchUsers;
         }
 
         public async Task FillNullRolesWithAnonymous()
