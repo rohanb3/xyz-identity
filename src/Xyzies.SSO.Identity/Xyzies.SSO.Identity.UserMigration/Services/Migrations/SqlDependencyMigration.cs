@@ -25,7 +25,7 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
         private string _connectionString;
         private string _tableName = "TWC_Users";
 
-        public SqlDependencyMigration(IMigrationService migrationService, ILogger logger, IOptionsMonitor<MigrationSettings> options)
+        public SqlDependencyMigration(IMigrationService migrationService, ILogger<SqlDependencyMigration> logger, IOptionsMonitor<MigrationSettings> options)
         {
             _migrationService = migrationService;
             _connectionString = options.CurrentValue?.CpDb;
