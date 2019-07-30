@@ -314,8 +314,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
                 if (type == ChangeType.Update)
                 {
-                    entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower()
+                                                                   || u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower() + _migrationPostfix);
                     if (existUser == null)
                     {
                         _logger.LogInformation($"User {entity.Email} was updated in Cable Portal, but was not found in Azure");
