@@ -211,7 +211,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 }
 
                 var chunks = GetChunks(usersList.Count, _migrationChunk);
-                var toPatch = GetUsersToPatch(usersList, azureUsers.ToList()); ;
                 Parallel.ForEach(chunks, (chunk) =>
                 {
                     {
@@ -283,6 +282,10 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         {
             try
             {
+                var roles = (await _roleRepository.GetAsync()).ToList();
+                var companyBranches = await _relationService.GetBranchesByCompanyTrustedAsync(entity.CompanyId.Value);
+                var statuses = (await _requestStatusesRepository.GetAsync()).ToList();
+
                 if (type == ChangeType.Insert)
                 {
                     entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
@@ -292,10 +295,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         _logger.LogInformation($"User {entity.Email} was inserted in Cable Portal, but was found in Azure");
                         return;
                     }
-                    var roles = (await _roleRepository.GetAsync()).ToList();
-                    var companyBranches = await _relationService.GetBranchesByCompanyTrustedAsync(entity.CompanyId.Value);
-                    var statuses = (await _requestStatusesRepository.GetAsync()).ToList();
-
                     PrepeareUserProperties(entity, roles, statuses, companyBranches);
                     await _azureClient.PostUser(entity.Adapt<AzureUser>());
 
@@ -322,6 +321,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                         _logger.LogInformation($"User {entity.Email} was updated in Cable Portal, but was not found in Azure");
                         return;
                     }
+                    PrepeareUserProperties(entity, roles, statuses, companyBranches);
                     var adaptedUser = entity.Adapt<AzureUser>();
                     adaptedUser.PasswordProfile.Password = passwordWasChanged ? entity.Password : null;
 
@@ -357,38 +357,6 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         private List<User> GetUsersToAdd(List<User> cpUsers, List<Profile> azureUsers)
         {
             return cpUsers.Where(x => !azureUsers.Select(u => u.CPUserId).Contains(x.Id)).ToList();
-        }
-
-        private List<AzureUser> GetUsersToPatch(List<User> cpUsers, List<AzureUser> azureUsers)
-        {
-            var patchUsers = new List<AzureUser>();
-            foreach (var cpUser in cpUsers)
-            {
-                var azureUser = azureUsers.FirstOrDefault(x => x.CPUserId == cpUser.Id);
-                var adaptedCpUser = cpUser.Adapt<AzureUser>();
-                if (azureUser != null)
-                {
-                    var isChanged = false;
-                    var fields = adaptedCpUser.GetType().GetProperties();
-                    var user = new AzureUser();
-                    user.ObjectId = azureUser.ObjectId;
-                    foreach (var field in fields)
-                    {
-                        var cpValue = field.GetValue(adaptedCpUser);
-                        var azureVal = field.GetValue(azureUser);
-                        if (cpValue != azureVal)
-                        {
-                            user.GetType().GetProperty(field.Name).SetValue(user, cpValue);
-                            isChanged = true;
-                        }
-                    }
-                    if (isChanged)
-                    {
-                        patchUsers.Add(user);
-                    }
-                }
-            }
-            return patchUsers;
         }
 
         public async Task FillNullRolesWithAnonymous()
