@@ -39,8 +39,9 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
                 _dependency = new SqlTableDependency<User>(_connectionString, _tableName);
                 _dependency.OnChanged += OnChange;
                 _dependency.Start();
+                _logger.LogInformation($"Subscribe to Cable Portal DB");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogInformation($"Subscribe failed - {ex.Message}");
             }
@@ -48,6 +49,7 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
 
         public async void OnChange(object sender, RecordChangedEventArgs<User> e)
         {
+           _logger.LogInformation($"User - {e.Entity.Email} starting migration by trigger, event - {e.ChangeType.ToString()}");
             await _migrationService.MigrateByTrigger(e.ChangeType, e.Entity);
         }
     }
