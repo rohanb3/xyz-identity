@@ -289,32 +289,25 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 if (type == ChangeType.Insert)
                 {
                     entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
-                    _logger.LogInformation($"Try to find User {entity.Email} in Azure");
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email.ToLower());
                     if (existUser != null)
                     {
                         _logger.LogInformation($"User {entity.Email} was inserted in Cable Portal, but was found in Azure");
                         return;
                     }
-                    _logger.LogInformation($"Start Prepeare User {entity.Email}");
                     PrepeareUserProperties(entity, roles, statuses, companyBranches);
-                    _logger.LogInformation($"User {entity.Email} Prepeared");
                     var insertedUser = await _azureClient.PostUser(entity.Adapt<AzureUser>());
-                    _logger.LogInformation($"User {entity.Email} inserted");
 
                     if (!string.IsNullOrWhiteSpace(entity.State))
                     {
-                    _logger.LogInformation($"Set User {entity.Email} state");
                         await _locationService.SetState(entity.State);
                     }
 
                     if (!string.IsNullOrWhiteSpace(entity.City))
                     {
-                    _logger.LogInformation($"Set User {entity.Email} city");
                         await _locationService.SetState(entity.City);
                     }
 
-                    _logger.LogInformation($"Set User {entity.Email} to cache");
                     _userService.UpdateUserInCache(insertedUser);
                     _logger.LogInformation($"New user, {entity.Name} {entity.LastName} {entity.Role ?? "NULL ROLE!!!"}");
                 }
