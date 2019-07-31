@@ -323,8 +323,12 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                     }
                     PrepeareUserProperties(entity, roles, statuses, companyBranches);
                     var adaptedUser = entity.Adapt<AzureUser>();
-                    adaptedUser.PasswordProfile.Password = passwordWasChanged ? entity.Password : null;
+                    if (!passwordWasChanged)
+                    {
+                        adaptedUser.PasswordProfile = null;
 
+                    }
+                    adaptedUser.SignInNames = null;
                     await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
 
                     if (!string.IsNullOrWhiteSpace(entity.State))
@@ -345,13 +349,13 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 {
                     entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
                     var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
-                    if(existUser == null)
+                    if (existUser == null)
                     {
                         _logger.LogInformation($"User {entity.Email} was deleted from Cable Portal, but was not found in Azure");
                         return;
                     }
                     await _userService.DeleteUserByIdAsync(existUser.ObjectId);
-                   _logger.LogInformation($"User {entity.Email} was deleted");
+                    _logger.LogInformation($"User {entity.Email} was deleted");
                 }
             }
             catch (Exception ex)
