@@ -348,7 +348,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 if (type == ChangeType.Delete)
                 {
                     entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower()
+                                                                   || u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
                     if (existUser == null)
                     {
                         _logger.LogInformation($"User {entity.Email} was deleted from Cable Portal, but was not found in Azure");
