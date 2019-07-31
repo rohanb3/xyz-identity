@@ -289,7 +289,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 if (type == ChangeType.Insert)
                 {
                     entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email.ToLower());
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email.ToLower()
+                                                                   || u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower() + _migrationPostfix);
                     if (existUser != null)
                     {
                         _logger.LogInformation($"User {entity.Email} was inserted in Cable Portal, but was found in Azure");
@@ -314,8 +315,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
 
                 if (type == ChangeType.Update)
                 {
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower()
-                                                                   || u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower() + _migrationPostfix);
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower()
+                                                                   || u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower() + _migrationPostfix);
                     if (existUser == null)
                     {
                         _logger.LogInformation($"User {entity.Email} was updated in Cable Portal, but was not found in Azure");
@@ -348,8 +349,8 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 if (type == ChangeType.Delete)
                 {
                     entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
-                    var existUser = await _userService.GetUserBy(u => u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower()
-                                                                   || u.SignInNames.FirstOrDefault(name => name.Type == "emailAddress")?.Value.ToLower() == entity.Email.ToLower());
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower()
+                                                                   || u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower());
                     if (existUser == null)
                     {
                         _logger.LogInformation($"User {entity.Email} was deleted from Cable Portal, but was not found in Azure");
@@ -361,7 +362,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Cannot {type.ToString()} user {entity.Email} exception - {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                _logger.LogInformation($"Cannot {type.ToString()} user {entity.Email} exception - {ex.Message}");
             }
         }
 
