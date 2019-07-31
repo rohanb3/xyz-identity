@@ -50,7 +50,7 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
         public async void OnChange(object sender, RecordChangedEventArgs<User> e)
         {
             _logger.LogInformation($"User - {e.Entity.Email} starting migration by trigger, event - {e.ChangeType.ToString()}");
-            var wasPasswordChanged = e.Entity.Password != e.EntityOldValues.Password;
+            var wasPasswordChanged = e.Entity.Password != e.EntityOldValues?.Password;
             await _migrationService.MigrateByTrigger(e.ChangeType, e.Entity, wasPasswordChanged);
         }
     }
