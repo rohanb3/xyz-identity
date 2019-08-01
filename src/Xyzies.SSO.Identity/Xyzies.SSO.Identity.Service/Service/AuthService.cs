@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.Services.Models.User;
@@ -25,10 +25,11 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IPermissionService _permissionService;
         private readonly IUserService _userService;
         private readonly IRelationService _relationService;
+        private readonly IRequestStatusRepository _requestStatusesRepository;
         private readonly AuthServiceOptions _options;
         private readonly ILogger _logger;
 
-        public AuthService(IPermissionService permissionService, IRelationService relationService, ILogger<AuthService> logger, IUserService userService, IOptionsMonitor<AuthServiceOptions> authServiceOptionsMonitor)
+        public AuthService(IPermissionService permissionService, IRequestStatusRepository requestStatusesRepository, IRelationService relationService, ILogger<AuthService> logger, IUserService userService, IOptionsMonitor<AuthServiceOptions> authServiceOptionsMonitor)
         {
             _permissionService = permissionService ??
                 throw new ArgumentNullException(nameof(permissionService));
@@ -40,17 +41,19 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentNullException(nameof(userService));
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
+            _requestStatusesRepository = requestStatusesRepository ??
+                throw new ArgumentNullException(nameof(requestStatusesRepository));
         }
 
         private async Task<TokenResponse> RequestAzureEndpoint(FormUrlEncodedContent content)
         {
-            using(HttpClient httpClient = new HttpClient())
+            using (HttpClient httpClient = new HttpClient())
             {
                 var response = await httpClient.PostAsync(_options.TokenEndpoint, content);
                 var responseString = await response?.Content?.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    var value = JsonConvert.DeserializeObject(responseString)as JToken;
+                    var value = JsonConvert.DeserializeObject(responseString) as JToken;
                     var tokenResponse = value.ToObject<TokenResponse>();
 
                     return tokenResponse;
@@ -69,6 +72,12 @@ namespace Xyzies.SSO.Identity.Services.Service
             if (user == null)
             {
                 throw new ArgumentException(ErrorReponses.UserDoesNotExits);
+            }
+
+            var userStatus = (await _requestStatusesRepository.GetByAsync(x => x.Id == user.StatusId))?.Name;
+            if (userStatus == null || !userStatus.ToLower().Contains("approved"))
+            {
+                throw new AccessException("Check your status");
             }
 
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
