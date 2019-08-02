@@ -74,23 +74,27 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentException(ErrorReponses.UserDoesNotExits);
             }
 
+            _logger.LogError("Checking user status on authorization");
             var userStatus = (await _requestStatusesRepository.GetByAsync(x => x.Id == user.StatusId))?.Name;
             if (userStatus == null || !userStatus.ToLower().Contains("approved"))
             {
                 throw new AccessException("Check your status");
             }
 
+            _logger.LogError("Getting token");
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
             var jwtToken = new JwtSecurityToken(result.Access_token);
             var companyId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == CompanyIdClaimType)?.Value;
             var roleName = jwtToken.Claims.FirstOrDefault(claim => claim.Type == RoleClaimType)?.Value ??
                 throw new ArgumentNullException("Can't get role");
 
+            _logger.LogError("Checking permissions");
             await _permissionService.CheckPermissionExpiration();
             var hasPermissions = _permissionService.CheckPermission(roleName, new string[] { options.Scope });
 
             if (int.TryParse(companyId, out int parsedCompanyId))
             {
+                _logger.LogError("Checking company");
                 var company = await _relationService.GetCompanyById(parsedCompanyId, result.Access_token);
                 if (!(company?.RequestStatus?.Name?.ToLower().Contains("onboarded") ?? false))
                 {
