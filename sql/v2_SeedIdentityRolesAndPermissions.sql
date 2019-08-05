@@ -1,3 +1,5 @@
+delete from [PermissionToPolicy]
+delete from [PolicyToRole]
 delete from [Permissions];
 delete from [Policies];
 delete from [TWC_Role];
@@ -118,13 +120,13 @@ values
     ('ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9', 8, 'AccountAdmin', NULL, getdate(), 0),--8 
     ('da671d01-1133-4cc9-94a6-b77587f21fad', 9, 'OperationAdmin', NULL, getdate(), 0),--9 
     ('4d6de41d-bfdb-4a68-8988-017c2a4ce2af', 10, 'Role #10', NULL, getdate(), 0),--10
-    ('af16483d-9c81-4443-84d6-a976e54fbfa9', 11, 'Role #11', NULL, getdate(), 0),--11
+    ('af16483d-9c81-4443-84d6-a976e54fbfa9', 11, 'SAM', NULL, getdate(), 0),--11
     ('1727f429-580a-4d6b-b3fe-bce0ebbbd210', 12, 'Role #12', NULL, getdate(), 0),--12
     ('13e75147-0736-45db-bf34-d3b0aebdeafe', 13, 'Role #13', NULL, getdate(), 0),--13
     ('d47fd2ad-46ce-4173-8689-88573aa9ffac', 14, 'Operation Assistant', NULL, getdate(), 0),--14
     ('1e0b4f66-d15e-4366-994a-5bba45db1540', 15, 'Role #15', NULL, getdate(), 0),--15
     ('b2669957-2b49-460b-9074-3a68aa075c12', 16, 'Role #16', NULL, getdate(), 0),--16
-    ('92b1d474-8764-4363-bf7c-05d8f0520bce', 18, 'SAM', NULL, getdate(), 0),--18 
+	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--16
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0 
 
 
@@ -205,9 +207,10 @@ values
 	('415b2993-7e32-4859-8b59-2b527bcdeea3', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'), --ReadUsersInCompany for Supervisor
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --ReadAllUsers for AccountAdmin
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --ReadAllUsers for OperationAdmin
+    ('415b2993-7e32-4859-8b59-2b527bcdeea2', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'), --ReadAllUsers for Support Admin Superviser
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'), --ReadAllUsers for Operation Assistant
-	
-	('415b2993-7e32-4859-8b59-2b527bcdeea2', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --ReadAllUsers for SAM
+
+	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --ReadAllUsers for SAM
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'a98dc9cb-7847-4858-8693-5fd11b24b58c'), --ReadAllUsers for Anonymous
 
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -220,8 +223,8 @@ values
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'), --DisputeAdmin for operation assistant
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DisputeAdmin for account admin
 
-    ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --DisputeSam for SAM
-    ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', '92b1d474-8764-4363-bf7c-05d8f0520bce'), --OutDisputeAdmin for SAM
+    ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --DisputeSam for SAM
+    ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --OutDisputeAdmin for SAM
 	('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --OutDisputeAdmin for system admin
 
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'da671d01-1133-4cc9-94a6-b77587f21fad'),  --OrderManager for operation admin
@@ -231,7 +234,7 @@ values
 
     ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for system admin
 
-	('489b2156-6cb3-4d76-b5a4-c13776b82421', '92b1d474-8764-4363-bf7c-05d8f0520bce'),  --OrderManager for SAM
+	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),  --OrderManager for SAM
 
 ---------------------------------------------------------------------------------------------------------------------------------------
     ('415b2993-7e32-4859-8b59-2b527bcdeea1', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--TemplatesFull policy for operation admin
@@ -266,18 +269,21 @@ values
     ('91d3b70e-3c7e-4faf-97c0-718809bf3a2a', 'a89d3c96-5f4d-475f-8588-08e1523feffb'),--ReviewsAdminLogin policies for SalesRep
 
     ('b695018c-c264-4246-9e33-9dce90f338c2', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--VspOperatorLogin policies for supportadmin
-    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', '92b1d474-8764-4363-bf7c-05d8f0520bce'),--RecontiliationLogin policies for SAM
+    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),--RecontiliationLogin policies for SAM
     ('b695018c-c264-4246-9e33-9dce90f338c2', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--VspOperatorLogin policies for Superviser
+    ('b695018c-c264-4246-9e33-9dce90f338c2', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--VspOperatorLogin policies for Support Admin Superviser 
 
 ----------------------- Devices  -------------------------------------------------------
-	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DeviceAdmin for AccountAdmin
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--DeviceAdmin for AccountAdmin
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceAdmin for OperationAdmin
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--DeviceAdmin for Operation Assistant
+    ('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--DeviceAdmin for Operation Admin Superviser
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceAdmin for SystemAdmin
 
-	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DeviceBase for AccountAdmin
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--DeviceBase for AccountAdmin
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceBase for OperationAdmin
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--DeviceBase for Operation Assistant
+    ('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--DeviceBase for Support Admin Superviser
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceBase for SystemAdmin
 	
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--DeviceBase for Supervisor
@@ -286,6 +292,7 @@ values
 ----------------------- Comments  -------------------------------------------------------
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--CommentBase for AccountAdmin
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--CommentBase for OperationAdmin
+    ('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--CommentBase for Support Admin Superviser
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--CommentBase for Operation Assistant
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--CommentBase for SystemAdmin
 	
@@ -296,11 +303,13 @@ values
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--HistoryBase for AccountAdmin
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryBase for OperationAdmin
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--HistoryBase for Operation Assistant
+    ('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--HistoryBase for Support Admin Superviser
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryBase for SystemAdmin
 	
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--HistoryAdmin for AccountAdmin
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--HistoryAdmin for OperationAdmin
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--HistoryAdmin for Operation Assistant
+    ('f1a2b40a-781e-416b-aeed-21961b01c86a', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--HistoryAdmin for Support Admin Superviser
 	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--HistoryAdmin for SystemAdmin
 
 	('a104bad3-cdad-4722-9c16-2f735f58ffc0', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--HistoryBase for Supervisor
@@ -310,10 +319,9 @@ values
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--NotificationBase for AccountAdmin
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--NotificationBase for OperationAdmin
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--NotificationBase for Operation Assistant
+    ('9702e098-d66b-4d7b-a758-0f204a7b8321', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--NotificationBase for Support Admin Superviser
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--NotificationBase for SystemAdmin
 	
 	('9702e098-d66b-4d7b-a758-0f204a7b8321', '37fdfbf6-3ee2-4827-b7be-cefe78213d92');--NotificationBase for Supervisor
 	
-	
-
 ---------------------------------------------------------------------------------------
