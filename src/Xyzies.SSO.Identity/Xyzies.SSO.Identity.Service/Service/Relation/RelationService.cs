@@ -73,6 +73,15 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         }
 
         /// <inheritdoc />
+        public async Task<List<BranchModel>> GetBranchesByCompanyTrustedAsync(int companyId)
+        {
+            var uri = new Uri($"{_publicApiUrl}/company/{companyId}/branch/{Consts.Security.StaticToken}/trusted");
+            var responseString = await SendGetRequest(uri);
+
+            return GetPublicApiResponse<List<BranchModel>>(responseString);
+        }
+
+        /// <inheritdoc />
         public async Task<List<CompanyModel>> GetCompaniesTrustedAsync()
         {
             var uri = new Uri($"{_publicApiUrl}/company/{Consts.Security.StaticToken}/trusted");

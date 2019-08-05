@@ -57,6 +57,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
 
                 throw ex;
             }
+
             catch (AccessException ex)
             {
                 if (ex.Message.Contains(Consts.ErrorReponses.AzureLoginError))
@@ -72,6 +73,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     Content = ex.Message,
                     ContentType = "application/json"
                 };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("General exception, message - {message}", ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 

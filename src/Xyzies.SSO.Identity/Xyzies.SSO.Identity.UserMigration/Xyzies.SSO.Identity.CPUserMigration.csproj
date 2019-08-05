@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.0" />
+    <PackageReference Include="SqlTableDependency" Version="8.5.4" />
   </ItemGroup>
 
   <ItemGroup>

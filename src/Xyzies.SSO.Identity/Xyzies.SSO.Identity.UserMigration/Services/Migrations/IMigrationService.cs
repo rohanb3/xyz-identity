@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TableDependency.SqlClient.Base.Enums;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
+using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.UserMigration.Models;
 
 namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
@@ -16,6 +18,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         Task RemoveAllUsersFromCP(MigrationOptions options);
         Task SetAllEmailsToLowerCase(MigrationOptions options);
         Task MigrateAzureToCPAsync();
+        Task MigrateByTrigger(ChangeType type, User entity, bool passwordWasChanged);
         /// <summary>
         /// Change role from operator to support admin
         /// </summary>

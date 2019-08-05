@@ -174,8 +174,24 @@ namespace Xyzies.SSO.Identity.Services.Service
             }
         }
 
+        public void UpdateUserInCache(AzureUser model)
+        {
+            var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+            var user = usersInCache.FirstOrDefault(x => x.CPUserId == model.CPUserId);
+
+            if (user != null)
+            {
+                MergeObjects(model, user);
+            }
+            else
+            {
+                usersInCache.Add(model.Adapt<AzureUser>());
+            }
+            _cache.Set(Consts.Cache.UsersKey, usersInCache);
+        }
+
         /// <inheritdoc />
-        public async Task<Profile> CreateUserAsync(ProfileCreatable model, string token)
+        public async Task<Profile> CreateUserAsync(ProfileCreatable model, string token = null)
         {
             if (model == null)
             {
@@ -190,7 +206,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 {
                     throw new ArgumentException("User already exist", "User");
                 }
-                if (!string.IsNullOrWhiteSpace(model.Role))
+                if (!string.IsNullOrWhiteSpace(model.Role) && !string.IsNullOrWhiteSpace(token))
                 {
                     await ValidateUserRole(model);
                     await ValidationUserByRole(model, token);
@@ -390,16 +406,22 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <inheritdoc />
         public async Task SetUsersCache()
         {
-            var usersToCache = new List<AzureUser>();
+            var usersToCache = await GetAllUsersFromAzure();
+            _cache.Set(Consts.Cache.UsersKey, usersToCache);
+        }
+
+        /// <inheritdoc />
+        public async Task<List<AzureUser>> GetAllUsersFromAzure()
+        {
+            var azureUsers = new List<AzureUser>();
             var users = await _azureClient.GetUsers(userCount: 999);
-            usersToCache.AddRange(users.Users);
+            azureUsers.AddRange(users.Users);
             while (!string.IsNullOrEmpty(users.NextLink))
             {
                 users = await _azureClient.GetUsers(users.NextLink.Split('?').LastOrDefault(), 999, true);
-                usersToCache.AddRange(users.Users);
+                azureUsers.AddRange(users.Users);
             }
-
-            _cache.Set(Consts.Cache.UsersKey, usersToCache);
+            return azureUsers;
         }
 
         /// <inheritdoc />
