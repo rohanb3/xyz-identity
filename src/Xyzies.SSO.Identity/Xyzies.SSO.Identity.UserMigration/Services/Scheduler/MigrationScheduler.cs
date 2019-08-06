@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.UserMigration.Models;
@@ -35,6 +36,10 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Timed Background User Migration is starting.");
+
+            var serviceScope = _serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var sqlDependency = serviceScope.ServiceProvider.GetService<ISqlDependencyMigration>();
+            sqlDependency.Initialize();
 
             _token = cancellationToken;
             if (_options.Enabled)

@@ -1,11 +1,14 @@
 ﻿using Mapster;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TableDependency.SqlClient.Base.Enums;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
 using Xyzies.SSO.Identity.Data.Helpers;
@@ -168,6 +171,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
         {
             try
             {
+
                 List<State> usersState = new List<State>();
                 List<City> usersCity = new List<City>();
 
@@ -176,6 +180,7 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 var statuses = await _requestStatusesRepository.GetAsync();
                 var branches = await _relationService.GetBranchesTrustedAsync();
                 var companiesIds = (await _relationService.GetCompaniesTrustedAsync()).Select(x => x.Id).ToList();
+                var azureUsers = await _userService.GetAllUsersFromAzure();
 
                 List<User> usersList;
                 List<Role> rolesList;
@@ -271,6 +276,99 @@ namespace Xyzies.SSO.Identity.UserMigration.Services.Migrations
                 await _userMigrationHistoryRepository.AddAsync(new UserMigrationHistory { CreatedOn = DateTime.UtcNow });
                 await _userService.SetUsersCache();
             }
+        }
+
+        public async Task MigrateByTrigger(ChangeType type, User entity, bool passwordWasChanged)
+        {
+            try
+            {
+                var roles = (await _roleRepository.GetAsync()).ToList();
+                var companyBranches = await _relationService.GetBranchesByCompanyTrustedAsync(entity.CompanyId.Value);
+                var statuses = (await _requestStatusesRepository.GetAsync()).ToList();
+
+                if (type == ChangeType.Insert)
+                {
+                    entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email.ToLower()
+                                                                   || u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower() + _migrationPostfix);
+                    if (existUser != null)
+                    {
+                        _logger.LogInformation($"User {entity.Email} was inserted in Cable Portal, but was found in Azure");
+                        return;
+                    }
+                    PrepeareUserProperties(entity, roles, statuses, companyBranches);
+                    var insertedUser = await _azureClient.PostUser(entity.Adapt<AzureUser>());
+
+                    if (!string.IsNullOrWhiteSpace(entity.State))
+                    {
+                        await _locationService.SetState(entity.State);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(entity.City))
+                    {
+                        await _locationService.SetState(entity.City);
+                    }
+
+                    _userService.UpdateUserInCache(insertedUser);
+                    _logger.LogInformation($"New user, {entity.Name} {entity.LastName} {entity.Role ?? "NULL ROLE!!!"}");
+                }
+
+                if (type == ChangeType.Update)
+                {
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower()
+                                                                   || u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower() + _migrationPostfix);
+                    if (existUser == null)
+                    {
+                        _logger.LogInformation($"User {entity.Email} was updated in Cable Portal, but was not found in Azure");
+                        return;
+                    }
+                    PrepeareUserProperties(entity, roles, statuses, companyBranches);
+                    var adaptedUser = entity.Adapt<AzureUser>();
+                    if (!passwordWasChanged)
+                    {
+                        adaptedUser.PasswordProfile = null;
+
+                    }
+                    adaptedUser.SignInNames = null;
+                    await _azureClient.PatchUser(existUser.ObjectId, adaptedUser);
+
+                    if (!string.IsNullOrWhiteSpace(entity.State))
+                    {
+                        await _locationService.SetState(entity.State);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(entity.City))
+                    {
+                        await _locationService.SetState(entity.City);
+                    }
+
+                    _userService.UpdateUserInCache(entity.Adapt<AzureUser>());
+                    _logger.LogInformation($"User updated, {entity.Name} {entity.LastName} {entity.Role ?? "NULL ROLE!!!"}");
+                }
+
+                if (type == ChangeType.Delete)
+                {
+                    entity.Email = string.IsNullOrEmpty(_migrationPostfix) ? entity.Email : entity.Email + _migrationPostfix;
+                    var existUser = await _userService.GetUserBy(u => u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower()
+                                                                   || u.SignInNames?.FirstOrDefault(name => name.Type == "emailAddress")?.Value?.ToLower() == entity.Email?.ToLower() + _migrationPostfix);
+                    if (existUser == null)
+                    {
+                        _logger.LogInformation($"User {entity.Email} was deleted from Cable Portal, but was not found in Azure");
+                        return;
+                    }
+                    await _userService.DeleteUserByIdAsync(existUser.ObjectId);
+                    _logger.LogInformation($"User {entity.Email} was deleted");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Cannot {type.ToString()} user {entity.Email} exception - {ex.Message}");
+            }
+        }
+
+        private List<User> GetUsersToAdd(List<User> cpUsers, List<Profile> azureUsers)
+        {
+            return cpUsers.Where(x => !azureUsers.Select(u => u.CPUserId).Contains(x.Id)).ToList();
         }
 
         public async Task FillNullRolesWithAnonymous()

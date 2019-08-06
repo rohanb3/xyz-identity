@@ -1,3 +1,5 @@
+delete from [PermissionToPolicy]
+delete from [PolicyToRole]
 delete from [Permissions];
 delete from [Policies];
 delete from [TWC_Role];

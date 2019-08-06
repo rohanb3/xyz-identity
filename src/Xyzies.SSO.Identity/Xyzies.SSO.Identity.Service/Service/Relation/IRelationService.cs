@@ -53,5 +53,12 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// </summary>
         /// <returns></returns>
         Task<List<CompanyModel>> GetCompaniesTrustedAsync();
+
+        /// <summary>
+        /// Get branches by company by trusted token
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
+        Task<List<BranchModel>> GetBranchesByCompanyTrustedAsync(int companyId);
     }
 }

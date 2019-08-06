@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.Services.Models.User;
@@ -21,14 +25,24 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IPermissionService _permissionService;
         private readonly IUserService _userService;
         private readonly IRelationService _relationService;
+        private readonly IRequestStatusRepository _requestStatusesRepository;
         private readonly AuthServiceOptions _options;
+        private readonly ILogger _logger;
 
-        public AuthService(IPermissionService permissionService, IRelationService relationService, IUserService userService, IOptionsMonitor<AuthServiceOptions> authServiceOptionsMonitor)
+        public AuthService(IPermissionService permissionService, IRequestStatusRepository requestStatusesRepository, IRelationService relationService, ILogger<AuthService> logger, IUserService userService, IOptionsMonitor<AuthServiceOptions> authServiceOptionsMonitor)
         {
-            _permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
-            _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
-            _options = authServiceOptionsMonitor.CurrentValue ?? throw new ArgumentNullException(nameof(authServiceOptionsMonitor));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _permissionService = permissionService ??
+                throw new ArgumentNullException(nameof(permissionService));
+            _relationService = relationService ??
+                throw new ArgumentNullException(nameof(relationService));
+            _options = authServiceOptionsMonitor.CurrentValue ??
+                throw new ArgumentNullException(nameof(authServiceOptionsMonitor));
+            _userService = userService ??
+                throw new ArgumentNullException(nameof(userService));
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _requestStatusesRepository = requestStatusesRepository ??
+                throw new ArgumentNullException(nameof(requestStatusesRepository));
         }
 
         private async Task<TokenResponse> RequestAzureEndpoint(FormUrlEncodedContent content)
@@ -44,6 +58,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
                     return tokenResponse;
                 }
+                _logger.LogError("Error while requesting azure endpoint, {message}, {JSON}", responseString, JsonConvert.SerializeObject(response));
 
                 throw new AccessException(responseString);
             }
@@ -59,16 +74,27 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentException(ErrorReponses.UserDoesNotExits);
             }
 
+            _logger.LogError("Checking user status on authorization");
+            var userStatus = (await _requestStatusesRepository.GetByAsync(x => x.Id == user.StatusId))?.Name;
+            if (userStatus == null || !userStatus.ToLower().Contains("approved"))
+            {
+                throw new AccessException("Check your status");
+            }
+
+            _logger.LogError("Getting token");
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
             var jwtToken = new JwtSecurityToken(result.Access_token);
             var companyId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == CompanyIdClaimType)?.Value;
-            var roleName = jwtToken.Claims.FirstOrDefault(claim => claim.Type == RoleClaimType)?.Value ?? throw new ArgumentNullException("Can't get role");
+            var roleName = jwtToken.Claims.FirstOrDefault(claim => claim.Type == RoleClaimType)?.Value ??
+                throw new ArgumentNullException("Can't get role");
 
+            _logger.LogError("Checking permissions");
             await _permissionService.CheckPermissionExpiration();
             var hasPermissions = _permissionService.CheckPermission(roleName, new string[] { options.Scope });
 
             if (int.TryParse(companyId, out int parsedCompanyId))
             {
+                _logger.LogError("Checking company");
                 var company = await _relationService.GetCompanyById(parsedCompanyId, result.Access_token);
                 if (!(company?.RequestStatus?.Name?.ToLower().Contains("onboarded") ?? false))
                 {
@@ -88,13 +114,13 @@ namespace Xyzies.SSO.Identity.Services.Service
             return await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
         }
 
-
         private List<KeyValuePair<string, string>> BaseOptions
         {
-            get => new List<KeyValuePair<string, string>> {
-                 new KeyValuePair<string, string>("scope", $"openid offline_access {_options.Scope}"),
-                 new KeyValuePair<string, string>("response_type", "id_token"),
-                 new KeyValuePair<string, string>("client_id", _options.ClientId)
+            get => new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("scope", $"openid offline_access {_options.Scope}"),
+                new KeyValuePair<string, string>("response_type", "id_token"),
+                new KeyValuePair<string, string>("client_id", _options.ClientId)
             };
         }
 
