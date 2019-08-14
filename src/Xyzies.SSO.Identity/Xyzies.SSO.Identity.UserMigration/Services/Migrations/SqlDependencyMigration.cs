@@ -1,14 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using TableDependency.SqlClient;
+using TableDependency.SqlClient.Base.Enums;
 using TableDependency.SqlClient.Base.EventArgs;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -38,6 +33,8 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
             {
                 _dependency = new SqlTableDependency<User>(_connectionString, _tableName, includeOldValues: true);
                 _dependency.OnChanged += OnChange;
+                _dependency.OnError += OnError;
+                _dependency.OnStatusChanged += OnStatusChanged;
                 _dependency.Start();
                 _logger.LogInformation($"Subscribe to Cable Portal DB");
             }
@@ -52,6 +49,23 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Migrations
             _logger.LogInformation($"User - {e.Entity.Email} starting migration by trigger, event - {e.ChangeType.ToString()}");
             var wasPasswordChanged = e.Entity.Password != e.EntityOldValues?.Password;
             await _migrationService.MigrateByTrigger(e.ChangeType, e.Entity, wasPasswordChanged);
+        }
+
+        public async void OnError(object sender, ErrorEventArgs e)
+        {
+            _logger.LogInformation("Dependency was broken - message: {message}", e.Message);
+            _logger.LogInformation("Starting resubscription");
+            await Initialize();
+        }
+
+        public async void OnStatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            if (e.Status == TableDependencyStatus.StopDueToCancellation)
+            {
+                _logger.LogInformation("Dependency was stopped by - {message}", e.Status);
+                _logger.LogInformation("Starting resubscription");
+                await Initialize();
+            }
         }
     }
 }
