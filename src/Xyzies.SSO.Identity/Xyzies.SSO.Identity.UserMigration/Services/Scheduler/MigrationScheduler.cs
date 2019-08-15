@@ -38,8 +38,6 @@ namespace Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler
             _logger.LogInformation("Timed Background User Migration is starting.");
 
             var serviceScope = _serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var sqlDependency = serviceScope.ServiceProvider.GetService<ISqlDependencyMigration>();
-            sqlDependency.Initialize();
 
             _token = cancellationToken;
             if (_options.Enabled)
