@@ -224,6 +224,8 @@ namespace Xyzies.SSO.Identity.API
             {
                 // TODO: Refactoring
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
+                var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
+                sqlDependency.Initialize();
                 userService.SetUsersCache().Wait();
             }
             
@@ -235,13 +237,13 @@ namespace Xyzies.SSO.Identity.API
                 .UseMvc()
                 .UseSwagger(options =>
                 {
-                    options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = "/api/identity/");//
+                    options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = "/api/identity/");
                     options.RouteTemplate = "/swagger/{documentName}/swagger.json";
                 })
                 .UseSwaggerUI(uiOptions =>
                 {
                     uiOptions.SwaggerEndpoint("v1/swagger.json", $"v1.0.0");
-                    ////uiOptions.RoutePrefix = "/api/identity";
+                    //uiOptions.RoutePrefix = "/api/identity";
                     uiOptions.DisplayRequestDuration();
                 });
 
