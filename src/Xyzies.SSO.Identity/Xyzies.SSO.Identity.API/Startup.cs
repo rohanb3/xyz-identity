@@ -224,6 +224,8 @@ namespace Xyzies.SSO.Identity.API
             {
                 // TODO: Refactoring
                 var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
+                var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
+                sqlDependency.Initialize();
                 userService.SetUsersCache().Wait();
             }
             
