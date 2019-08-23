@@ -127,7 +127,7 @@ namespace Xyzies.SSO.Identity.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
-            
+
             #region DI configuration
 
             services.AddScoped<DbContext, IdentityDataContext>();
@@ -214,21 +214,16 @@ namespace Xyzies.SSO.Identity.API
                     .UseHttpsRedirection();
             }
 
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
-                //context.Database.Migrate();
-            }
+            var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+            var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
+            //context.Database.Migrate();
 
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                // TODO: Refactoring
-                var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
-                var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
-                sqlDependency.Initialize();
-                userService.SetUsersCache().Wait();
-            }
-            
+            // TODO: Refactoring
+            var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
+            var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
+            sqlDependency.Initialize();
+            userService.SetUsersCache().Wait();
+
             app.UseAuthentication()
                 .UseProcessClaims()
                 .UseHealthChecks("/healthz")
