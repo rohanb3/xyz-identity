@@ -214,20 +214,15 @@ namespace Xyzies.SSO.Identity.API
                     .UseHttpsRedirection();
             }
 
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
-                //context.Database.Migrate();
-            }
-
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                // TODO: Refactoring
-                var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
-                var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
-                sqlDependency.Initialize();
-                userService.SetUsersCache().Wait();
-            }
+            var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+            var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
+            //context.Database.Migrate();
+            // TODO: Refactoring
+            var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
+            var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
+            sqlDependency.Initialize();
+            userService.SetUsersCache().Wait();
+            
             
             app.UseAuthentication()
                 .UseProcessClaims()
