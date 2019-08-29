@@ -131,7 +131,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
         // You can implement this function like "clean function" named GetUserCreadentials
         private async Task SetCredentials(HttpClient client)
         {
-            if (_credentials == null)
+            if (_credentials == null || _credentials.ExpiresOn <= DateTime.UtcNow)
             {
                 using (var httpClient = new HttpClient())
                 {
@@ -155,6 +155,7 @@ namespace Xyzies.SSO.Identity.Data.Repository.Azure
                     }
 
                     _credentials = JsonConvert.DeserializeObject<AzureAdApiCredentials>(buffer);
+                    _credentials.ExpiresOn = DateTime.UtcNow.AddSeconds(_credentials.ExpiresIn);
                     if (_credentials == null)
                     {
                         throw new InvalidOperationException("Couldn't retrieve auth data");

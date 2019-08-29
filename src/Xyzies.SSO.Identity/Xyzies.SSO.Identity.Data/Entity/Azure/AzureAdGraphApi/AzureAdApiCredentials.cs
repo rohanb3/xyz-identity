@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi
 {
@@ -11,6 +12,8 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi
         public string TokenType { get; set; }
 
         [JsonProperty("expires_in")]
-        public int ExpiresIn { get; set; }
+        public long ExpiresIn { get; set; }
+
+        public DateTime ExpiresOn { get; set; }
     }
 }
