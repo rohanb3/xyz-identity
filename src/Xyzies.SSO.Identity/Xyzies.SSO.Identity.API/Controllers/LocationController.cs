@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
+using System;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -48,6 +49,19 @@ namespace Xyzies.SSO.Identity.API.Controllers
             return Ok(cities);
         }
 
+        /// <summary>
+        /// Get cities
+        /// </summary>
+        /// <returns>Collection of cities</returns>
+        [HttpGet]
+        [Route("city")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<City>))]
+        public async Task<IActionResult> GetCitiesByIds(List<Guid> ids)
+        {
+            var cities = await _localtionService.GetAllCities(ids);
+            return Ok(cities);
+        }
+
 
         /// <summary>
         /// Get states
@@ -59,6 +73,19 @@ namespace Xyzies.SSO.Identity.API.Controllers
         public async Task<IActionResult> GetAllStates()
         {
             var states = await _localtionService.GetAllStates();
+            return Ok(states);
+        }
+
+        /// <summary>
+        /// Get states
+        /// </summary>
+        /// <returns>Collection of states</returns>
+        [HttpGet]
+        [Route("state")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<State>))]
+        public async Task<IActionResult> GetAllStates(List<Guid> ids)
+        {
+            var states = await _localtionService.GetAllStates(ids);
             return Ok(states);
         }
     }
