@@ -83,7 +83,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet]
         [Route("state")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<State>))]
-        public async Task<IActionResult> GetAllStates(List<Guid> ids)
+        public async Task<IActionResult> GetStatesByIds(List<Guid> ids)
         {
             var states = await _localtionService.GetAllStates(ids);
             return Ok(states);
