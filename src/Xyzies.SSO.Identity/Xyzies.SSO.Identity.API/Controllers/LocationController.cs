@@ -6,6 +6,7 @@ using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Services.Service;
 using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -54,9 +55,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// </summary>
         /// <returns>Collection of cities</returns>
         [HttpGet]
-        [Route("city")]
+        [Route("city/ids")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<City>))]
-        public async Task<IActionResult> GetCitiesByIds(List<Guid> ids)
+        public async Task<IActionResult> GetCitiesByIds([Required]List<Guid> ids)
         {
             var cities = await _localtionService.GetAllCities(ids);
             return Ok(cities);
@@ -81,9 +82,9 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// </summary>
         /// <returns>Collection of states</returns>
         [HttpGet]
-        [Route("state")]
+        [Route("state/ids")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<State>))]
-        public async Task<IActionResult> GetStatesByIds(List<Guid> ids)
+        public async Task<IActionResult> GetStatesByIds([Required]List<Guid> ids)
         {
             var states = await _localtionService.GetAllStates(ids);
             return Ok(states);
