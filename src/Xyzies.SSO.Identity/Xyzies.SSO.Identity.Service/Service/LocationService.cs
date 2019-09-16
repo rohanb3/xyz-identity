@@ -25,6 +25,12 @@ namespace Xyzies.SSO.Identity.Services.Service
             return cities.Include(city => city.State).ToList();
         }
 
+        public async Task<List<City>> GetAllCities(List<Guid> ids)
+        {
+            var cities = await _cityRepo.GetAsync(x => ids.Contains(x.Id));
+            return cities.Include(city => city.State).ToList();
+        }
+
         public async Task<List<City>> GetAllCities(string stateName)
         {
             var state = await _stateRepo.GetByAsync(s => s.Name == stateName || s.ShortName == stateName);
@@ -35,6 +41,12 @@ namespace Xyzies.SSO.Identity.Services.Service
         public async Task<List<State>> GetAllStates()
         {
             var state = await _stateRepo.GetAsync();
+            return state.ToList();
+        }
+
+        public async Task<List<State>> GetAllStates(List<Guid> ids)
+        {
+            var state = await _stateRepo.GetAsync(x => ids.Contains(x.Id));
             return state.ToList();
         }
 
@@ -67,7 +79,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 try
                 {
                     var state = states.FirstOrDefault(x => x.Name == city.State.Name);
-                    if(state == null)
+                    if (state == null)
                     {
                         continue;
                     }

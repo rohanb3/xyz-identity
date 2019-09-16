@@ -48,14 +48,14 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                //if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
+                if (ex.Message == Consts.ErrorReponses.UserDoesNotExits)
                 {
                     return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
                             new KeyValuePair<string, string[]>("Email", new string[] { "This email is not registered in the system. Please, check and try again" })
                         })));
                 }
 
-                //throw ex;
+                throw ex;
             }
 
             catch (AccessException ex)
