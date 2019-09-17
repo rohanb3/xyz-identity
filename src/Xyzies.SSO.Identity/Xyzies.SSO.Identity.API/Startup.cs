@@ -233,7 +233,7 @@ namespace Xyzies.SSO.Identity.API
                 .UseSwagger(options =>
                 {
                     options.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = "/api/identity/");
-                    options.RouteTemplate = "/swagger/{documentName}/swagger.json";
+                    options.RouteTemplate = "/swagger/{documentName}/swagger.json";//
                 })
                 .UseSwaggerUI(uiOptions =>
                 {
