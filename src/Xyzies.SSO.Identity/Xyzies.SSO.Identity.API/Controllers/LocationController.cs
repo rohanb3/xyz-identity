@@ -57,7 +57,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet]
         [Route("city/ids")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<City>))]
-        public async Task<IActionResult> GetCitiesByIds([Required]List<Guid> ids)
+        public async Task<IActionResult> GetCitiesByIds([FromQuery]List<Guid> ids)
         {
             var cities = await _localtionService.GetAllCities(ids);
             return Ok(cities);
@@ -84,7 +84,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet]
         [Route("state/ids")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<State>))]
-        public async Task<IActionResult> GetStatesByIds([Required]List<Guid> ids)
+        public async Task<IActionResult> GetStatesByIds([FromQuery]List<Guid> ids)
         {
             var states = await _localtionService.GetAllStates(ids);
             return Ok(states);
