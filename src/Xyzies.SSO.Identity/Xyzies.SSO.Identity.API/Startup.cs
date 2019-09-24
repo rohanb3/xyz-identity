@@ -239,7 +239,7 @@ namespace Xyzies.SSO.Identity.API
                 {
                     uiOptions.SwaggerEndpoint("v1/swagger.json", $"v1.0.0");
                     //uiOptions.RoutePrefix = "/api/identity";
-                    uiOptions.DisplayRequestDuration();
+                    uiOptions.DisplayRequestDuration();//
                 });
 
         }
