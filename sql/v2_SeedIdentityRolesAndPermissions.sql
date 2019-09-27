@@ -126,7 +126,8 @@ values
     ('d47fd2ad-46ce-4173-8689-88573aa9ffac', 14, 'Operation Assistant', NULL, getdate(), 0),--14
     ('1e0b4f66-d15e-4366-994a-5bba45db1540', 15, 'Role #15', NULL, getdate(), 0),--15
     ('b2669957-2b49-460b-9074-3a68aa075c12', 16, 'Role #16', NULL, getdate(), 0),--16
-	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--16
+	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--17
+	('c19dd856-2e67-45cf-94e1-b70820b0cfc8', 23, 'Spectrum Director', NULL, getdate(), 0),--18
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0 
 
 
@@ -211,6 +212,7 @@ values
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'), --ReadAllUsers for Operation Assistant
 
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --ReadAllUsers for SAM
+	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'), --ReadAllUsers for Spectrum Director
 	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'a98dc9cb-7847-4858-8693-5fd11b24b58c'), --ReadAllUsers for Anonymous
 
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -223,6 +225,9 @@ values
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'), --DisputeAdmin for operation assistant
     ('601e493f-61b3-4fac-89cb-a8d21e331abc', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --DisputeAdmin for account admin
 
+
+    ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'), --DisputeSam for Spectrum Director
+    ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'), --OutDisputeAdmin for Spectrum Director
     ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --DisputeSam for SAM
     ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --OutDisputeAdmin for SAM
 	('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --OutDisputeAdmin for system admin
@@ -235,6 +240,7 @@ values
     ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for system admin
 
 	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),  --OrderManager for SAM
+	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),  --OrderManager for Spectrum Director
 
 ---------------------------------------------------------------------------------------------------------------------------------------
     ('415b2993-7e32-4859-8b59-2b527bcdeea1', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--TemplatesFull policy for operation admin
@@ -270,6 +276,7 @@ values
 
     ('b695018c-c264-4246-9e33-9dce90f338c2', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--VspOperatorLogin policies for supportadmin
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),--RecontiliationLogin policies for SAM
+    ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),--RecontiliationLogin policies for Spectrum Director
     ('b695018c-c264-4246-9e33-9dce90f338c2', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--VspOperatorLogin policies for Superviser
     ('b695018c-c264-4246-9e33-9dce90f338c2', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--VspOperatorLogin policies for Support Admin Superviser 
 
