@@ -177,7 +177,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         public void UpdateUserInCache(AzureUser model)
         {
             var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-            var user = usersInCache.FirstOrDefault(x => x.CPUserId == model.CPUserId);
+            var user = usersInCache.FirstOrDefault(x => x.ObjectId == model.ObjectId);
 
             if (user != null)
             {
