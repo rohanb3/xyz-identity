@@ -206,25 +206,25 @@ namespace Xyzies.SSO.Identity.Services.Service
                 {
                     throw new ArgumentException("User already exist", "User");
                 }
-                if (!string.IsNullOrWhiteSpace(model.Role) && !string.IsNullOrWhiteSpace(token))
-                {
-                    await ValidateUserRole(model);
-                    await ValidationUserByRole(model, token);
-                }
+                // if (!string.IsNullOrWhiteSpace(model.Role) && !string.IsNullOrWhiteSpace(token))
+                // {
+                //     await ValidateUserRole(model);
+                //     await ValidationUserByRole(model, token);
+                // }
 
                 var createdUser = await _azureClient.PostUser(model.Adapt<AzureUser>());
 
-                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                usersInCache.Add(createdUser);
-                _cache.Set(Consts.Cache.UsersKey, usersInCache);
-                if (!string.IsNullOrEmpty(model.State))
-                {
-                    await _localtionService.SetState(model.State);
-                }
-                if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
-                {
-                    await _localtionService.SetCity(model.City, model.State);
-                }
+                // var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                // usersInCache.Add(createdUser);
+                // _cache.Set(Consts.Cache.UsersKey, usersInCache);
+                // if (!string.IsNullOrEmpty(model.State))
+                // {
+                //     await _localtionService.SetState(model.State);
+                // }
+                // if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
+                // {
+                //     await _localtionService.SetCity(model.City, model.State);
+                // }
 
                 return createdUser.Adapt<Profile>();
             }
