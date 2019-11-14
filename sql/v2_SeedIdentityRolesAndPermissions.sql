@@ -114,11 +114,13 @@ values
     ('a89d3c96-5f4d-475f-8588-08e1523feffb', 2, 'SalesRep', NULL, getdate(), 0),--2
     ('c71b2170-98cf-4e69-8455-282fdbd21779', 3, 'Agent', NULL, getdate(), 0),--3 
     ('87a421a2-60e1-46c9-8e2e-679c1f5f3c8e', 4, 'SupportAdmin', NULL, getdate(), 0),--4 
+
     ('a2285edf-44d0-4f2b-be30-4d6e49644da2', 5, 'SystemAdmin', NULL, getdate(), 0),--5 
+
     ('fafbb1b8-b039-4145-a923-f1c39d4fe603', 6, 'Manager', NULL, getdate(), 0),--6 
     ('37fdfbf6-3ee2-4827-b7be-cefe78213d92', 7, 'Supervisor', NULL, getdate(), 0),--7 
-    ('ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9', 8, 'AccountAdmin', NULL, getdate(), 0),--8 
-    ('da671d01-1133-4cc9-94a6-b77587f21fad', 9, 'OperationAdmin', NULL, getdate(), 0),--9 
+    ('ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9', 8, 'AccountAdmin', NULL, getdate(), 0),--8
+    ('da671d01-1133-4cc9-94a6-b77587f21fad', 9, 'OperationAdmin', NULL, getdate(), 0),--9
     ('4d6de41d-bfdb-4a68-8988-017c2a4ce2af', 10, 'Role #10', NULL, getdate(), 0),--10
     ('af16483d-9c81-4443-84d6-a976e54fbfa9', 11, 'SAM', NULL, getdate(), 0),--11
     ('1727f429-580a-4d6b-b3fe-bce0ebbbd210', 12, 'Role #12', NULL, getdate(), 0),--12
@@ -232,16 +234,24 @@ values
     ('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'af16483d-9c81-4443-84d6-a976e54fbfa9'), --OutDisputeAdmin for SAM
 	('a9ffa03d-8a57-40ba-a75b-3b4a823b0b13', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --OutDisputeAdmin for system admin
 
-    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'da671d01-1133-4cc9-94a6-b77587f21fad'),  --OrderManager for operation admin
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),  --OrderManager for operation assistant
-    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),  --OrderManager for account admin
-	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderManager for system admin
 
-    ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for system admin
+    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'da671d01-1133-4cc9-94a6-b77587f21fad'),  --OrderManager for Operation admin
+    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),  --OrderManager for Account admin
+	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderManager for System admin
+    ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),  --OrderManager for Spectrum director
 
+    --*Can see Commissions on order list
+    ('f778d726-e016-47ec-b6ea-8d016937ae73', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),  --OrderAdmin for System admin
+    ('f778d726-e016-47ec-b6ea-8d016937ae73', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),  --OrderAdmin for Spectrum director
+
+    --*Can not see Commissions on order list
 	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),  --OrderManager for SAM
 	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),  --OrderManager for Spectrum Director
 
+    ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --ReconciliationWebAdmin for System admin
+    ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --ReconciliationWebAdmin for Operation admin
+    ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'), --ReconciliationWebAdmin for AccountAdmin
 ---------------------------------------------------------------------------------------------------------------------------------------
     ('415b2993-7e32-4859-8b59-2b527bcdeea1', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--TemplatesFull policy for operation admin
     ('6f4ce9a2-1633-46b3-b7b6-5a93e5cbd3a2', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--ReviewsFull policy for operation admin

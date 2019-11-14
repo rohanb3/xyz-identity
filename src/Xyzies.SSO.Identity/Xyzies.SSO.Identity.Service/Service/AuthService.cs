@@ -86,11 +86,13 @@ namespace Xyzies.SSO.Identity.Services.Service
             var roleName = jwtToken.Claims.FirstOrDefault(claim => claim.Type == RoleClaimType)?.Value ??
                 throw new ArgumentNullException("Can't get role");
 
+            _logger.LogError("Checking permissions");
             await _permissionService.CheckPermissionExpiration();
             var hasPermissions = _permissionService.CheckPermission(roleName, new string[] { options.Scope });
 
             if (int.TryParse(companyId, out int parsedCompanyId))
             {
+                _logger.LogError("Checking company");
                 var company = await _relationService.GetCompanyById(parsedCompanyId, result.Access_token);
                 if (!(company?.RequestStatus?.Name?.ToLower().Contains("onboarded") ?? false))
                 {
