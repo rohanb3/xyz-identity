@@ -145,28 +145,28 @@ namespace Xyzies.SSO.Identity.Services.Service
             try
             {
                 await _azureClient.PatchUser(id, model.Adapt<AzureUser>());
-                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                var user = usersInCache.FirstOrDefault(x => x.ObjectId == id);
-                if (user != null)
-                {
-                    MergeObjects(model.Adapt<AzureUser>(), user);
-                    if (string.IsNullOrEmpty(model.State))
-                    {
-                        model.State = user.State;
-                    }
-                }
-                else
-                {
-                    usersInCache.Add(model.Adapt<AzureUser>());
-                }
+                // var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                // var user = usersInCache.FirstOrDefault(x => x.ObjectId == id);
+                // if (user != null)
+                // {
+                //     MergeObjects(model.Adapt<AzureUser>(), user);
+                //     if (string.IsNullOrEmpty(model.State))
+                //     {
+                //         model.State = user.State;
+                //     }
+                // }
+                // else
+                // {
+                //     usersInCache.Add(model.Adapt<AzureUser>());
+                // }
 
-                _cache.Set(Consts.Cache.UsersKey, usersInCache);
+                // _cache.Set(Consts.Cache.UsersKey, usersInCache);
 
-                if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
-                {
-                    await _localtionService.SetCity(model.City, model?.State);
-                    await _localtionService.SetState(model.State);
-                }
+                // if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
+                // {
+                //     await _localtionService.SetCity(model.City, model?.State);
+                //     await _localtionService.SetState(model.State);
+                // }
             }
             catch (ApplicationException)
             {
@@ -177,7 +177,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         public void UpdateUserInCache(AzureUser model)
         {
             var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-            var user = usersInCache.FirstOrDefault(x => x.CPUserId == model.CPUserId);
+            var user = usersInCache.FirstOrDefault(x => x.ObjectId == model.ObjectId);
 
             if (user != null)
             {
@@ -206,25 +206,25 @@ namespace Xyzies.SSO.Identity.Services.Service
                 {
                     throw new ArgumentException("User already exist", "User");
                 }
-                if (!string.IsNullOrWhiteSpace(model.Role) && !string.IsNullOrWhiteSpace(token))
-                {
-                    await ValidateUserRole(model);
-                    await ValidationUserByRole(model, token);
-                }
+                // if (!string.IsNullOrWhiteSpace(model.Role) && !string.IsNullOrWhiteSpace(token))
+                // {
+                //     await ValidateUserRole(model);
+                //     await ValidationUserByRole(model, token);
+                // }
 
                 var createdUser = await _azureClient.PostUser(model.Adapt<AzureUser>());
 
-                var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                usersInCache.Add(createdUser);
-                _cache.Set(Consts.Cache.UsersKey, usersInCache);
-                if (!string.IsNullOrEmpty(model.State))
-                {
-                    await _localtionService.SetState(model.State);
-                }
-                if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
-                {
-                    await _localtionService.SetCity(model.City, model.State);
-                }
+                // var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
+                // usersInCache.Add(createdUser);
+                // _cache.Set(Consts.Cache.UsersKey, usersInCache);
+                // if (!string.IsNullOrEmpty(model.State))
+                // {
+                //     await _localtionService.SetState(model.State);
+                // }
+                // if (!string.IsNullOrEmpty(model.City) && !string.IsNullOrEmpty(model.State))
+                // {
+                //     await _localtionService.SetCity(model.City, model.State);
+                // }
 
                 return createdUser.Adapt<Profile>();
             }

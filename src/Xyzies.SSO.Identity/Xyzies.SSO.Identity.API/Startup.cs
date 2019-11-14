@@ -38,6 +38,7 @@ using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
 using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
+using Xyzies.SSO.Identity.Service.Service.UsersUpdatingScheduler;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -147,9 +148,11 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<ILocaltionService, LocationService>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
             services.AddScoped<ISqlDependencyMigration, SqlDependencyMigration>();
+            services.AddScoped<IUsersBackgroundService, UsersBackgroundService>();
             services.AddSingleton<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddHostedService<UsersBackgroundService>();
             services.AddHostedService<MigrationScheduler>();
             services.AddUserMigrationService();
             #endregion
@@ -219,10 +222,8 @@ namespace Xyzies.SSO.Identity.API
             //context.Database.Migrate();s
 
             // TODO: Refactoring
-            var userService = serviceScope.ServiceProvider.GetRequiredService<IUserService>();
             var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
             sqlDependency.Initialize();
-            userService.SetUsersCache().Wait();
 
             app.UseAuthentication()
                 .UseProcessClaims()
