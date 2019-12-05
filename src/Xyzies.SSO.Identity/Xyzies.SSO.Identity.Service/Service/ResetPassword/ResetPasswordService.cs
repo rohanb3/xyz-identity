@@ -61,14 +61,14 @@ namespace Xyzies.SSO.Identity.Services.Service.ResetPassword
         {
             try
             {
-                var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value == email));
+                var user = await _userService.GetUserBy(u => u.SignInNames.Any(n => n.Value?.ToLower() == email?.ToLower()));
                 if (user == null)
                 {
                     throw new ArgumentException(Consts.ErrorReponses.UserDoesNotExits);
                 }
 
                 var code = GenerateFourDigitCode();
-                var previusRequest = await _passwordResetRequestRepository.GetByAsync(request => request.Email == email);
+                var previusRequest = await _passwordResetRequestRepository.GetByAsync(request => request.Email.ToLower() == email.ToLower());
 
                 if (previusRequest != null)
                 {
