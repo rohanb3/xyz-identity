@@ -98,6 +98,10 @@ namespace Xyzies.SSO.Identity.Services.Service
                 {
                     throw new AccessException("There is some problems with your company");
                 }
+                if (company.Tenant == null)
+                {
+                    throw new AccessException("Tenant is not specified for your Company. Please, contact support");
+                }
             }
             if (hasPermissions)
             {
