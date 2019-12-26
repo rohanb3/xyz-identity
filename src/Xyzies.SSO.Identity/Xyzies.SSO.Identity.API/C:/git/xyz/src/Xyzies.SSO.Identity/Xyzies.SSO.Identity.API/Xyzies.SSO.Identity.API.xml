@@ -379,16 +379,5 @@
             </summary>
             <param name="rootCause"></param>
         </member>
-        <member name="T:Xyzies.TWC.DisputeService.API.Controllers.VersionController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Xyzies.TWC.DisputeService.API.Controllers.VersionController.Get">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
     </members>
 </doc>

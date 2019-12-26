@@ -8,14 +8,22 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            serializer.Serialize(writer, value);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            Guid temp = new Guid();
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
 
-            if (existingValue != null && Guid.TryParse(existingValue.ToString(), out temp))
+            String jsonObjectValue = serializer.Deserialize<string>(reader);
+
+            Guid temp = new Guid();
+            var isParsed = Guid.TryParse(jsonObjectValue, out temp);
+
+            if (isParsed)
             {
                 return temp;
             }
