@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace Xyzies.TWC.DisputeService.API.Controllers
@@ -22,11 +23,11 @@ namespace Xyzies.TWC.DisputeService.API.Controllers
             return await Task.FromResult(Ok(new
             {
                 ServiceName = "XYZies.SSO.IdentityService",
-                ServiceVersion = "1.3.0",
-                ApiVersion = "1.0",
-                BuildNumber = "none",
-                ReleaseDate = DateTime.Now.ToShortDateString(),
-                UUseHttp2 = isHttp20
+                    ServiceVersion = "1.3.0",
+                    ApiVersion = "1.0",
+                    BuildNumber = "none",
+                    ReleaseDate = DateTime.Now.ToShortDateString(),
+                    UUseHttp2 = isHttp20
             }));
         }
     }
