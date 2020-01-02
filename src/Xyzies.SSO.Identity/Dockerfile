@@ -11,5 +11,3 @@ RUN ["dotnet", "build"]
 EXPOSE 8081
 
 ENTRYPOINT ["dotnet", "run", "-p", "/app/Xyzies.SSO.Identity.API/" ]
-
-
