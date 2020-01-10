@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
+using Newtonsoft.Json;
+
 using Xyzies.SSO.Identity.Data.Helpers;
 
 namespace Xyzies.SSO.Identity.Data.Entity.Azure
@@ -37,9 +39,11 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         public string AvatarUrl { get; set; }
 
         [JsonProperty(Consts.BranchIdPropertyName)]
+        [JsonConverter(typeof(AzureCustomGuidFieldJsonConverter))]
         public Guid? BranchId { get; set; }
 
         [JsonProperty(Consts.DepartmentIdPropertyName)]
+        [JsonConverter(typeof(AzureCustomGuidFieldJsonConverter))]
         public Guid? DepartmentId { get; set; }
 
         public string City { get; set; }
@@ -56,6 +60,7 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         public int? CPUserId { get; set; }
 
         [JsonProperty(Consts.StatudIdPropertyName)]
+        [JsonConverter(typeof(AzureCustomGuidFieldJsonConverter))]
         public Guid? StatusId { get; set; }
 
         public string CompanyName { get; set; }
