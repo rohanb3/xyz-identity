@@ -1,0 +1,383 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Xyzies.SSO.Identity.API</name>
+    </assembly>
+    <members>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.AuthorizeController.Token(Xyzies.SSO.Identity.Services.Models.User.UserAuthorizeOptions)">
+            <summary>
+            Authorizes user with passed credentials
+            </summary>
+            <param name="username">User name</param>
+            <param name="password">User password</param>
+            <param name="scope">scope what user will use to work with. Example - xyzies.authorization.reviews.admin</param>
+            <returns>Access token with additional info</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.AuthorizeController.Refresh(Xyzies.SSO.Identity.Services.Models.User.UserRefreshOptions)">
+            <summary>
+            Return refreshed access_token
+            </summary>
+            <returns>Refreshed access_token</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.AuthorizeController.SendResetCode(Xyzies.SSO.Identity.API.Models.RequestVerificationCodeModel)">
+            <summary>
+            Sends verification code to current email, creates row in DB with reset password request data
+            </summary>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.AuthorizeController.VerifyCode(Xyzies.SSO.Identity.API.Models.VerifyCodeModel)">
+            <summary>
+            Verifys confirmation code for passed email
+            </summary>
+            <param name="options"></param>
+            <returns>If success, returns reset token to reset password for konfirmed user</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.AuthorizeController.ResetPassword(Xyzies.SSO.Identity.API.Models.PasswordModel)">
+            <summary>
+            Resets password by resetToken
+            </summary>
+            <param name="options"></param>
+            <returns>If success, resets password for konfirmed user</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.LocationController.GetAll(System.String)">
+            <summary>
+            Get cities for current state
+            </summary>
+            <param name="stateName">Name of state</param>
+            <returns>Collection of cities for passed state</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.LocationController.GetAllCities">
+            <summary>
+            Get cities
+            </summary>
+            <returns>Collection of cities</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.LocationController.GetCitiesByIds(System.Collections.Generic.List{System.Guid})">
+            <summary>
+            Get cities
+            </summary>
+            <returns>Collection of cities</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.LocationController.GetAllStates">
+            <summary>
+            Get states
+            </summary>
+            <returns>Collection of states</returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.LocationController.GetStatesByIds(System.Collections.Generic.List{System.Guid})">
+            <summary>
+            Get states
+            </summary>
+            <returns>Collection of states</returns>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.Controllers.MigrationsController">
+            <summary>
+            Controller for user migrations between CP and B2C
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.#ctor(Xyzies.SSO.Identity.UserMigration.Services.Migrations.IMigrationService)">
+            <summary>
+            Constructor with dependecies
+            </summary>
+            <param name="migrationService"></param>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.MigrateAzureToCp">
+            <summary>
+            Migrate users from Azure AD B2C to Cable Portal DB
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.Migrate(System.Nullable{System.Int32},System.Nullable{System.Int32},System.String[])">
+            <summary>
+            Migrate users from CP base to Azure
+            </summary>
+            <param name="limit">Limit of users from CP base</param>
+            <param name="offset">Offset for users from CP base</param>
+            <param name="emails">Specify users by their mail</param>
+            <returns></returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.FillBranches(System.Nullable{System.Int32},System.Nullable{System.Int32},System.String[])">
+            <summary>
+            Fill SuperAdmins with default company branches
+            </summary>
+            <param name="limit"></param>
+            <param name="offset"></param>
+            <param name="emails"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.Controllers.RoleController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.RoleController.#ctor(Microsoft.Extensions.Logging.ILogger{Xyzies.SSO.Identity.API.Controllers.RoleController},Xyzies.SSO.Identity.Services.Service.Roles.IRoleService,Xyzies.SSO.Identity.Services.Service.Permission.IPermissionService)">
+            <summary>
+            
+            </summary>
+            <param name="logger"></param>
+            <param name="roleRepository"></param>
+            <param name="permissionService"></param>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.RoleController.HasPermission(System.String[],System.String)">
+            <summary>
+            
+            </summary>
+            <param name="scope"></param>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.RoleController.Get">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.Controllers.UsersController">
+            <summary>
+            AAD Users Endpoints
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.#ctor(Xyzies.SSO.Identity.Services.Service.IUserService)">
+            <summary>
+            Ctor with dependencies
+            </summary>
+            <param name="userService"></param>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Get(Xyzies.SSO.Identity.Data.Entity.UserFilteringParams,Xyzies.SSO.Identity.Data.Entity.UserSortingParameters)">
+            <summary>
+            Returns collection of users
+            </summary>
+            <returns>Collection of users</returns>
+            <response code="200">If users fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.GetAllUsersForTrustedService(System.String,System.String)">
+            <summary>
+            Returns user for trusted service
+            </summary>
+            <returns>Collection of users</returns>
+            <response code="200">If users fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.GetAllUsersForTrustedService(System.String)">
+            <summary>
+            Returns collection of users for trusted service
+            </summary>
+            <returns>Collection of users</returns>
+            <response code="200">If users fetched successfully</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.GetFilteredUsersForTrustedService(System.String,Xyzies.SSO.Identity.Data.Entity.UserFilteringParams)">
+            <summary>
+            Returns collection of users for trusted service by passed filters. POST method required to pass large collections inside filters
+            </summary>
+            <returns>Collection of users</returns>
+            <response code="200">If users fetched successfully</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.GetTotalInCompanies(System.Collections.Generic.List{System.String},Xyzies.SSO.Identity.Data.Entity.UserSortingParameters,Xyzies.SSO.Identity.Data.Core.LazyLoadParameters)">
+            <summary>
+            Returns total count of users
+            </summary>
+            <returns>Collection of users</returns>
+            <response code="200">If users fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.GetAllForTrustedService(System.String)">
+            <summary>
+            Returns total count of users
+            </summary>
+            <returns>Collection of users</returns>
+            <response code="200">If users fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Get(System.String,System.Int32)">
+            <summary>
+            Get user by his Cable Portal id
+            </summary>
+            <param name="id">Cable Portal id</param>
+            <param name="token">Static token</param>
+            <returns>User with passed identifier, or not found response</returns>
+            <response code="200">If user fetched successfully</response>
+            <response code="403">If authorization token is invalid</response>
+            <response code="404">If user was not found</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Get(System.String)">
+            <summary>
+            Get user by his id, objectId or userPrincipalName
+            </summary>
+            <param name="id">Azure AD B2C user uniq identifier or integer. Can be objectId of userPrincipalName</param>
+            <returns>User with passed identifier, or not found response</returns>
+            <response code="200">If user fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="404">If user was not found</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Get">
+            <summary>
+            Get user by his objectId from token
+            </summary>
+            <returns>User with passed identifier, or not found response</returns>
+            <response code="200">If user fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="404">If user was not found</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Delete(System.String)">
+            <summary>
+            Delete user by his objectId or userPrincipalName
+            </summary>
+            <param name="id">Azure AD B2C user uniq identifier. Can be objectId of userPrincipalName</param>
+            <returns>User with passed identifier, or not found response</returns>
+            <response code="204">If user deleted successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="404">If user was not found</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Post(Xyzies.SSO.Identity.Services.Models.User.ProfileCreatable)">
+            <summary>
+            Creates new user
+            </summary>
+            <param name="userCreatable">User DTO to create</param>
+            <returns>URL to newly created user</returns>
+            <response code="201">If user fetched successfully</response>
+            <response code="401">If authorization token is invalid</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.Patch(System.String,Xyzies.SSO.Identity.Services.Models.User.BaseProfile)">
+            <summary>
+            Update user properties by objectId or userPrincipalName
+            </summary>
+            <param name="objectId">objectId or userPrincipalName of Azure AD B2C User</param>
+            <param name="userToUpdate">User DTO to update</param>
+            <returns>URL to updated user</returns>
+            <response code="201">If user updated successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="404">If user was not found</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.UploadAvatar(System.String,Xyzies.SSO.Identity.Services.Models.User.AvatarModel)">
+            <summary>
+            Update a user photo thumbnail
+            </summary>
+            <param name="userId"></param>
+            <param name="avatarModel"></param>
+            <returns></returns>
+            <response code="204">If avatar updated successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="400">If avatar not updated</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.DeleteAvatar(System.String)">
+            <summary>
+            Delete a user photo thumbnail
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+            <response code="200">If avatar updated successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="400">If avatar not deleted</response>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.GetAvatar(System.String)">
+            <summary>
+            Get a user photo thumbnail
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+            <response code="200">If avatar updated successfully</response>
+            <response code="401">If authorization token is invalid</response>
+            <response code="404">If avatar not found</response>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.IdentityDataContextFactory">
+            <summary>
+            TODO: Remove before release
+            </summary>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.Filters.AccessFilter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Filters.AccessFilter.Scopes">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Filters.AccessFilter.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="scopes"></param>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Filters.AccessFilter.OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext,Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate)">
+            <inheritdoc />
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.AuthorizeModel">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.Models.PasswordModel">
+            <summary>
+            Model to reset password by resetToken
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Models.PasswordModel.ResetToken">
+            <summary>
+            Reset token to verify user
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Models.PasswordModel.Password">
+            <summary>
+            New password to update
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Models.RequestVerificationCodeModel.Email">
+            <summary>
+            Email to sent code
+            </summary>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.Models.ResetTokenResponse">
+            <summary>
+            Response with token, that allows to reset password
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Models.ResetTokenResponse.ResetToken">
+            <summary>
+            Reset token
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Models.VerifyCodeModel.Email">
+            <summary>
+            Email to verify with current code
+            </summary>
+        </member>
+        <member name="P:Xyzies.SSO.Identity.API.Models.VerifyCodeModel.Code">
+            <summary>
+            Code to verify with current email
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+        </member>
+        <member name="T:Xyzies.SSO.Identity.API.StartupException">
+            <summary>
+            Use this type of exception when configuration is wrong
+            </summary>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.StartupException.#ctor(System.String)">
+            <summary>
+            Instantiate a new object of exception
+            </summary>
+            <param name="rootCause"></param>
+        </member>
+        <member name="M:Xyzies.SSO.Identity.API.StartupException.Throw(System.String)">
+            <summary>
+            Throw a StartupException
+            </summary>
+            <param name="rootCause"></param>
+        </member>
+    </members>
+</doc>
