@@ -57,9 +57,9 @@ namespace Xyzies.SSO.Identity.Service.Service.UsersUpdatingScheduler
             {
                 await _userService.SetUsersCache();
             }
-            catch
+            catch (Exception ex)
             {
-                _logger.LogCritical("[BG] Users Cache Fetch Failed!! \n Something wrong with _userService.SetUsersCache method!");
+                _logger.LogCritical("[BG] Users Cache Fetch Failed!! \n Something wrong with _userService.SetUsersCache method!", ex);
             }
         }
 
