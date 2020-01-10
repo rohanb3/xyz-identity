@@ -1,43 +1,49 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Reflection;
+
+using Ardas.AspNetCore.Logging;
+
+using Mapster;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.AzureADB2C.UI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.AzureADB2C.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.Extensions.Hosting;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Mapster;
+
+using Swashbuckle.AspNetCore.Swagger;
+
 using Xyzies.SSO.Identity.Data;
+using Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi;
 using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
-using Xyzies.SSO.Identity.Data.Entity.Azure.AzureAdGraphApi;
-using Xyzies.SSO.Identity.Services.Mapping;
-using Xyzies.SSO.Identity.Services.Service;
-using Xyzies.SSO.Identity.Services.Middleware;
-using Xyzies.SSO.Identity.Services.Service.Roles;
-using Xyzies.SSO.Identity.Services.Service.Permission;
-using Xyzies.SSO.Identity.Services.Helpers;
-using Xyzies.SSO.Identity.UserMigration;
-using System.Collections.Generic;
-using System.Linq;
-using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Mailer;
-using Xyzies.SSO.Identity.Services.Service.ResetPassword;
+using Xyzies.SSO.Identity.Services.Helpers;
+using Xyzies.SSO.Identity.Services.Mapping;
+using Xyzies.SSO.Identity.Services.Middleware;
+using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Services.Service;
+using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Service.Relation;
-using Ardas.AspNetCore.Logging;
-using Microsoft.Extensions.Hosting;
+using Xyzies.SSO.Identity.Services.Service.ResetPassword;
+using Xyzies.SSO.Identity.Services.Service.Roles;
+using Xyzies.SSO.Identity.UserMigration;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 using Xyzies.SSO.Identity.CPUserMigration.Models;
 using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
+using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 using Xyzies.SSO.Identity.Service.Service.UsersUpdatingScheduler;
 
 namespace Xyzies.SSO.Identity.API
@@ -68,7 +74,7 @@ namespace Xyzies.SSO.Identity.API
             //    .AddDefaultTokenProviders();
 
             services.AddAuthentication(AzureADB2CDefaults.BearerAuthenticationScheme)
-               .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
+                .AddAzureADB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
 
             services.Configure<ProjectSettingsOption>(option => Configuration.Bind("ProjectSettings", option));
             services.Configure<ServiceOption>(option => Configuration.Bind("Services", option));
@@ -122,9 +128,9 @@ namespace Xyzies.SSO.Identity.API
             services.AddCors(setup => setup
                 .AddPolicy("dev", policy =>
                     policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials()));
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMemoryCache();
@@ -163,6 +169,7 @@ namespace Xyzies.SSO.Identity.API
             services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
             services.Configure<MigrationSchedulerOptions>(Configuration.GetSection("MigrationsScheduler"));
             services.Configure<MigrationSettings>(Configuration.GetSection("ConnectionStrings"));
+            services.Configure<AssemblyOptions>(Configuration.GetSection("AssemblyVersion"));
 
             services.AddSwaggerGen(options =>
             {
@@ -171,35 +178,33 @@ namespace Xyzies.SSO.Identity.API
                 options.SwaggerDoc("v1", new Info
                 {
                     Title = "Xyzies.Identity",
-                    Version = $"v1.0.0",
-                    Description = ""
+                        Version = $"v1.0.0",
+                        Description = ""
                 });
 
                 options.AddSecurityDefinition("Bearer", new ApiKeyScheme
                 {
                     In = "header",
-                    Name = "Authorization",
-                    Description = "Please enter JWT with Bearer into field",
-                    Type = "apiKey"
+                        Name = "Authorization",
+                        Description = "Please enter JWT with Bearer into field",
+                        Type = "apiKey"
                 });
 
                 options.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                {
-                    { "Bearer", Enumerable.Empty<string>() }
+                { { "Bearer", Enumerable.Empty<string>() }
                 });
 
                 options.CustomSchemaIds(x => x.FullName);
                 options.EnableAnnotations();
                 options.DescribeAllEnumsAsStrings();
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
-                   string.Concat(Assembly.GetExecutingAssembly().GetName().Name, ".xml")));
+                    string.Concat(Assembly.GetExecutingAssembly().GetName().Name, ".xml")));
             });
 
             TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
             UserMappingConfigurations.ConfigureUserMappers();
             RolesMappingConfigurations.ConfigureRoleMappers();
         }
-
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
