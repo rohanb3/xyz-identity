@@ -59,7 +59,7 @@ namespace Xyzies.SSO.Identity.Data.Entity.Azure
         [JsonProperty(Consts.CPUserIdPropertyName)]
         public int? CPUserId { get; set; }
 
-        [JsonProperty(Consts.StatudIdPropertyName)]
+        [JsonProperty(Consts.StatusIdPropertyName)]
         [JsonConverter(typeof(AzureCustomGuidFieldJsonConverter))]
         public Guid? StatusId { get; set; }
 
