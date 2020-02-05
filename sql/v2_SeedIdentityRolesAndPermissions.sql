@@ -47,26 +47,29 @@ values
 	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'xyzies.devicemanagment.device.update.admin', 1),--30
 	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'xyzies.devicemanagment.device.read.admin', 1),--31
 	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'xyzies.devicemanagment.device.delete.admin', 1),--32
----------------------------------------------------------------------------------------
+------------------------------- Realtime Dashboard -------------------------------------------------
+	('c52a1ca1-b224-489c-8f8c-955cd965a67c', 'xyzies.vsp.realtimedashboard.subscribe', 1),--33
+	('493f9349-7593-4676-9d3a-384d81fd42ac', 'xyzies.vsp.realtimedashboard.choosetenant', 1),--34
+	('9b996553-984d-4f94-8cf0-b9e773557e81', 'xyzies.vsp.call.answer', 1),--35
 
 ---------------------- Comments  -------------------------------------------------------
-	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--33
-	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--34
+	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--36
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--37
 ---------------------------------------------------------------------------------------
 
 ---------------------- History  -------------------------------------------------------
-	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--35
-	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--36
+	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--38
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--39
 ---------------------------------------------------------------------------------------
 
 ---------------------- Notification  -------------------------------------------------------
-	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1),--37
+	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1),--40
 ---------------------------------------------------------------------------------------
 
 -------------------------------------Last-----------------------------------------------------------------------------------------------
-    ('cace7e20-c5f9-4e98-984d-76fd8c35c4d6', 'xyzies.identity.user.read.all', 1),--38
-	('cace7e20-c5f9-4e98-984d-76fd8c35c4d7', 'xyzies.identity.user.read.incompany', 1),--39
-	('cace7e20-c5f9-4e98-984d-76fd8c35c4d8', 'xyzies.identity.user.read.myself', 1);--40
+    ('cace7e20-c5f9-4e98-984d-76fd8c35c4d6', 'xyzies.identity.user.read.all', 1),--41
+	('cace7e20-c5f9-4e98-984d-76fd8c35c4d7', 'xyzies.identity.user.read.incompany', 1),--42
+	('cace7e20-c5f9-4e98-984d-76fd8c35c4d8', 'xyzies.identity.user.read.myself', 1);--43
 ------------------------------------------------------------------------------------------------------------------------------------
 
 insert into [Policies]
@@ -86,26 +89,30 @@ values
     ('489b2156-6cb3-4d76-b5a4-c13776b82421', 'OrderManager'), --11
     ('f778d726-e016-47ec-b6ea-8d016937ae73', 'OrderAdmin'), --12
     ('bea8223a-dd34-477a-ae9b-ff6537a84d6f', 'DisputeSam'), --13
------------------------------------------------------------------------
+---------------------- Realtime Dashboard ---------------------------------------
+	('9c6b88b8-f857-4dbc-bfb9-5fb847b77e9c', 'CallsBase'),--14
+	('99efd393-a1eb-48e4-b438-a18d78771ff2', 'RealtimeDashboardBase'),--15
+	('8f705eaa-1dd1-488b-a4ad-5ae15c642336', 'RealtimeDashboardAdmin'),--16
+
 ---------------------- Devices  -------------------------------------------------------
-	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'DeviceBase'),--14
-	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin'),--15
+	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'DeviceBase'),--17
+	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'DeviceAdmin'),--18
 ---------------------------------------------------------------------------------------
 ---------------------- Comments  -------------------------------------------------------
-	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase'),--16
+	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'CommentBase'),--19
 ---------------------------------------------------------------------------------------
 ---------------------- History  -------------------------------------------------------
-	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'HistoryBase'),--17
-	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin'),--18
+	('a104bad3-cdad-4722-9c16-2f735f58ffc0', 'HistoryBase'),--20
+	('f1a2b40a-781e-416b-aeed-21961b01c86a', 'HistoryAdmin'),--21
 ---------------------------------------------------------------------------------------
 ---------------------- Notification  -------------------------------------------------------
-	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'NotificationBase'),--19
+	('9702e098-d66b-4d7b-a758-0f204a7b8321', 'NotificationBase'),--22
 ---------------------------------------------------------------------------------------
 
 -------------------------------------Last-----------------------------------------------------------------------------------------------
-	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'ReadAllUsers'),--20
-	('415b2993-7e32-4859-8b59-2b527bcdeea3', 'ReadUsersInCompany'),--21
-	('415b2993-7e32-4859-8b59-2b527bcdeea4', 'ReadOnlyRequester');--22
+	('415b2993-7e32-4859-8b59-2b527bcdeea2', 'ReadAllUsers'),--23
+	('415b2993-7e32-4859-8b59-2b527bcdeea3', 'ReadUsersInCompany'),--24
+	('415b2993-7e32-4859-8b59-2b527bcdeea4', 'ReadOnlyRequester');--25
 ------------------------------------------------------------------------------------------------------------------------------------
 
 insert into [TWC_Role]
@@ -131,6 +138,7 @@ values
 	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--17
 
 	('c19dd856-2e67-45cf-94e1-b70820b0cfc8', 23, 'Spectrum Director', NULL, getdate(), 0),--18
+	('43cfb8e3-8ddd-4aab-9ae5-052fd4cdb8fc', 24, 'TenantAdmin', NULL, getdate(), 0),--19
 
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0 
 
@@ -179,7 +187,14 @@ values
 	('14b656a6-2c23-4300-b9b8-7051b0745d84', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.update.admin to DeviceAdmin
 	('ce38932d-53f6-46e4-abe0-12cdd6bc6b4a', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.read.admin to DeviceAdmin
 	('8902b1ad-de90-4619-9c40-0486a0a8c32b', 'd064b092-dbb9-4622-88f8-32b9c44e5cec'), --xyzies.devicemanagment.delete.admin to DeviceAdmin
----------------------------------------------------------------------------------------
+----------------------- Realtime Dashboard -------------------------------------------------------
+	('c52a1ca1-b224-489c-8f8c-955cd965a67c', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.realtimedashboard.subscribe to RealtimeDashboardAdmin
+	('493f9349-7593-4676-9d3a-384d81fd42ac', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.realtimedashboard.choosetenant to RealtimeDashboardAdmin
+	('c52a1ca1-b224-489c-8f8c-955cd965a67c', '99efd393-a1eb-48e4-b438-a18d78771ff2'), --xyzies.vsp.realtimedashboard.subscribe to RealtimeDashboardBase
+
+	('9b996553-984d-4f94-8cf0-b9e773557e81', '9c6b88b8-f857-4dbc-bfb9-5fb847b77e9c'), --xyzies.vsp.call.answer to CallBase
+
+
 ---------------------- Comments  -------------------------------------------------------
 	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'ea3431be-811d-449f-b51b-5deda83cdc8d'), --xyzies.devicemanagment.create to CommentBase
 	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'ea3431be-811d-449f-b51b-5deda83cdc8d'), --xyzies.devicemanagment.read to CommentBase
@@ -290,12 +305,14 @@ values
     ('221315e1-b212-41f4-bf3a-ce6b5bbb9f7a', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),--RecontiliationLogin policies for Spectrum Director
     ('b695018c-c264-4246-9e33-9dce90f338c2', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--VspOperatorLogin policies for Superviser
     ('b695018c-c264-4246-9e33-9dce90f338c2', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--VspOperatorLogin policies for Support Admin Superviser 
+    
+    ('b695018c-c264-4246-9e33-9dce90f338c2', '43cfb8e3-8ddd-4aab-9ae5-052fd4cdb8fc'),--VspOperatorLogin policies for TenantAdmin
 
 ----------------------- Devices  -------------------------------------------------------
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--DeviceAdmin for AccountAdmin
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--DeviceAdmin for OperationAdmin
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--DeviceAdmin for Operation Assistant
-    ('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--DeviceAdmin for Operation Admin Superviser
+    ('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'da653a4b-fe47-4e02-813a-c99c0b4d4c79'),--DeviceAdmin for Support Admin Superviser
 	('d064b092-dbb9-4622-88f8-32b9c44e5cec', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--DeviceAdmin for SystemAdmin
 
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--DeviceBase for AccountAdmin
@@ -306,7 +323,16 @@ values
 	
 	('128cdc31-c597-4ca6-bdbc-55d66e31f698', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--DeviceBase for Supervisor
 
----------------------------------------------------------------------------------------
+----------------------- Realtime Dashboard ---------------------------------------------------
+	('8f705eaa-1dd1-488b-a4ad-5ae15c642336', '37fdfbf6-3ee2-4827-b7be-cefe78213d92'),--RealtimeDashboardAdmin for Supervisor
+    ('8f705eaa-1dd1-488b-a4ad-5ae15c642336', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--RealtimeDashboardAdmin for AccountAdmin
+	('8f705eaa-1dd1-488b-a4ad-5ae15c642336', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--RealtimeDashboardAdmin for OperationAdmin
+	('8f705eaa-1dd1-488b-a4ad-5ae15c642336', 'd47fd2ad-46ce-4173-8689-88573aa9ffac'),--RealtimeDashboardAdmin for Operation Assistant
+	('8f705eaa-1dd1-488b-a4ad-5ae15c642336', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'),--RealtimeDashboardAdmin for SystemAdmin
+
+	('99efd393-a1eb-48e4-b438-a18d78771ff2', '43cfb8e3-8ddd-4aab-9ae5-052fd4cdb8fc'),--RealtimeDashboardBase for TenantAdmin
+	
+    ('9c6b88b8-f857-4dbc-bfb9-5fb847b77e9c', '87a421a2-60e1-46c9-8e2e-679c1f5f3c8e'),--CallsBase for SupportAdmin
 ----------------------- Comments  -------------------------------------------------------
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'ee9aa7f3-b3b5-4f64-a79c-ce192c576ad9'),--CommentBase for AccountAdmin
 	('ea3431be-811d-449f-b51b-5deda83cdc8d', 'da671d01-1133-4cc9-94a6-b77587f21fad'),--CommentBase for OperationAdmin
