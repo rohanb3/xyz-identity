@@ -50,26 +50,27 @@ values
 ------------------------------- Realtime Dashboard -------------------------------------------------
 	('c52a1ca1-b224-489c-8f8c-955cd965a67c', 'xyzies.vsp.realtimedashboard.subscribe', 1),--33
 	('493f9349-7593-4676-9d3a-384d81fd42ac', 'xyzies.vsp.realtimedashboard.choosetenant', 1),--34
-	('9b996553-984d-4f94-8cf0-b9e773557e81', 'xyzies.vsp.call.answer', 1),--35
+	('64fcac90-37ad-4bfd-8b32-09496af92786', 'xyzies.vsp.dashboard.choosetenant', 1),--35
+	('9b996553-984d-4f94-8cf0-b9e773557e81', 'xyzies.vsp.call.answer', 1),--36
 
 ---------------------- Comments  -------------------------------------------------------
-	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--36
-	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--37
+	('2c307cb5-0d8a-42f9-982b-7fbb3172c51d', 'xyzies.devicemanagment.comment.create', 1),--37
+	('0c538b5f-84d0-4d1b-bba5-70d4c7969678', 'xyzies.devicemanagment.comment.read', 1),--38
 ---------------------------------------------------------------------------------------
 
 ---------------------- History  -------------------------------------------------------
-	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--38
-	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--39
+	('a88cb33c-1a02-4511-9dba-546e3ed239d6', 'xyzies.devicemanagment.history.read', 1),--39
+	('63dfac6d-3d56-4072-ac4b-ad628ef7dd99', 'xyzies.devicemanagment.history.read.admin', 1),--40
 ---------------------------------------------------------------------------------------
 
 ---------------------- Notification  -------------------------------------------------------
-	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1),--40
+	('7cc53c19-0bf0-4cc9-ab3f-7702f459e43c', 'xyzies.notification.email.create', 1),--41
 ---------------------------------------------------------------------------------------
 
 -------------------------------------Last-----------------------------------------------------------------------------------------------
-    ('cace7e20-c5f9-4e98-984d-76fd8c35c4d6', 'xyzies.identity.user.read.all', 1),--41
-	('cace7e20-c5f9-4e98-984d-76fd8c35c4d7', 'xyzies.identity.user.read.incompany', 1),--42
-	('cace7e20-c5f9-4e98-984d-76fd8c35c4d8', 'xyzies.identity.user.read.myself', 1);--43
+    ('cace7e20-c5f9-4e98-984d-76fd8c35c4d6', 'xyzies.identity.user.read.all', 1),--42
+	('cace7e20-c5f9-4e98-984d-76fd8c35c4d7', 'xyzies.identity.user.read.incompany', 1),--43
+	('cace7e20-c5f9-4e98-984d-76fd8c35c4d8', 'xyzies.identity.user.read.myself', 1);--44
 ------------------------------------------------------------------------------------------------------------------------------------
 
 insert into [Policies]
@@ -190,6 +191,7 @@ values
 ----------------------- Realtime Dashboard -------------------------------------------------------
 	('c52a1ca1-b224-489c-8f8c-955cd965a67c', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.realtimedashboard.subscribe to RealtimeDashboardAdmin
 	('493f9349-7593-4676-9d3a-384d81fd42ac', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.realtimedashboard.choosetenant to RealtimeDashboardAdmin
+	('64fcac90-37ad-4bfd-8b32-09496af92786', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.dashboard.choosetenant to RealtimeDashboardAdmin
 	('c52a1ca1-b224-489c-8f8c-955cd965a67c', '99efd393-a1eb-48e4-b438-a18d78771ff2'), --xyzies.vsp.realtimedashboard.subscribe to RealtimeDashboardBase
 
 	('9b996553-984d-4f94-8cf0-b9e773557e81', '9c6b88b8-f857-4dbc-bfb9-5fb847b77e9c'), --xyzies.vsp.call.answer to CallBase
