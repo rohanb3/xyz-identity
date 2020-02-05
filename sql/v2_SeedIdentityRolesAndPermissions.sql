@@ -193,6 +193,7 @@ values
 	('c52a1ca1-b224-489c-8f8c-955cd965a67c', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.realtimedashboard.subscribe to DashboardAdmin
 	('493f9349-7593-4676-9d3a-384d81fd42ac', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.realtimedashboard.choosetenant to DashboardAdmin
 	('64fcac90-37ad-4bfd-8b32-09496af92786', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.dashboard.choosetenant to DashboardAdmin
+	('6a614860-b293-4dc5-bd6d-313dda3f86bd', '8f705eaa-1dd1-488b-a4ad-5ae15c642336'), --xyzies.vsp.dashboard.get to DashboardAdmin
 	
     ('c52a1ca1-b224-489c-8f8c-955cd965a67c', '99efd393-a1eb-48e4-b438-a18d78771ff2'), --xyzies.vsp.realtimedashboard.subscribe to DashboardBase
 	('6a614860-b293-4dc5-bd6d-313dda3f86bd', '99efd393-a1eb-48e4-b438-a18d78771ff2'), --xyzies.vsp.dashboard.get to DashboardBase
