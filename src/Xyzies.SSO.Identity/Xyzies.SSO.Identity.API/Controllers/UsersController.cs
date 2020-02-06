@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Authorization;
-using Xyzies.SSO.Identity.Data.Entity;
-using Xyzies.SSO.Identity.Services.Service;
-using Xyzies.SSO.Identity.Services.Models.User;
-using Xyzies.SSO.Identity.Services.Exceptions;
-using Xyzies.SSO.Identity.Data.Core;
-using Xyzies.SSO.Identity.Data.Helpers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+
+using Xyzies.SSO.Identity.Data.Core;
+using Xyzies.SSO.Identity.Data.Entity;
+using Xyzies.SSO.Identity.Data.Helpers;
+using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Services.Models.User;
+using Xyzies.SSO.Identity.Services.Service;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -44,15 +46,15 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter, [FromQuery]UserSortingParameters sorting)
+        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter, [FromQuery] UserSortingParameters sorting)
         {
             try
             {
-                var currentUser = new UserIdentityParams
-                {
-                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
-                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
-                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+            var currentUser = new UserIdentityParams
+            {
+            Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+            Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+            CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
 
@@ -97,9 +99,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
-                    })));
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>>
+                {
+                    new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown", new string[] { ex.Message })
+                })));
             }
             catch (KeyNotFoundException)
             {
@@ -136,9 +139,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
-                    })));
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>>
+                {
+                    new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown", new string[] { ex.Message })
+                })));
             }
             catch (AccessException)
             {
@@ -174,16 +178,16 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                        new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown" , new string[] { ex.Message })
-                    })));
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>>
+                {
+                    new KeyValuePair<string, string[]>(ex.ParamName ?? "Unknown", new string[] { ex.Message })
+                })));
             }
             catch (AccessException)
             {
                 return new ContentResult { StatusCode = 403 };
             }
         }
-
 
         /// <summary>
         /// Returns total count of users
@@ -276,8 +280,6 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
         }
 
-
-
         /// <summary>
         /// Get user by his id, objectId or userPrincipalName
         /// </summary>
@@ -292,11 +294,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                var currentUser = new UserIdentityParams
-                {
-                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
-                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
-                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+            var currentUser = new UserIdentityParams
+            {
+            Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+            Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+            CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var user = await _userService.GetUserByIdAsync(id, currentUser);
                 return Ok(user);
@@ -359,7 +361,13 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                await _userService.DeleteUserByIdAsync(id);
+                // await _userService.DeleteUserByIdAsync(id);
+                var Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value;
+                var Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value;
+                var CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value;
+
+                _logger.LogCritical($"DeleteUserByIdAsync requested by userId {Id} userRole {Role} userCompany {CompanyId}");
+
                 return NoContent();
             }
             catch (KeyNotFoundException ex)
@@ -381,7 +389,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] [Required] ProfileCreatable userCreatable)
+        public async Task<IActionResult> Post([FromBody][Required] ProfileCreatable userCreatable)
         {
             try
             {
@@ -395,9 +403,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>> {
-                            new KeyValuePair<string, string[]>(ex.ParamName, new string[] { ex.Message })
-                        })));
+                return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>(new List<KeyValuePair<string, string[]>>
+                {
+                    new KeyValuePair<string, string[]>(ex.ParamName, new string[] { ex.Message })
+                })));
             }
         }
 
@@ -411,7 +420,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         /// <response code="404">If user was not found</response>
         [HttpPatch("{objectId}")]
-        public async Task<IActionResult> Patch(string objectId, [FromBody] [Required] BaseProfile userToUpdate)
+        public async Task<IActionResult> Patch(string objectId, [FromBody][Required] BaseProfile userToUpdate)
         {
             try
             {
@@ -439,7 +448,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="400">If avatar not updated</response>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpPut("{userId}/avatar")]
-        public async Task<IActionResult> UploadAvatar([FromRoute][Required] string userId, [FromForm] [Required] AvatarModel avatarModel)
+        public async Task<IActionResult> UploadAvatar([FromRoute][Required] string userId, [FromForm][Required] AvatarModel avatarModel)
         {
             try
             {
@@ -485,7 +494,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="404">If avatar not found</response>
         // TODO: Fix 'image/*' to valid type
         //[Produces("image/*")] 
-        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK /* 200 */)]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK /* 200 */ )]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
