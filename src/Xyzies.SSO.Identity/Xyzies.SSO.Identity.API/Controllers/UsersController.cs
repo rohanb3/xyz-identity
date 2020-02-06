@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
@@ -27,15 +28,18 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger<UsersController> _logger;
 
         /// <summary>
         /// Ctor with dependencies
         /// </summary>
         /// <param name="userService"></param>
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ILogger<UsersController> logger)
         {
             _userService = userService ??
                 throw new ArgumentNullException(nameof(userService));
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
