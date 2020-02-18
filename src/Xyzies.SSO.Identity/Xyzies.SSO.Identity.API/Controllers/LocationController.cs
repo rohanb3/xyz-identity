@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Services.Service;
-using Xyzies.SSO.Identity.UserMigration.Services.Migrations;
-using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Xyzies.SSO.Identity.API.Controllers
 {
@@ -15,12 +15,10 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class LocationController : ControllerBase
     {
         private readonly ILocaltionService _localtionService;
-        private readonly IMigrationService _migration;
 
-        public LocationController(ILocaltionService localtionService, IMigrationService migration)
+        public LocationController(ILocaltionService localtionService)
         {
             _localtionService = localtionService;
-            _migration = migration;
         }
 
         /// <summary>
@@ -57,12 +55,11 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet]
         [Route("city/ids")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<City>))]
-        public async Task<IActionResult> GetCitiesByIds([FromQuery]List<Guid> ids)
+        public async Task<IActionResult> GetCitiesByIds([FromQuery] List<Guid> ids)
         {
             var cities = await _localtionService.GetAllCities(ids);
             return Ok(cities);
         }
-
 
         /// <summary>
         /// Get states
@@ -84,7 +81,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         [HttpGet]
         [Route("state/ids")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<State>))]
-        public async Task<IActionResult> GetStatesByIds([FromQuery]List<Guid> ids)
+        public async Task<IActionResult> GetStatesByIds([FromQuery] List<Guid> ids)
         {
             var states = await _localtionService.GetAllStates(ids);
             return Ok(states);

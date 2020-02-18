@@ -71,40 +71,6 @@
             </summary>
             <returns>Collection of states</returns>
         </member>
-        <member name="T:Xyzies.SSO.Identity.API.Controllers.MigrationsController">
-            <summary>
-            Controller for user migrations between CP and B2C
-            </summary>
-        </member>
-        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.#ctor(Xyzies.SSO.Identity.UserMigration.Services.Migrations.IMigrationService)">
-            <summary>
-            Constructor with dependecies
-            </summary>
-            <param name="migrationService"></param>
-        </member>
-        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.MigrateAzureToCp">
-            <summary>
-            Migrate users from Azure AD B2C to Cable Portal DB
-            </summary>
-        </member>
-        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.Migrate(System.Nullable{System.Int32},System.Nullable{System.Int32},System.String[])">
-            <summary>
-            Migrate users from CP base to Azure
-            </summary>
-            <param name="limit">Limit of users from CP base</param>
-            <param name="offset">Offset for users from CP base</param>
-            <param name="emails">Specify users by their mail</param>
-            <returns></returns>
-        </member>
-        <member name="M:Xyzies.SSO.Identity.API.Controllers.MigrationsController.FillBranches(System.Nullable{System.Int32},System.Nullable{System.Int32},System.String[])">
-            <summary>
-            Fill SuperAdmins with default company branches
-            </summary>
-            <param name="limit"></param>
-            <param name="offset"></param>
-            <param name="emails"></param>
-            <returns></returns>
-        </member>
         <member name="T:Xyzies.SSO.Identity.API.Controllers.RoleController">
             <summary>
             

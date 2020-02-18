@@ -39,11 +39,7 @@ using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Roles;
-using Xyzies.SSO.Identity.UserMigration;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using Xyzies.SSO.Identity.CPUserMigration.Models;
-using Xyzies.SSO.Identity.CPUserMigration.Services.Migrations;
-using Xyzies.SSO.Identity.CPUserMigration.Services.Scheduler;
 using Xyzies.SSO.Identity.Service.Service.UsersUpdatingScheduler;
 
 namespace Xyzies.SSO.Identity.API
@@ -153,22 +149,17 @@ namespace Xyzies.SSO.Identity.API
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<ILocaltionService, LocationService>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
-            services.AddScoped<ISqlDependencyMigration, SqlDependencyMigration>();
             services.AddScoped<IUsersBackgroundService, UsersBackgroundService>();
             services.AddSingleton<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddHostedService<UsersBackgroundService>();
-            services.AddHostedService<MigrationScheduler>();
-            services.AddUserMigrationService();
             #endregion
 
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("AzureAdB2C"));
             services.Configure<AzureAdGraphApiOptions>(Configuration.GetSection("AzureAdGraphApi"));
             services.Configure<AuthServiceOptions>(Configuration.GetSection("UserAuthorization"));
             services.Configure<ResetPasswordOptions>(Configuration.GetSection("ResetPassword"));
-            services.Configure<MigrationSchedulerOptions>(Configuration.GetSection("MigrationsScheduler"));
-            services.Configure<MigrationSettings>(Configuration.GetSection("ConnectionStrings"));
             services.Configure<AssemblyOptions>(Configuration.GetSection("AssemblyVersion"));
 
             services.AddSwaggerGen(options =>
@@ -225,10 +216,6 @@ namespace Xyzies.SSO.Identity.API
             var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
             var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
             //context.Database.Migrate();s
-
-            // TODO: Refactoring
-            var sqlDependency = serviceScope.ServiceProvider.GetRequiredService<ISqlDependencyMigration>();
-            sqlDependency.Initialize();
 
             app.UseAuthentication()
                 .UseProcessClaims()

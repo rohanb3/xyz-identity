@@ -30,6 +30,8 @@ namespace Xyzies.SSO.Identity.API.Controllers
         private readonly IUserService _userService;
         private readonly ILogger _logger;
 
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Ctor with dependencies
         /// </summary>
