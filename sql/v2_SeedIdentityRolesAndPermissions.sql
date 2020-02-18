@@ -137,8 +137,7 @@ values
     ('d47fd2ad-46ce-4173-8689-88573aa9ffac', 14, 'Operation Assistant', NULL, getdate(), 0),--14
     ('1e0b4f66-d15e-4366-994a-5bba45db1540', 15, 'Role #15', NULL, getdate(), 0),--15
     ('b2669957-2b49-460b-9074-3a68aa075c12', 16, 'Role #16', NULL, getdate(), 0),--16
-	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--17
-
+	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--16
 	('c19dd856-2e67-45cf-94e1-b70820b0cfc8', 23, 'Spectrum Director', NULL, getdate(), 0),--18
 	('43cfb8e3-8ddd-4aab-9ae5-052fd4cdb8fc', 24, 'TenantAdmin', NULL, getdate(), 0),--19
 
@@ -270,6 +269,7 @@ values
 
     --*Can not see Commissions on order list
 	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),  --OrderManager for SAM
+	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),  --OrderManager for Spectrum Director
 
     ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --ReconciliationWebAdmin for System admin
     ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --ReconciliationWebAdmin for Operation admin

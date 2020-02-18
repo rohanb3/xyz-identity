@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Xyzies.SSO.Identity.Data.Entity
 {
     [Table("TWC_Role")]
-    public class CPRole : BaseEntity<Guid>
+    public class CpRoles : BaseEntity<Guid>
     {
         [Column("RoleKey")]
         public override Guid Id { get; set; }

@@ -74,14 +74,12 @@ namespace Xyzies.SSO.Identity.Services.Service
                 throw new ArgumentException(ErrorReponses.UserDoesNotExits);
             }
 
-            _logger.LogError("Checking user status on authorization");
             var userStatus = (await _requestStatusesRepository.GetByAsync(x => x.Id == user.StatusId))?.Name;
             if (userStatus == null || !userStatus.ToLower().Contains("approved"))
             {
                 throw new AccessException("Check your status");
             }
 
-            _logger.LogError("Getting token");
             var result = await RequestAzureEndpoint(new FormUrlEncodedContent(GetKeyValuePairOptions(options)));
             var jwtToken = new JwtSecurityToken(result.Access_token);
             var companyId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == CompanyIdClaimType)?.Value;
