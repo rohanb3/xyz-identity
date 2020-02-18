@@ -215,7 +215,7 @@ namespace Xyzies.SSO.Identity.API
 
             var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
             var context = serviceScope.ServiceProvider.GetRequiredService<IdentityDataContext>();
-            context.Database.Migrate();
+            //context.Database.Migrate();s
 
             app.UseAuthentication()
                 .UseProcessClaims()
@@ -232,7 +232,7 @@ namespace Xyzies.SSO.Identity.API
                 {
                     uiOptions.SwaggerEndpoint("v1/swagger.json", $"v1.0.0");
                     //uiOptions.RoutePrefix = "/api/identity";
-                    uiOptions.DisplayRequestDuration();
+                    uiOptions.DisplayRequestDuration();//
                 });
 
         }

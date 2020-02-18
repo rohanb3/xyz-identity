@@ -28,6 +28,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger _logger;
 
         private readonly ILogger _logger;
 
