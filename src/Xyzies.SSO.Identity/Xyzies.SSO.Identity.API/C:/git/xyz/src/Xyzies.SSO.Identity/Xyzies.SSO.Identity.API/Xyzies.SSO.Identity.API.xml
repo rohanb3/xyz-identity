@@ -103,7 +103,7 @@
             AAD Users Endpoints
             </summary>
         </member>
-        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.#ctor(Xyzies.SSO.Identity.Services.Service.IUserService)">
+        <member name="M:Xyzies.SSO.Identity.API.Controllers.UsersController.#ctor(Xyzies.SSO.Identity.Services.Service.IUserService,Microsoft.Extensions.Logging.ILogger{Xyzies.SSO.Identity.API.Controllers.UsersController})">
             <summary>
             Ctor with dependencies
             </summary>
