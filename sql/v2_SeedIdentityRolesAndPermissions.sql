@@ -139,7 +139,7 @@ values
     ('b2669957-2b49-460b-9074-3a68aa075c12', 16, 'Role #16', NULL, getdate(), 0),--16
 	('da653a4b-fe47-4e02-813a-c99c0b4d4c79', 18, 'Support Admin Supervisor', NULL, getdate(), 0),--16
 	('c19dd856-2e67-45cf-94e1-b70820b0cfc8', 23, 'Spectrum Director', NULL, getdate(), 0),--18
-	('43cfb8e3-8ddd-4aab-9ae5-052fd4cdb8fc', 24, 'TenantAdmin', NULL, getdate(), 0),--19
+	('43cfb8e3-8ddd-4aab-9ae5-052fd4cdb8fc', 24, 'Tenant Admin', NULL, getdate(), 0),--19
 
     ('a98dc9cb-7847-4858-8693-5fd11b24b58c', 0, 'Anonymous', NULL, getdate(), 0);--0 
 
