@@ -269,7 +269,6 @@ values
 
     --*Can not see Commissions on order list
 	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'af16483d-9c81-4443-84d6-a976e54fbfa9'),  --OrderManager for SAM
-	('489b2156-6cb3-4d76-b5a4-c13776b82421', 'c19dd856-2e67-45cf-94e1-b70820b0cfc8'),  --OrderManager for Spectrum Director
 
     ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'a2285edf-44d0-4f2b-be30-4d6e49644da2'), --ReconciliationWebAdmin for System admin
     ('7b0ad5ee-429d-4577-ad70-7d3323069804', 'da671d01-1133-4cc9-94a6-b77587f21fad'), --ReconciliationWebAdmin for Operation admin
