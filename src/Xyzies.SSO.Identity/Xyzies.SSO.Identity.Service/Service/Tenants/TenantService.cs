@@ -35,13 +35,14 @@ namespace Xyzies.SSO.Identity.Services.Service.Tenants
         /// <inheritdoc />
         public async Task<IEnumerable<TenantWithCompanies>> GetFromCache()
         {
-            var cacheExpiration = _memoryCache.Get<DateTime>(Consts.Cache.ExpirationKey);
+            var cacheExpiration = _memoryCache.Get<DateTime>(Consts.Cache.TanentExpirationKey);
             var tenants = _memoryCache.Get<IEnumerable<TenantWithCompanies>>(Consts.Cache.TanentsKey);
             if (cacheExpiration < DateTime.Now || tenants?.Count() == 0)
             {
                 await SetToCacheAsync();
+                tenants = _memoryCache.Get<IEnumerable<TenantWithCompanies>>(Consts.Cache.TanentsKey);
             }
-            return tenants;
+            return tenants ?? new List<TenantWithCompanies>();
         }
 
         /// <inheritdoc />
@@ -50,7 +51,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Tenants
             var tenants =  await _httpService.GetTenantsWithCompaniesAsync();
 
             _memoryCache.Set(Consts.Cache.TanentsKey, tenants);
-            _memoryCache.Set(Consts.Cache.ExpirationKey, DateTime.Now.AddHours(1));
+            _memoryCache.Set(Consts.Cache.TanentExpirationKey, DateTime.Now.AddHours(1));
         }
     }
 }

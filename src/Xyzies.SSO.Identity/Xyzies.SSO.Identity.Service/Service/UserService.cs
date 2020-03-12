@@ -514,6 +514,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }).ToList();
 
             var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
+            var test = usersWithTenant.Where(x => x.CompanyId == "8186").ToList();
 
             var searchedUsers = usersWithTenant.GetByParameters(filter, sorting);
             searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
@@ -535,14 +536,15 @@ namespace Xyzies.SSO.Identity.Services.Service
                 TenantId = x.Id,
                 CompanyId = c.Id
             })).ToList();
-            var userGroupedByCompanyId = users.GroupBy(x => int.Parse(x.CompanyId));
+            int companyId = 0;
+            var userGroupedByCompanyId = users.GroupBy(x => (int.TryParse(x.CompanyId, out companyId) ? companyId : 0));
             var userWithTenant = (from u in userGroupedByCompanyId
                                   join t in tenantIdWithCompanyIdList on u.Key equals t.CompanyId into _t
                                   from t in _t.DefaultIfEmpty()
                                   select new
                                   {
                                       Users = u.ToList(),
-                                      t.TenantId
+                                      t?.TenantId
                                   }).ToList();
             userWithTenant.ForEach(x => x.Users.ForEach(u => u.TenantId = x.TenantId));
             return userWithTenant.SelectMany(x=>x.Users).ToList();
