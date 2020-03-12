@@ -78,6 +78,7 @@ namespace Xyzies.SSO.Identity.Data.Helpers
             public const string PermissionKey = "Permission";
             public const string ExpirationKey = "Expiration";
             public const string UsersKey = "Users";
+            public const string TanentsKey = "Tenants";
         }
 
         public class UsersSorting

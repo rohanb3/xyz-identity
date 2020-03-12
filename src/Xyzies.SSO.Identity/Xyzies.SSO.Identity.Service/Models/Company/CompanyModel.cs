@@ -7,19 +7,8 @@ namespace Xyzies.SSO.Identity.Services.Models.Company
     /// <summary>
     /// Company model
     /// </summary>
-    public class CompanyModel
+    public class CompanyModel : CompanySimpleModel
     {
-        /// <summary>
-        /// Id
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Name
-        /// </summary>
-        [JsonProperty("companyName")]
-        public string Name { get; set; }
-
         /// <summary>
         /// Status key from CP
         /// </summary>
