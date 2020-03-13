@@ -514,7 +514,6 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }).ToList();
 
             var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
-            var test = usersWithTenant.Where(x => x.CompanyId == "8186").ToList();
 
             var searchedUsers = usersWithTenant.GetByParameters(filter, sorting);
             searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
