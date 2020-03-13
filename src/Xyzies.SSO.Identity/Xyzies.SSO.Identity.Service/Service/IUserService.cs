@@ -11,7 +11,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public interface IUserService
     {
-        Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null);
+        Task<LazyLoadedResult<ProfileWithTenants>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null);
         Task<Profile> GetUserByIdAsync(string id, UserIdentityParams user);
         Task<Profile> GetUserBy(Func<AzureUser, bool> predicate);
         Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds = null, UserSortingParameters sorting = null, LazyLoadParameters lazyParameters = null);

@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Helpers;
+using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
 
@@ -52,6 +53,15 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             var responseString = await SendGetRequest(uri, token);
 
             return GetPublicApiResponse<List<CompanyModel>>(responseString);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TenantWithCompanies>> GetTenantsWithCompaniesAsync()
+        {
+            var uri = new Uri($"{_publicApiUrl}/tenant/simple/{Consts.Security.StaticToken}/trusted");
+            var responseString = await SendGetRequest(uri);
+
+            return GetPublicApiResponse<IEnumerable<TenantWithCompanies>>(responseString);
         }
 
         /// <inheritdoc />
