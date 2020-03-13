@@ -66,6 +66,8 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                .Map(dest => dest.PasswordPolicies, src => PasswordPolicy.DisablePasswordExpirationAndStrong)
                .Ignore(dest => dest.Email);
 
+            TypeAdapterConfig<AzureUserWithTenant, UserBaseModel>.NewConfig()
+                .Map(dest => dest.UserName, src => src.DisplayName);
         }
 
         private static string GetSignInNameValue(SignInName name) => name?.Value;

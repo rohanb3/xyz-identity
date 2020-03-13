@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Xyzies.SSO.Identity.Data.Entity;
-using Xyzies.SSO.Identity.Service.Models;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Models.Company
 {
@@ -17,6 +17,6 @@ namespace Xyzies.SSO.Identity.Services.Models.Company
         /// <summary>
         /// Company Tenant
         /// </summary>
-        public Tenant Tenant { get; set; }
+        public TenantModel Tenant { get; set; }
     }
 }

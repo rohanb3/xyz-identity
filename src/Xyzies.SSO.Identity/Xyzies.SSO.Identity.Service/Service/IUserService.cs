@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 using Xyzies.SSO.Identity.Services.Models.User;
 
 namespace Xyzies.SSO.Identity.Services.Service
@@ -12,6 +13,7 @@ namespace Xyzies.SSO.Identity.Services.Service
     public interface IUserService
     {
         Task<LazyLoadedResult<ProfileWithTenants>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null);
+        Task<IEnumerable<TenantSimpleWithUsersModel>> GetAllUsersByTenantAsync(UserIdentityParams user, TenantFilter filter = null);
         Task<Profile> GetUserByIdAsync(string id, UserIdentityParams user);
         Task<Profile> GetUserBy(Func<AzureUser, bool> predicate);
         Dictionary<string, int> GetUsersCountInCompanies(List<string> companyIds = null, UserSortingParameters sorting = null, LazyLoadParameters lazyParameters = null);

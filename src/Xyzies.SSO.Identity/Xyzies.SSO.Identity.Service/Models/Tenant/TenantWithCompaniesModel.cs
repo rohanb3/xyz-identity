@@ -1,18 +1,14 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Xyzies.SSO.Identity.Service.Models;
+﻿using System.Collections.Generic;
 using Xyzies.SSO.Identity.Services.Models.Company;
 
-namespace Xyzies.SSO.Identity.Services.Models
+namespace Xyzies.SSO.Identity.Services.Models.Tenant
 {
     /// <summary>
     /// Tenant with short information by companies
     /// </summary>
-    public class TenantWithCompanies : Tenant
+    public class TenantWithCompaniesModel : TenantModel
     {
-        public TenantWithCompanies()
+        public TenantWithCompaniesModel()
         {
             Companies = new List<CompanySimpleModel>();
         }

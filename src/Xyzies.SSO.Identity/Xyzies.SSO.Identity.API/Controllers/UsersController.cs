@@ -14,6 +14,7 @@ using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
 
@@ -62,6 +63,39 @@ namespace Xyzies.SSO.Identity.API.Controllers
                     CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
+
+                return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
+        }
+
+        /// <summary>
+        /// Returns collection of users by tenant
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet("simple/bytenant")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TenantSimpleWithUsersModel>))]
+        [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetByTenant([FromQuery] TenantFilter tenantFilter)
+        {
+            try
+            {
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                };
+                var users = await _userService.GetAllUsersByTenantAsync(currentUser, tenantFilter);
 
                 return Ok(users);
             }

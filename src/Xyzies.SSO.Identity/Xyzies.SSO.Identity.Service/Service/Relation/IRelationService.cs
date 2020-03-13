@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
@@ -33,7 +33,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task<IEnumerable<TenantWithCompanies>> GetTenantsWithCompaniesAsync();
+        Task<IEnumerable<TenantWithCompaniesModel>> GetTenantsWithCompaniesAsync();
 
         /// <summary>
         /// Get branch by id
