@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Helpers;
-using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 using Xyzies.SSO.Identity.Services.Service.Relation;
 
 namespace Xyzies.SSO.Identity.Services.Service.Tenants
@@ -33,22 +32,22 @@ namespace Xyzies.SSO.Identity.Services.Service.Tenants
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TenantWithCompanies>> GetFromCache()
+        public async Task<IEnumerable<TenantWithCompaniesModel>> GetFromCache()
         {
             var cacheExpiration = _memoryCache.Get<DateTime>(Consts.Cache.TenantExpirationKey);
-            var tenants = _memoryCache.Get<IEnumerable<TenantWithCompanies>>(Consts.Cache.TenantsKey);
+            var tenants = _memoryCache.Get<IEnumerable<TenantWithCompaniesModel>>(Consts.Cache.TenantsKey);
             if (cacheExpiration < DateTime.Now || tenants?.Count() == 0)
             {
                 await SetToCacheAsync();
-                tenants = _memoryCache.Get<IEnumerable<TenantWithCompanies>>(Consts.Cache.TenantsKey);
+                tenants = _memoryCache.Get<IEnumerable<TenantWithCompaniesModel>>(Consts.Cache.TenantsKey);
             }
-            return tenants ?? new List<TenantWithCompanies>();
+            return tenants ?? new List<TenantWithCompaniesModel>();
         }
 
         /// <inheritdoc />
         public async Task SetToCacheAsync()
         {
-            var tenants =  await _httpService.GetTenantsWithCompaniesAsync();
+            var tenants = await _httpService.GetTenantsWithCompaniesAsync();
 
             _memoryCache.Set(Consts.Cache.TenantsKey, tenants);
             _memoryCache.Set(Consts.Cache.TenantExpirationKey, DateTime.Now.AddHours(1));

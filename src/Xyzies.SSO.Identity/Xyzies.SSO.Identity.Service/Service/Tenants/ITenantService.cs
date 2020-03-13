@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Service.Tenants
 {
@@ -15,8 +14,8 @@ namespace Xyzies.SSO.Identity.Services.Service.Tenants
         /// Get tenants from cache
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TenantWithCompanies>> GetFromCache();
-        
+        Task<IEnumerable<TenantWithCompaniesModel>> GetFromCache();
+
         /// <summary>
         /// Add tenants to cache
         /// </summary>

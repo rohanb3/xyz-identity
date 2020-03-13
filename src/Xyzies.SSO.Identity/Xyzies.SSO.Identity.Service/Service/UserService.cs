@@ -15,6 +15,7 @@ using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Service.Relation;
@@ -100,14 +101,14 @@ namespace Xyzies.SSO.Identity.Services.Service
             await _permissionService.CheckPermissionExpiration();
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
             {
-                return await GetUsers(filter, sorting);
+                return await GetUsersWithTenant(filter, sorting);
             }
 
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }))
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
 
-                return await GetUsers(filter, sorting);
+                return await GetUsersWithTenant(filter, sorting);
             }
 
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }))
@@ -132,6 +133,26 @@ namespace Xyzies.SSO.Identity.Services.Service
             throw new ArgumentException("Can not check you permission");
         }
 
+        public async Task<IEnumerable<TenantSimpleWithUsersModel>> GetAllUsersByTenantAsync(UserIdentityParams user, TenantFilter filter = null)
+        {
+            await _permissionService.CheckPermissionExpiration();
+            var usersGroupedByTenant = await GroupUserByTenant();
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
+            {
+                if(filter?.TenantIds.Count() != 0)
+                {
+                    usersGroupedByTenant = usersGroupedByTenant.Where(x => filter.TenantIds.Contains(x.Id));
+                }
+                return usersGroupedByTenant;
+            }
+
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }))
+            {
+                var currentUserTenantId = await _tenantService.GetByCompanyId(ParseCompanyIdToNumber(user.CompanyId));
+                return usersGroupedByTenant = usersGroupedByTenant.Where(x => x.Id == currentUserTenantId);
+            }
+            throw new ArgumentException("Can not check you permission");
+        }
 
         public Task<Profile> GetUserBy(Func<AzureUser, bool> predicate)
         {
@@ -503,16 +524,9 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private string FormUrlForDownloadUserAvatar(string userId) => $"{_projectUrl}/users/{userId}/avatar";
 
-        private async Task<LazyLoadedResult<ProfileWithTenants>> GetUsers(UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null)
+        private async Task<LazyLoadedResult<ProfileWithTenants>> GetUsersWithTenant(UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null)
         {
-            var statuses = await _requestStatusRepository.GetAsync();
-            var users = _cache.Get<IEnumerable<AzureUser>>(Consts.Cache.UsersKey)
-                .Join(statuses, user => user.StatusId, status => status.Id, (user, status) =>
-                {
-                    user.RequestStatus = status;
-                    return user;
-                }).ToList();
-
+            var users = GetUsers();
             var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
 
             var searchedUsers = usersWithTenant.GetByParameters(filter, sorting);
@@ -527,6 +541,19 @@ namespace Xyzies.SSO.Identity.Services.Service
             });
         }
 
+        private async Task<List<AzureUser>> GetUsers()
+        {
+            var statuses = await _requestStatusRepository.GetAsync();
+            var users = _cache.Get<IEnumerable<AzureUser>>(Consts.Cache.UsersKey)
+                .Join(statuses, user => user.StatusId, status => status.Id, (user, status) =>
+                {
+                    user.RequestStatus = status;
+                    return user;
+                }).ToList();
+
+            return users;
+        }
+
         private async Task<List<AzureUserWithTenant>> MapUsersToTenant(List<AzureUserWithTenant> users)
         {
             var tenants = await _tenantService.GetFromCache();
@@ -535,8 +562,7 @@ namespace Xyzies.SSO.Identity.Services.Service
                 TenantId = x.Id,
                 CompanyId = c.Id
             })).ToList();
-            int companyId = 0;
-            var userGroupedByCompanyId = users.GroupBy(x => (int.TryParse(x.CompanyId, out companyId) ? companyId : 0));
+            var userGroupedByCompanyId = users.GroupBy(x => ParseCompanyIdToNumber(x.CompanyId));
             var userWithTenant = (from u in userGroupedByCompanyId
                                   join t in tenantIdWithCompanyIdList on u.Key equals t.CompanyId into _t
                                   from t in _t.DefaultIfEmpty()
@@ -547,6 +573,36 @@ namespace Xyzies.SSO.Identity.Services.Service
                                   }).ToList();
             userWithTenant.ForEach(x => x.Users.ForEach(u => u.TenantId = x.TenantId));
             return userWithTenant.SelectMany(x=>x.Users).ToList();
+        }
+
+        private async Task<IEnumerable<TenantSimpleWithUsersModel>> GroupUserByTenant()
+        {
+            var users = await GetUsers();
+            var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
+            var groupUsersByTenant = usersWithTenant.GroupBy(x => x.TenantId);
+            var tenantsWithCompaniesList = await _tenantService.GetFromCache();
+            var tenants = tenantsWithCompaniesList.Select(x => new TenantBaseModel
+            {
+                Id = x.Id,
+                Name = x.Name
+            });
+
+            var tenantsWithGroupedUserList = (from t in tenants
+                                              join u in groupUsersByTenant on t.Id equals u.Key
+                                              select new TenantSimpleWithUsersModel
+                                              {
+                                                  Id = t.Id,
+                                                  Name = t.Name,
+                                                  Users = u.Adapt<IEnumerable<UserBaseModel>>()
+                                              });
+
+            return tenantsWithGroupedUserList;
+        }
+
+        private int ParseCompanyIdToNumber(string companyIdStr)
+        {
+            int companyId = 0;
+            return int.TryParse(companyIdStr, out companyId) ? companyId : 0;
         }
 
         private static void MergeObjects<T1, T2>(T1 source, T2 destination)

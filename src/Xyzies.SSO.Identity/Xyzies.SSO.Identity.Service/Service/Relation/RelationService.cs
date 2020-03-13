@@ -9,9 +9,9 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Helpers;
-using Xyzies.SSO.Identity.Services.Models;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
@@ -56,12 +56,12 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TenantWithCompanies>> GetTenantsWithCompaniesAsync()
+        public async Task<IEnumerable<TenantWithCompaniesModel>> GetTenantsWithCompaniesAsync()
         {
             var uri = new Uri($"{_publicApiUrl}/tenant/simple/{Consts.Security.StaticToken}/trusted");
             var responseString = await SendGetRequest(uri);
 
-            return GetPublicApiResponse<IEnumerable<TenantWithCompanies>>(responseString);
+            return GetPublicApiResponse<IEnumerable<TenantWithCompaniesModel>>(responseString);
         }
 
         /// <inheritdoc />
