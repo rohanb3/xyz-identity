@@ -1,12 +1,16 @@
-﻿using Mapster;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using Mapster;
+
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
@@ -37,6 +41,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IPermissionService _permissionService = null;
         private readonly ICpUsersRepository _cpUsersRep = null;
         private readonly ITenantService _tenantService = null;
+        private readonly ILogger<UserService> _logger = null;
         private readonly string _projectUrl;
 
         /// <summary>
@@ -52,6 +57,7 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="cpUsersRep"></param>
         /// <param name="tenantService"></param>
         /// <param name="options"></param>
+        /// <param name="logger"></param>
         public UserService(IAzureAdClient azureClient,
             IMemoryCache cache,
             ILocaltionService localtionService,
@@ -61,8 +67,12 @@ namespace Xyzies.SSO.Identity.Services.Service
             IRequestStatusRepository requestStatusRepository,
             ICpUsersRepository cpUsersRep,
             ITenantService tenantService,
+            ILogger<UserService> logger,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
             _azureClient = azureClient ??
                 throw new ArgumentNullException(nameof(azureClient));
             _localtionService = localtionService ??
@@ -76,9 +86,9 @@ namespace Xyzies.SSO.Identity.Services.Service
             _roleRepository = roleRepository ??
                 throw new ArgumentNullException(nameof(roleRepository));
             _permissionService = permissionService ??
-               throw new ArgumentNullException(nameof(permissionService));
+                throw new ArgumentNullException(nameof(permissionService));
             _requestStatusRepository = requestStatusRepository ??
-               throw new ArgumentNullException(nameof(requestStatusRepository));
+                throw new ArgumentNullException(nameof(requestStatusRepository));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
             _tenantService = tenantService ??
@@ -124,9 +134,9 @@ namespace Xyzies.SSO.Identity.Services.Service
                 return new LazyLoadedResult<ProfileWithTenants>()
                 {
                     Result = new List<ProfileWithTenants> { salesRepWithTenant },
-                    Limit = 1,
-                    Offset = 0,
-                    Total = 1
+                        Limit = 1,
+                        Offset = 0,
+                        Total = 1
                 };
             }
 
@@ -139,7 +149,7 @@ namespace Xyzies.SSO.Identity.Services.Service
             var usersGroupedByTenant = await GroupUserByTenant();
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
             {
-                if(filter?.TenantIds.Count() != 0)
+                if (filter?.TenantIds.Count() != 0)
                 {
                     usersGroupedByTenant = usersGroupedByTenant.Where(x => filter.TenantIds.Contains(x.Id));
                 }
@@ -277,15 +287,16 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                var userToChange = usersInCache.FirstOrDefault(user => GetUserEmail(user)?.ToLower() == userMail.ToLower()) ?? throw new KeyNotFoundException();
+                var userToChange = usersInCache.FirstOrDefault(user => GetUserEmail(user)?.ToLower() == userMail.ToLower()) ??
+                    throw new KeyNotFoundException();
 
                 MergeObjects(new ProfileCreatable
                 {
                     PasswordProfile = new PasswordProfile
                     {
                         EnforceChangePasswordPolicy = false,
-                        ForceChangePasswordNextLogin = false,
-                        Password = password
+                            ForceChangePasswordNextLogin = false,
+                            Password = password
                     }
 
                 }, userToChange);
@@ -337,8 +348,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
-                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester })
-                    && id != user.Id)
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }) &&
+                    id != user.Id)
                 {
                     throw new AccessException();
                 }
@@ -346,15 +357,17 @@ namespace Xyzies.SSO.Identity.Services.Service
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
                 if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ??
+                        throw new KeyNotFoundException("User not found");
                     return result?.Adapt<Profile>();
                 }
 
-                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany })
-                    || _permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester })
-                    && !string.IsNullOrEmpty(user.CompanyId))
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }) ||
+                    _permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }) &&
+                    !string.IsNullOrEmpty(user.CompanyId))
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ??
+                        throw new KeyNotFoundException("User not found");
                     if (result == null && result?.CompanyId != user.CompanyId)
                     {
                         throw new AccessException();
@@ -526,7 +539,7 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task<LazyLoadedResult<ProfileWithTenants>> GetUsersWithTenant(UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null)
         {
-            var users = GetUsers();
+            var users = await GetUsers();
             var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
 
             var searchedUsers = usersWithTenant.GetByParameters(filter, sorting);
@@ -556,23 +569,28 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private async Task<List<AzureUserWithTenant>> MapUsersToTenant(List<AzureUserWithTenant> users)
         {
-            var tenants = await _tenantService.GetFromCache();
-            var tenantIdWithCompanyIdList = tenants.SelectMany(x => x.Companies.Select(c => new
+            try
             {
-                TenantId = x.Id,
-                CompanyId = c.Id
-            })).ToList();
-            var userGroupedByCompanyId = users.GroupBy(x => ParseCompanyIdToNumber(x.CompanyId));
-            var userWithTenant = (from u in userGroupedByCompanyId
-                                  join t in tenantIdWithCompanyIdList on u.Key equals t.CompanyId into _t
-                                  from t in _t.DefaultIfEmpty()
-                                  select new
-                                  {
-                                      Users = u.ToList(),
-                                      t?.TenantId
-                                  }).ToList();
-            userWithTenant.ForEach(x => x.Users.ForEach(u => u.TenantId = x.TenantId));
-            return userWithTenant.SelectMany(x=>x.Users).ToList();
+                var tenants = await _tenantService.GetFromCache();
+                var tenantIdWithCompanyIdList = tenants.SelectMany(x => x.Companies.Select(c => new
+                {
+                    TenantId = x.Id,
+                        CompanyId = c.Id
+                })).ToList();
+                var userGroupedByCompanyId = users.GroupBy(x => ParseCompanyIdToNumber(x.CompanyId));
+                var userWithTenant = (from u in userGroupedByCompanyId join t in tenantIdWithCompanyIdList on u.Key equals t.CompanyId into _t from t in _t.DefaultIfEmpty()select new
+                {
+                    Users = u.ToList(),
+                        t?.TenantId
+                }).ToList();
+                userWithTenant.ForEach(x => x.Users.ForEach(u => u.TenantId = x.TenantId));
+                return userWithTenant.SelectMany(x => x.Users).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Unexpected error while MapUsersToTenant", ex);
+                throw ex;
+            }
         }
 
         private async Task<IEnumerable<TenantSimpleWithUsersModel>> GroupUserByTenant()
@@ -584,17 +602,15 @@ namespace Xyzies.SSO.Identity.Services.Service
             var tenants = tenantsWithCompaniesList.Select(x => new TenantBaseModel
             {
                 Id = x.Id,
-                Name = x.Name
+                    Name = x.Name
             });
 
-            var tenantsWithGroupedUserList = (from t in tenants
-                                              join u in groupUsersByTenant on t.Id equals u.Key
-                                              select new TenantSimpleWithUsersModel
-                                              {
-                                                  Id = t.Id,
-                                                  Name = t.Name,
-                                                  Users = u.Adapt<IEnumerable<UserBaseModel>>()
-                                              });
+            var tenantsWithGroupedUserList = (from t in tenants join u in groupUsersByTenant on t.Id equals u.Key select new TenantSimpleWithUsersModel
+            {
+                Id = t.Id,
+                    Name = t.Name,
+                    Users = u.Adapt<IEnumerable<UserBaseModel>>()
+            });
 
             return tenantsWithGroupedUserList;
         }
