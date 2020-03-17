@@ -9,5 +9,6 @@ namespace Xyzies.SSO.Identity.Services.Models.User
         public string ObjectId { get; set; }
 
         public string UserName { get; set; }
+        public string CompanyId { get; set; }
     }
 }
