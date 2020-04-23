@@ -41,6 +41,7 @@ using Xyzies.SSO.Identity.Services.Service.ResetPassword;
 using Xyzies.SSO.Identity.Services.Service.Roles;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Xyzies.SSO.Identity.Service.Service.UsersUpdatingScheduler;
+using Xyzies.SSO.Identity.Services.Service.Tenants;
 
 namespace Xyzies.SSO.Identity.API
 {
@@ -153,6 +154,7 @@ namespace Xyzies.SSO.Identity.API
             services.AddSingleton<IRelationService, RelationService>();
             services.AddMailer(options => Configuration.GetSection("MailerOptions").Bind(options));
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddScoped<ITenantService, TenantService>();
             services.AddHostedService<UsersBackgroundService>();
             #endregion
 
@@ -232,7 +234,7 @@ namespace Xyzies.SSO.Identity.API
                 {
                     uiOptions.SwaggerEndpoint("v1/swagger.json", $"v1.0.0");
                     //uiOptions.RoutePrefix = "/api/identity";
-                    uiOptions.DisplayRequestDuration();//
+                    uiOptions.DisplayRequestDuration(); //
                 });
 
         }

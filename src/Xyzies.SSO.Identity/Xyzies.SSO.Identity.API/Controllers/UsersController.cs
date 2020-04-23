@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,7 @@ using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Exceptions;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service;
 
@@ -25,7 +26,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
     [Route("api/users")]
     [ApiController]
     [Authorize]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseController
     {
         private readonly IUserService _userService;
         private readonly ILogger _logger;
@@ -50,18 +51,52 @@ namespace Xyzies.SSO.Identity.API.Controllers
         /// <response code="401">If authorization token is invalid</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Profile>))]
-        public async Task<IActionResult> Get([FromQuery] UserFilteringParams filter, [FromQuery] UserSortingParameters sorting)
+        [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Get([FromQuery] UserFilteringParamsWithTenant filter, [FromQuery] UserSortingParameters sorting)
         {
             try
             {
-            var currentUser = new UserIdentityParams
-            {
-            Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
-            Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
-            CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
                 };
                 var users = await _userService.GetAllUsersAsync(currentUser, filter, sorting);
                 _logger.LogInformation("Get all users requested by user with object id {id}, users: {users}", currentUser.Id, string.Join(",", users.Result.Select(user => $"{user.GivenName ?? ""} {user.Surname ?? ""}")));
+                return Ok(users);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (AccessException)
+            {
+                return new ContentResult { StatusCode = 403 };
+            }
+        }
+
+        /// <summary>
+        /// Returns collection of users by tenant
+        /// </summary>
+        /// <returns>Collection of users</returns>
+        /// <response code="200">If users fetched successfully</response>
+        /// <response code="401">If authorization token is invalid</response>
+        [HttpGet("simple/bytenant")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TenantSimpleWithUsersModel>))]
+        [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetByTenant([FromQuery] TenantFilter tenantFilter)
+        {
+            try
+            {
+                var currentUser = new UserIdentityParams
+                {
+                    Id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.UserIdPropertyName)?.Value,
+                    Role = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.RoleClaimType)?.Value,
+                    CompanyId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == Consts.CompanyIdClaimType)?.Value
+                };
+                var users = await _userService.GetAllUsersByTenantAsync(currentUser, tenantFilter);
+
                 return Ok(users);
             }
             catch (ArgumentException ex)
@@ -176,7 +211,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
                 {
                     Role = Consts.Roles.OperationsAdmin
                 };
-                var users = await _userService.GetAllUsersAsync(currentUser, filters);
+                var users = await _userService.GetAllUsersAsync(currentUser, filters.Adapt<UserFilteringParamsWithTenant>());
 
                 return Ok(users);
             }
@@ -399,8 +434,7 @@ namespace Xyzies.SSO.Identity.API.Controllers
         {
             try
             {
-                string token = HttpContext.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault();
-                var userToResponse = await _userService.CreateUserAsync(userCreatable, token);
+                var userToResponse = await _userService.CreateUserAsync(userCreatable, base.Token);
                 return Ok(userToResponse);
             }
             catch (ApplicationException ex)

@@ -1,16 +1,20 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using Xyzies.SSO.Identity.Data.Helpers;
 using Xyzies.SSO.Identity.Services.Helpers;
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
@@ -55,6 +59,15 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<TenantWithCompaniesModel>> GetTenantsWithCompaniesAsync()
+        {
+            var uri = new Uri($"{_publicApiUrl}/tenant/simple/{Consts.Security.StaticToken}/trusted");
+            var responseString = await SendGetRequest(uri);
+
+            return GetPublicApiResponse<IEnumerable<TenantWithCompaniesModel>>(responseString);
+        }
+
+        /// <inheritdoc />
         public async Task<List<BranchModel>> GetBranchesAsync(string token = null)
         {
             var uri = new Uri($"{_publicApiUrl}/branch");
@@ -90,6 +103,14 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
             return GetPublicApiResponse<List<CompanyModel>>(responseString);
         }
 
+        public async Task<TenantModel> GetTenantSingleByCompanyIdTrusted(string companyId)
+        {
+            var uri = new Uri($"{_publicApiUrl}/tenant/trusted/{Consts.Security.StaticToken}/single/{companyId}/by-company");
+            var responseString = await SendGetRequest(uri);
+
+            return GetPublicApiResponse<TenantModel>(responseString);
+        }
+
         #region Helpers
         private T GetPublicApiResponse<T>(string responseString)
         {
@@ -107,7 +128,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
 
         private async Task<string> SendGetRequest(Uri uri, string token = null)
         {
-            using (HttpClient client = new HttpClient())
+            using(HttpClient client = new HttpClient())
             {
                 client.BaseAddress = uri;
                 if (!string.IsNullOrWhiteSpace(token))

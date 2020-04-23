@@ -1,12 +1,16 @@
-﻿using Mapster;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using Mapster;
+
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 using Xyzies.SSO.Identity.Data.Core;
 using Xyzies.SSO.Identity.Data.Entity;
 using Xyzies.SSO.Identity.Data.Entity.Azure;
@@ -15,9 +19,11 @@ using Xyzies.SSO.Identity.Data.Repository;
 using Xyzies.SSO.Identity.Data.Repository.Azure;
 using Xyzies.SSO.Identity.Services.Exceptions;
 using Xyzies.SSO.Identity.Services.Models;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 using Xyzies.SSO.Identity.Services.Models.User;
 using Xyzies.SSO.Identity.Services.Service.Permission;
 using Xyzies.SSO.Identity.Services.Service.Relation;
+using Xyzies.SSO.Identity.Services.Service.Tenants;
 
 namespace Xyzies.SSO.Identity.Services.Service
 {
@@ -34,6 +40,8 @@ namespace Xyzies.SSO.Identity.Services.Service
         private readonly IRequestStatusRepository _requestStatusRepository = null;
         private readonly IPermissionService _permissionService = null;
         private readonly ICpUsersRepository _cpUsersRep = null;
+        private readonly ITenantService _tenantService = null;
+        private readonly ILogger<UserService> _logger = null;
         private readonly string _projectUrl;
 
         /// <summary>
@@ -46,7 +54,10 @@ namespace Xyzies.SSO.Identity.Services.Service
         /// <param name="roleRepository"></param>
         /// <param name="permissionService"></param>
         /// <param name="requestStatusRepository"></param>
+        /// <param name="cpUsersRep"></param>
+        /// <param name="tenantService"></param>
         /// <param name="options"></param>
+        /// <param name="logger"></param>
         public UserService(IAzureAdClient azureClient,
             IMemoryCache cache,
             ILocaltionService localtionService,
@@ -55,8 +66,13 @@ namespace Xyzies.SSO.Identity.Services.Service
             IPermissionService permissionService,
             IRequestStatusRepository requestStatusRepository,
             ICpUsersRepository cpUsersRep,
+            ITenantService tenantService,
+            ILogger<UserService> logger,
             IOptionsMonitor<ProjectSettingsOption> options)
         {
+
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
             _azureClient = azureClient ??
                 throw new ArgumentNullException(nameof(azureClient));
             _localtionService = localtionService ??
@@ -70,11 +86,13 @@ namespace Xyzies.SSO.Identity.Services.Service
             _roleRepository = roleRepository ??
                 throw new ArgumentNullException(nameof(roleRepository));
             _permissionService = permissionService ??
-               throw new ArgumentNullException(nameof(permissionService));
+                throw new ArgumentNullException(nameof(permissionService));
             _requestStatusRepository = requestStatusRepository ??
-               throw new ArgumentNullException(nameof(requestStatusRepository));
+                throw new ArgumentNullException(nameof(requestStatusRepository));
             _projectUrl = options.CurrentValue?.ProjectUrl ??
                 throw new InvalidOperationException("Missing URL to Azure");
+            _tenantService = tenantService ??
+                throw new ArgumentNullException(nameof(tenantService));
         }
 
         /// <inheritdoc />
@@ -88,38 +106,84 @@ namespace Xyzies.SSO.Identity.Services.Service
         }
 
         /// <inheritdoc />
-        public async Task<LazyLoadedResult<Profile>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParams filter = null, UserSortingParameters sorting = null)
+        public async Task<LazyLoadedResult<ProfileWithTenants>> GetAllUsersAsync(UserIdentityParams user, UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null)
         {
             await _permissionService.CheckPermissionExpiration();
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
             {
-                return await GetUsers(filter, sorting);
+                return await GetUsersWithTenant(filter, sorting);
+            }
+
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInTenant }))
+            {
+                try
+                {
+                    var tenant = await _httpService.GetTenantSingleByCompanyIdTrusted(user.CompanyId);
+                    filter.TenantId = tenant.Id;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Public API get tenant by company id inner exception", ex);
+                }
+
+                return await GetUsersWithTenant(filter, sorting);
             }
 
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }))
             {
                 filter.CompanyId = new List<string> { user.CompanyId };
 
-                return await GetUsers(filter, sorting);
+                return await GetUsersWithTenant(filter, sorting);
             }
 
             if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }))
             {
                 var salesRep = await GetUserByIdAsync(user.Id.ToString(), user);
                 salesRep.AvatarUrl = FormUrlForDownloadUserAvatar(salesRep.ObjectId);
-
-                return new LazyLoadedResult<Profile>()
+                var salesRepWithTenant = salesRep.Adapt<ProfileWithTenants>();
+                if (salesRepWithTenant.CompanyId.HasValue)
                 {
-                    Result = new List<Profile> { salesRep.Adapt<Profile>() },
-                    Limit = 1,
-                    Offset = 0,
-                    Total = 1
+                    salesRepWithTenant.TenantId = await _tenantService.GetByCompanyId(salesRepWithTenant.CompanyId.Value);
+                }
+
+                return new LazyLoadedResult<ProfileWithTenants>()
+                {
+                    Result = new List<ProfileWithTenants> { salesRepWithTenant },
+                        Limit = 1,
+                        Offset = 0,
+                        Total = 1
                 };
             }
 
             throw new ArgumentException("Can not check you permission");
         }
 
+        public async Task<IEnumerable<TenantSimpleWithUsersModel>> GetAllUsersByTenantAsync(UserIdentityParams user, TenantFilter filter = null)
+        {
+            await _permissionService.CheckPermissionExpiration();
+            var usersGroupedByTenant = await GroupUserByTenant();
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
+            {
+                if (filter?.TenantIds.Count() != 0)
+                {
+                    usersGroupedByTenant = usersGroupedByTenant.Where(x => filter.TenantIds.Contains(x.Id));
+                }
+                return usersGroupedByTenant;
+            }
+
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInTenant }))
+            {
+                var currentUserTenantId = await _tenantService.GetByCompanyId(ParseCompanyIdToNumber(user.CompanyId));
+                return usersGroupedByTenant = usersGroupedByTenant.Where(x => x.Id == currentUserTenantId);
+            }
+
+            if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }))
+            {
+                var currentUserTenantId = await _tenantService.GetByCompanyId(ParseCompanyIdToNumber(user.CompanyId));
+                return usersGroupedByTenant = usersGroupedByTenant.Where(x => x.Id == currentUserTenantId);
+            }
+            throw new ArgumentException("Can not check you permission");
+        }
 
         public Task<Profile> GetUserBy(Func<AzureUser, bool> predicate)
         {
@@ -244,15 +308,16 @@ namespace Xyzies.SSO.Identity.Services.Service
                 }
 
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
-                var userToChange = usersInCache.FirstOrDefault(user => GetUserEmail(user)?.ToLower() == userMail.ToLower()) ?? throw new KeyNotFoundException();
+                var userToChange = usersInCache.FirstOrDefault(user => GetUserEmail(user)?.ToLower() == userMail.ToLower()) ??
+                    throw new KeyNotFoundException();
 
                 MergeObjects(new ProfileCreatable
                 {
                     PasswordProfile = new PasswordProfile
                     {
                         EnforceChangePasswordPolicy = false,
-                        ForceChangePasswordNextLogin = false,
-                        Password = password
+                            ForceChangePasswordNextLogin = false,
+                            Password = password
                     }
 
                 }, userToChange);
@@ -304,8 +369,8 @@ namespace Xyzies.SSO.Identity.Services.Service
 
             try
             {
-                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester })
-                    && id != user.Id)
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }) &&
+                    id != user.Id)
                 {
                     throw new AccessException();
                 }
@@ -313,15 +378,17 @@ namespace Xyzies.SSO.Identity.Services.Service
                 var usersInCache = _cache.Get<List<AzureUser>>(Consts.Cache.UsersKey);
                 if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadAll }))
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ??
+                        throw new KeyNotFoundException("User not found");
                     return result?.Adapt<Profile>();
                 }
 
-                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany })
-                    || _permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester })
-                    && !string.IsNullOrEmpty(user.CompanyId))
+                if (_permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadInCompany }) ||
+                    _permissionService.CheckPermission(user.Role, new string[] { Consts.UsersReadPermission.ReadOnlyRequester }) &&
+                    !string.IsNullOrEmpty(user.CompanyId))
                 {
-                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ?? throw new KeyNotFoundException("User not found");
+                    var result = usersInCache.FirstOrDefault(x => x.ObjectId == id) ??
+                        throw new KeyNotFoundException("User not found");
                     if (result == null && result?.CompanyId != user.CompanyId)
                     {
                         throw new AccessException();
@@ -491,7 +558,24 @@ namespace Xyzies.SSO.Identity.Services.Service
 
         private string FormUrlForDownloadUserAvatar(string userId) => $"{_projectUrl}/users/{userId}/avatar";
 
-        private async Task<LazyLoadedResult<Profile>> GetUsers(UserFilteringParams filter = null, UserSortingParameters sorting = null)
+        private async Task<LazyLoadedResult<ProfileWithTenants>> GetUsersWithTenant(UserFilteringParamsWithTenant filter = null, UserSortingParameters sorting = null)
+        {
+            var users = await GetUsers();
+            var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
+
+            var searchedUsers = usersWithTenant.GetByParameters(filter, sorting);
+            searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
+
+            return await Task.FromResult(new LazyLoadedResult<ProfileWithTenants>
+            {
+                Result = searchedUsers.Adapt<IEnumerable<ProfileWithTenants>>(),
+                Limit = filter?.Limit,
+                Offset = filter?.Offset,
+                Total = searchedUsers?.Count
+            });
+        }
+
+        private async Task<List<AzureUser>> GetUsers()
         {
             var statuses = await _requestStatusRepository.GetAsync();
             var users = _cache.Get<IEnumerable<AzureUser>>(Consts.Cache.UsersKey)
@@ -501,16 +585,61 @@ namespace Xyzies.SSO.Identity.Services.Service
                     return user;
                 }).ToList();
 
-            var searchedUsers = users.GetByParameters(filter, sorting);
-            searchedUsers.ForEach(x => x.AvatarUrl = FormUrlForDownloadUserAvatar(x.ObjectId));
+            return users;
+        }
 
-            return await Task.FromResult(new LazyLoadedResult<Profile>
+        private async Task<List<AzureUserWithTenant>> MapUsersToTenant(List<AzureUserWithTenant> users)
+        {
+            try
             {
-                Result = searchedUsers?.Adapt<IEnumerable<Profile>>(),
-                Limit = filter?.Limit,
-                Offset = filter?.Offset,
-                Total = searchedUsers?.Count
+                var tenants = await _tenantService.GetFromCache();
+                var tenantIdWithCompanyIdList = tenants.SelectMany(x => x.Companies.Select(c => new
+                {
+                    TenantId = x.Id,
+                        CompanyId = c.Id
+                })).ToList();
+                var userGroupedByCompanyId = users.GroupBy(x => ParseCompanyIdToNumber(x.CompanyId));
+                var userWithTenant = (from u in userGroupedByCompanyId join t in tenantIdWithCompanyIdList on u.Key equals t.CompanyId into _t from t in _t.DefaultIfEmpty()select new
+                {
+                    Users = u.ToList(),
+                        t?.TenantId
+                }).ToList();
+                userWithTenant.ForEach(x => x.Users.ForEach(u => u.TenantId = x.TenantId));
+                return userWithTenant.SelectMany(x => x.Users).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Unexpected error while MapUsersToTenant", ex);
+                throw ex;
+            }
+        }
+
+        private async Task<IEnumerable<TenantSimpleWithUsersModel>> GroupUserByTenant()
+        {
+            var users = await GetUsers();
+            var usersWithTenant = await MapUsersToTenant(users.Adapt<List<AzureUserWithTenant>>());
+            var groupUsersByTenant = usersWithTenant.GroupBy(x => x.TenantId);
+            var tenantsWithCompaniesList = await _tenantService.GetFromCache();
+            var tenants = tenantsWithCompaniesList.Select(x => new TenantBaseModel
+            {
+                Id = x.Id,
+                    Name = x.Name
             });
+
+            var tenantsWithGroupedUserList = (from t in tenants join u in groupUsersByTenant on t.Id equals u.Key select new TenantSimpleWithUsersModel
+            {
+                Id = t.Id,
+                    Name = t.Name,
+                    Users = u.Adapt<IEnumerable<UserBaseModel>>()
+            });
+
+            return tenantsWithGroupedUserList;
+        }
+
+        private int ParseCompanyIdToNumber(string companyIdStr)
+        {
+            int companyId = 0;
+            return int.TryParse(companyIdStr, out companyId) ? companyId : 0;
         }
 
         private static void MergeObjects<T1, T2>(T1 source, T2 destination)

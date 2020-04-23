@@ -49,7 +49,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Permission
 
         public async Task CheckPermissionExpiration()
         {
-            var cacheExpiration = _memoryCache.Get<DateTime>(Consts.Cache.ExpirationKey);
+            var cacheExpiration = _memoryCache.Get<DateTime>(Consts.Cache.PermissionExpirationKey);
             var permissions = _memoryCache.Get<List<RoleModel>>(Consts.Cache.PermissionKey);
             if (cacheExpiration < DateTime.Now || permissions?.Count == 0)
             {
@@ -71,7 +71,7 @@ namespace Xyzies.SSO.Identity.Services.Service.Permission
             var permission = await _roleService.GetAllAsync();
 
             _memoryCache.Set(Consts.Cache.PermissionKey, permission);
-            _memoryCache.Set(Consts.Cache.ExpirationKey, DateTime.Now.AddHours(1));
+            _memoryCache.Set(Consts.Cache.PermissionExpirationKey, DateTime.Now.AddHours(1));
         }
     }
 }

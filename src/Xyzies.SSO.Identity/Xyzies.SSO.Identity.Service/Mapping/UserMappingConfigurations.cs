@@ -17,6 +17,9 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                 .Map(dest => dest.Email, src => GetSignInNameValue(src.SignInNames.FirstOrDefault(signInName => signInName.Type == "emailAddress")))
                 .Map(dest => dest.UserName, src => GetSignInNameValue(src.SignInNames.FirstOrDefault(signInName => signInName.Type == "userName")));
 
+            TypeAdapterConfig<AzureUserWithTenant, ProfileWithTenants>.NewConfig()
+                .Inherits<AzureUser, Profile>();
+
             TypeAdapterConfig<User, Profile>.NewConfig()
                .Map(dest => dest.ObjectId, src => src.Id)
                .Map(dest => dest.DisplayName, src => ReplaceNullOrEmpty($"{src.Name ?? ""} {src.LastName ?? ""}".Trim()))
@@ -66,6 +69,8 @@ namespace Xyzies.SSO.Identity.Services.Mapping
                .Map(dest => dest.PasswordPolicies, src => PasswordPolicy.DisablePasswordExpirationAndStrong)
                .Ignore(dest => dest.Email);
 
+            TypeAdapterConfig<AzureUserWithTenant, UserBaseModel>.NewConfig()
+                .Map(dest => dest.UserName, src => src.DisplayName);
         }
 
         private static string GetSignInNameValue(SignInName name) => name?.Value;

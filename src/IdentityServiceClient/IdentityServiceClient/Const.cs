@@ -17,6 +17,11 @@
                 public const string AdminUpdate = "xyzies.devicemanagment.device.update.admin";
                 public const string AdminRead = "xyzies.devicemanagment.device.read.admin";
                 public const string AdminDelete = "xyzies.devicemanagment.device.delete.admin";
+
+                public const string TenantCreate = "xyzies.devicemanagment.device.create.tenant";
+                public const string TenantUpdate = "xyzies.devicemanagment.device.update.tenant";
+                public const string TenantRead = "xyzies.devicemanagment.device.read.tenant";
+                public const string TenantDelete = "xyzies.devicemanagment.device.delete.tenant";
             }
 
             public class Comment

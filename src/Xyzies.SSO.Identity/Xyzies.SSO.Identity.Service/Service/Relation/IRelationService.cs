@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Xyzies.SSO.Identity.Services.Models.Branch;
 using Xyzies.SSO.Identity.Services.Models.Company;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Service.Relation
 {
@@ -26,6 +28,13 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <param name="filters"></param>
         /// <returns></returns>
         Task<List<CompanyModel>> GetCompanies(string token, CompanyFilters filters = null);
+
+        /// <summary>
+        /// Get tenants with companies
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TenantWithCompaniesModel>> GetTenantsWithCompaniesAsync();
 
         /// <summary>
         /// Get branch by id
@@ -60,5 +69,12 @@ namespace Xyzies.SSO.Identity.Services.Service.Relation
         /// <param name="companyId"></param>
         /// <returns></returns>
         Task<List<BranchModel>> GetBranchesByCompanyTrustedAsync(int companyId);
+
+        /// <summary>
+        /// Get tenant by company by trusted token
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
+        Task<TenantModel> GetTenantSingleByCompanyIdTrusted(string companyId);
     }
 }

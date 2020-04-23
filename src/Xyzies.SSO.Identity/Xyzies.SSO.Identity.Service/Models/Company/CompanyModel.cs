@@ -1,25 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Xyzies.SSO.Identity.Data.Entity;
-using Xyzies.SSO.Identity.Service.Models;
+using Xyzies.SSO.Identity.Services.Models.Tenant;
 
 namespace Xyzies.SSO.Identity.Services.Models.Company
 {
     /// <summary>
     /// Company model
     /// </summary>
-    public class CompanyModel
+    public class CompanyModel : CompanySimpleModel
     {
-        /// <summary>
-        /// Id
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Name
-        /// </summary>
-        [JsonProperty("companyName")]
-        public string Name { get; set; }
-
         /// <summary>
         /// Status key from CP
         /// </summary>
@@ -28,6 +17,6 @@ namespace Xyzies.SSO.Identity.Services.Models.Company
         /// <summary>
         /// Company Tenant
         /// </summary>
-        public Tenant Tenant { get; set; }
+        public TenantModel Tenant { get; set; }
     }
 }
